@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sehat Coach - Mobile Onboarding & Splash Prototype</title>
+  <meta name="description" content="Production-grade mobile onboarding funnel and splash visual prototype for Sehat Coach inside an iPhone 16 viewport.">
+  <meta name="theme-color" content="#144D24">
+  
+  <!-- Google Fonts CDN -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brandGreen: '#144D24',
+            graphiteYellow: '#DFA623',
+            slateSubtext: '#646C7A',
+            medicalBlue: '#0D1942',
+            canvasWhite: '#FFFFFF',
+            greenTint: 'rgba(20, 77, 36, 0.05)',
+          },
+          fontFamily: {
+            display: ['"Dela Gothic One"', 'sans-serif'],
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom Keyframes & Motion Spec */
+    
+    /* Splash Entrance */
+    @keyframes emblemEntrance {
+      0% { opacity: 0; transform: scale(0.5); }
+      70% { opacity: 1; transform: scale(1.06); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes lineDraw {
+      0% { stroke-dashoffset: 240; }
+      100% { stroke-dashoffset: 0; }
+    }
+
+    @keyframes leafFade {
+      0%, 45% { opacity: 0; transform: scale(0.85); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes titleSlideUp {
+      0% { opacity: 0; transform: translateY(12px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    @keyframes ambientBreathing {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(223, 166, 35, 0.0), 0 10px 25px -5px rgba(20, 77, 36, 0.15); }
+      50% { box-shadow: 0 0 24px 6px rgba(223, 166, 35, 0.35), 0 14px 30px -4px rgba(20, 77, 36, 0.25); }
+    }
+
+    @keyframes progressFillSplash {
+      0% { width: 0%; }
+      100% { width: 100%; }
+    }
+
+    .anim-emblem { animation: emblemEntrance 0.75s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+    .anim-line-draw { stroke-dasharray: 240; stroke-dashoffset: 240; animation: lineDraw 1.35s cubic-bezier(0.4, 0, 0.2, 1) 0.15s forwards; }
+    .anim-leaf-fill { opacity: 0; animation: leafFade 1.1s ease-out 0.5s forwards; transform-origin: center; }
+    .anim-title { opacity: 0; animation: titleSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.35s forwards; }
+    .anim-subtitle { opacity: 0; animation: fadeIn 0.65s ease-out 0.55s forwards; }
+    .anim-badge { opacity: 0; animation: titleSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.7s forwards; }
+    .anim-progress-splash { animation: progressFillSplash 2.2s cubic-bezier(0.25, 1, 0.5, 1) 0.1s forwards; }
+    .anim-ambient-glow { animation: ambientBreathing 3.2s ease-in-out infinite 1.1s; }
+
+    /* Onboarding Card Design Tokens */
+    .card-unselected {
+      background-color: #FFFFFF;
+      border: 1.5px solid #646C7A;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .card-selected {
+      background-color: rgba(20, 77, 36, 0.05) !important;
+      border: 2px solid #144D24 !important;
+      box-shadow: 0 4px 14px -2px rgba(20, 77, 36, 0.12);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Range Slider Styling */
+    input[type=range] {
+      -webkit-appearance: none;
+      width: 100%;
+      background: transparent;
+    }
+    input[type=range]:focus {
+      outline: none;
+    }
+    input[type=range]::-webkit-slider-runnable-track {
+      width: 100%;
+      height: 6px;
+      cursor: pointer;
+      background: #e2e8f0;
+      border-radius: 9999px;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      height: 22px;
+      width: 22px;
+      border-radius: 50%;
+      background: #144D24;
+      border: 3px solid #DFA623;
+      cursor: pointer;
+      -webkit-appearance: none;
+      margin-top: -8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      transition: transform 0.15s ease;
+    }
+    input[type=range]::-webkit-slider-thumb:active {
+      transform: scale(1.2);
+    }
+
+    /* Device Chassis & Viewport */
+    .iphone-frame {
+      box-shadow: 
+        0 0 0 12px #1c1c1e,
+        0 0 0 13px #2c2c2e,
+        0 25px 60px -15px rgba(0, 0, 0, 0.45),
+        0 0 80px 0 rgba(20, 77, 36, 0.08);
+    }
+
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* Circular Calculation Engine Ring */
+    .calc-ring-circle {
+      transition: stroke-dashoffset 0.1s linear;
+      transform: rotate(-90deg);
+      transform-origin: 50% 50%;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col justify-between items-center p-3 md:p-6 select-none overflow-x-hidden">
+
+  <!-- Background Ambient Glows -->
+  <div class="fixed top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-emerald-900/20 blur-[140px] rounded-full pointer-events-none z-0"></div>
+  <div class="fixed bottom-10 right-10 w-[400px] h-[400px] bg-amber-600/10 blur-[120px] rounded-full pointer-events-none z-0"></div>
+
+  <!-- Outer Header Controls Toolbar -->
+  <header class="w-full max-w-4xl flex flex-col sm:flex-row justify-between items-center gap-3 z-10 mb-2">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-lg bg-brandGreen flex items-center justify-center border border-graphiteYellow/30 text-graphiteYellow font-display text-xs">
+        SC
+      </div>
+      <div>
+        <h1 class="font-bold text-sm tracking-wide text-white flex items-center gap-2">
+          Sehat Coach <span class="text-[10px] bg-brandGreen/60 text-graphiteYellow border border-graphiteYellow/30 px-2 py-0.5 rounded-full uppercase tracking-wider font-semibold">Funnel Prototype</span>
+        </h1>
+        <p class="text-xs text-slate-400">iPhone 16 (393 × 852 px) • 8-Step Animated Onboarding</p>
+      </div>
+    </div>
+
+    <!-- Mode Selector & Controls -->
+    <div class="flex items-center gap-2 flex-wrap justify-center">
+      <button id="viewSplashBtn" onclick="switchView('splash')" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-medium text-slate-200 transition flex items-center gap-1.5 active:scale-95">
+        <svg class="w-3.5 h-3.5 text-graphiteYellow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        Splash Screen
+      </button>
+
+      <button id="viewFunnelBtn" onclick="switchView('funnel')" class="px-3 py-1.5 rounded-lg bg-brandGreen hover:bg-emerald-900 border border-graphiteYellow/40 text-xs font-semibold text-graphiteYellow transition flex items-center gap-1.5 active:scale-95">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+        Onboarding Funnel
+      </button>
+
+      <button onclick="restartFunnel()" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs text-slate-300 transition active:scale-95" title="Restart Funnel">
+        🔄
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN WRAPPER: Center Viewport Frame -->
+  <main class="relative z-10 my-auto flex flex-col items-center justify-center">
+    
+    <!-- iPhone 16 Outer Device Chassis -->
+    <div class="iphone-frame relative w-[393px] h-[852px] bg-canvasWhite rounded-[48px] overflow-hidden border-[6px] border-[#1c1c1e] transition-all duration-500">
+      
+      <!-- Side Physical Buttons Mockup -->
+      <div class="absolute -left-[10px] top-[140px] w-[4px] h-[28px] bg-slate-700 rounded-l-md"></div>
+      <div class="absolute -left-[10px] top-[185px] w-[4px] h-[50px] bg-slate-700 rounded-l-md"></div>
+      <div class="absolute -left-[10px] top-[245px] w-[4px] h-[50px] bg-slate-700 rounded-l-md"></div>
+      <div class="absolute -right-[10px] top-[190px] w-[4px] h-[75px] bg-slate-700 rounded-r-md"></div>
+
+      <!-- Dynamic Island Cutout -->
+      <div id="dynamicIsland" onclick="toggleIslandExpand()" class="dynamic-island absolute top-3 left-1/2 -translate-x-1/2 w-[120px] h-[35px] bg-black rounded-full z-50 flex items-center justify-between px-3 cursor-pointer hover:w-[130px] shadow-lg transition-all duration-300">
+        <div class="flex items-center gap-2 overflow-hidden">
+          <div class="w-2.5 h-2.5 rounded-full bg-graphiteYellow animate-ping"></div>
+          <span id="islandLabel" class="text-[10px] font-medium text-slate-300 opacity-0 transition-opacity duration-300 whitespace-nowrap">Sehat AI Engine</span>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <div class="w-3 h-3 rounded-full bg-neutral-900 border border-neutral-700 flex items-center justify-center">
+            <div class="w-1 h-1 rounded-full bg-blue-900"></div>
+          </div>
+          <div class="w-2.5 h-2.5 rounded-full bg-neutral-950"></div>
+        </div>
+      </div>
+
+      <!-- iOS Status Bar (Top) -->
+      <div class="w-full pt-3 px-7 flex justify-between items-center text-slate-900 z-40 text-xs font-semibold tracking-tight">
+        <span id="clockDisplay">9:41</span>
+        <div class="flex items-center gap-1.5 text-slate-800">
+          <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19.4c-.2.2-.2.51 0 .71.2.2.51.2.71 0l1.41-1.41C8.01 19.45 9.94 20 12 20c4.97 0 9-4.03 9-9s-4.03-9-9-9zm0 15c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/></svg>
+          <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12 4C7.31 4 3.07 5.9 0 8.98L12 21 24 8.98C20.93 5.9 16.69 4 12 4zm0 4.5c3.38 0 6.44 1.34 8.68 3.52L12 19.22 3.32 12.02C5.56 9.84 8.62 8.5 12 8.5z"/></svg>
+          <div class="w-5 h-2.5 border border-slate-800 rounded-sm p-0.5 flex items-center">
+            <div class="w-full h-full bg-slate-900 rounded-xs"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== VIEW 1: SPLASH SCREEN ==================== -->
+      <div id="splashView" class="relative w-full h-[810px] flex flex-col justify-between items-center px-6 pt-16 pb-6 bg-canvasWhite transition-opacity duration-400">
+        <!-- Spacing Header -->
+        <div class="w-full flex justify-end items-center">
+          <button onclick="toggleAudioFx()" title="Toggle Sound" class="p-2 rounded-full text-slateSubtext hover:bg-slate-100 transition">
+            <svg id="soundOnIcon" class="w-4 h-4 text-slateSubtext" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
+            <svg id="soundOffIcon" class="w-4 h-4 text-slate-400 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"/></svg>
+          </button>
+        </div>
+
+        <!-- Center Hero -->
+        <div class="flex flex-col items-center justify-center text-center -mt-6 my-auto">
+          <!-- Emblem Icon Container (88x88, Brand Green, 1.5px Slate Border) -->
+          <div onclick="triggerEmblemPulse()" class="anim-emblem anim-ambient-glow w-[88px] h-[88px] bg-brandGreen rounded-[22px] border-[1.5px] border-slateSubtext flex items-center justify-center relative cursor-pointer group shadow-lg">
+            <svg class="w-[52px] h-[52px] text-graphiteYellow overflow-visible" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path class="anim-leaf-fill" d="M34 26C34 26 44 20 50 28C56 36 46 48 38 48C34 48 34 40 34 34Z" fill="#DFA623" fill-opacity="0.22" />
+              <path class="anim-line-draw" d="M 6 34 L 16 34 L 21 18 L 27 46 L 32 26 L 35 34 L 38 34 C 42 34 48 30 50 25 C 52 20 44 16 38 22 C 34 26 34 34 36 40 C 38 46 44 48 48 44 C 51 41 51 36 48 33 C 44 29 38 34 34 34" stroke="#DFA623" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" />
+              <path class="anim-leaf-fill" d="M36 34C40 30 46 27 48 26" stroke="#DFA623" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+
+          <h1 class="anim-title font-display text-[26px] leading-tight text-brandGreen tracking-wide uppercase mt-[24px]">
+            SEHAT COACH
+          </h1>
+          <p class="anim-subtitle font-sans text-[14px] text-slateSubtext font-medium leading-snug mt-[8px]">
+            Your Desi Life & Health Assistant
+          </p>
+
+          <div class="anim-badge mt-[16px]">
+            <div class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-100 border border-slate-200 text-slate-700 text-[11px] font-semibold tracking-wider">
+              <span class="w-1.5 h-1.5 rounded-full bg-graphiteYellow"></span>
+              URDU • ENGLISH • BACHAT
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom Anchor & Start Funnel Callout -->
+        <div class="w-full flex flex-col items-center justify-end pb-2">
+          <div class="w-[180px] h-[3.5px] bg-slate-100 rounded-full overflow-hidden relative shadow-inner">
+            <div class="anim-progress-splash h-full bg-brandGreen rounded-full"></div>
+          </div>
+
+          <button onclick="switchView('funnel')" class="mt-4 px-6 py-2.5 rounded-xl bg-brandGreen text-white font-display text-xs tracking-wider uppercase hover:bg-emerald-900 transition active:scale-95 shadow-md flex items-center gap-2">
+            Start Onboarding
+            <svg class="w-3.5 h-3.5 text-graphiteYellow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+          </button>
+
+          <p class="font-sans text-[11px] text-slateSubtext font-medium tracking-[0.14em] uppercase mt-[12px]">
+            POWERED BY AI • BUILT FOR PAKISTAN
+          </p>
+
+          <div class="w-[134px] h-[5px] bg-slate-800/80 rounded-full mt-[16px]"></div>
+        </div>
+      </div>
+
+      <!-- ==================== VIEW 2: 8-STEP ONBOARDING FUNNEL ==================== -->
+      <div id="funnelView" class="hidden relative w-full h-[810px] flex flex-col justify-between bg-canvasWhite transition-opacity duration-400">
+        
+        <!-- Persistent Funnel Header -->
+        <header class="pt-3 px-5 pb-2 border-b border-slate-100 flex items-center justify-between gap-3 bg-white z-30">
+          <!-- Back Arrow Button -->
+          <button id="backBtn" onclick="prevStep()" class="p-1.5 rounded-lg text-slate-600 hover:bg-slate-100 transition active:scale-90 opacity-0 pointer-events-none">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+          </button>
+
+          <!-- 8-Step Segmented Progress Bar -->
+          <div class="flex-1 flex items-center gap-1.5 px-1">
+            <div class="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden relative">
+              <div id="funnelProgressBar" class="h-full bg-brandGreen transition-all duration-400 rounded-full" style="width: 12.5%;"></div>
+            </div>
+            <span id="stepCounterText" class="text-[10px] font-bold text-slate-500 font-sans whitespace-nowrap">1/8</span>
+          </div>
+
+          <!-- Skip / Help Icon -->
+          <button onclick="showHelpTooltip()" class="p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 transition active:scale-90" title="Help & Info">
+            <svg class="w-4 h-4 text-slateSubtext" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </button>
+        </header>
+
+        <!-- HORIZONTAL SLIDER VIEWPORT (translateX for 8 Steps) -->
+        <div class="relative flex-1 overflow-hidden w-full">
+          <div id="stepSlider" class="flex h-full w-[800%] transition-transform duration-400 ease-in-out">
+
+            <!-- STEP 1: GOAL SELECTION (Auto-Advance) -->
+            <section class="w-[393px] h-full flex flex-col justify-between px-5 pt-4 pb-6 overflow-y-auto no-scrollbar">
+              <div>
+                <h2 class="font-display text-[20px] text-brandGreen uppercase leading-tight">
+                  WHAT'S THE MAIN MISSION?
+                </h2>
+                <p class="font-sans text-[13px] text-slateSubtext mt-1.5 font-medium">
+                  We calibrate your metabolic trajectory based on your target.
+                </p>
+
+                <!-- Cards Group -->
+                <div class="space-y-3 mt-6">
+                  <!-- Goal Card 1 -->
+                  <div onclick="selectGoal('drop_fat', this)" class="card-unselected p-4 rounded-2xl cursor-pointer flex items-center gap-3.5 group">
+                    <div class="w-11 h-11 rounded-xl bg-amber-100 flex items-center justify-center text-xl shrink-0">
+                      🔥
+                    </div>
+                    <div class="flex-1">
+                      <h3 class="font-sans font-bold text-sm text-slate-900 group-hover:text-brandGreen">Drop Body Fat</h3>
+                      <p class="font-sans text-xs text-slateSubtext mt-0.5">Shed weight while eating normal home food</p>
+                    </div>
+                    <div class="w-5 h-5 rounded-full border-2 border-slate-400 flex items-center justify-center check-dot">
+                      <div class="w-2.5 h-2.5 rounded-full bg-brandGreen opacity-0 transition-opacity"></div>
+                    </div>
+                  </div>
+
+                  <!-- Goal Card 2 -->
+                  <div onclick="selectGoal('build_muscle', this)" class="card-unselected p-4 rounded-2xl cursor-pointer flex items-center gap-3.5 group">
+                    <div class="w-11 h-11 rounded-xl bg-emerald-100 flex items-center justify-center text-xl shrink-0">
+                      💪
+                    </div>
+                    <div class="flex-1">
+                      <h3 class="font-sans font-bold text-sm text-slate-900 group-hover:text-brandGreen">Build Muscle Mass</h3>
+                      <p class="font-sans text-xs text-slateSubtext mt-0.5">Hit your protein goals on a budget</p>
+                    </div>
+                    <div class="w-5 h-5 rounded-full border-2 border-slate-400 flex items-center justify-center check-dot">
+                      <div class="w-2.5 h-2.5 rounded-full bg-brandGreen opacity-0 transition-opacity"></div>
+                    </div>
+                  </div>
+
+                  <!-- Goal Card 3 -->
+                  <div onclick="selectGoal('stay_healthy', this)" class="card-unselected p-4 rounded-2xl cursor-pointer flex items-center gap-3.5 group">
+                    <div class="w-11 h-11 rounded-xl bg-blue-100 flex items-center justify-center text-xl shrink-0">
+                      🩺
+                    </div>
+                    <div class="flex-1">
+                      <h3 class="font-sans font-bold text-sm text-slate-900 group-hover:text-brandGreen">Stay Healthy & Energetic</h3>
+                      <p class="font-sans text-xs text-slateSubtext mt-0.5">Balanced daily nutrition & habit tracking</p>
+                    </div>
+                    <div class="w-5 h-5 rounded-full border-2 border-slate-400 flex items-center justify-center check-dot">
+                      <div class="w-2.5 h-2.5 rounded-full bg-brandGreen opacity-0 transition-opacity"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <p class="text-[11px] text-center text-slate-400 font-medium">⚡ Tap any option to auto-advance</p>
+            </section>
+
+            <!-- STEP 2: RAPID BIOMETRICS -->
+            <section class="w-[393px] h-full flex flex-col justify-between px-5 pt-4 pb-6 overflow-y-auto no-scrollbar">
+              <div>
+                <h2 class="font-display text-[20px] text-brandGreen uppercase leading-tight">
+                  CALIBRATE YOUR BIOLOGY
+                </h2>
+                <p class="font-sans text-[13px] text-slateSubtext mt-1 font-medium">
+                  Precision metrics for accurate energy expenditure.
+                </p>
+
+                <div class="space-y-4 mt-5">
+                  <!-- Sex & Unit Row -->
+                  <div class="grid grid-cols-2 gap-3">
+                    <!-- Sex Toggle -->
+                    <div>
+                      <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Biological Sex</label>
+                      <div class="flex bg-slate-100 p-1 rounded-xl border border-slate-200">
+                        <button onclick="setSex('male')" id="sexMaleBtn" class="flex-1 py-1.5 rounded-lg text-xs font-bold text-slate-900 bg-white shadow-2xs transition">Male 👨</button>
+                        <button onclick="setSex('female')" id="sexFemaleBtn" class="flex-1 py-1.5 rounded-lg text-xs font-semibold text-slate-500 transition">Female 👩</button>
+                      </div>
+                    </div>
+
+                    <!-- Unit Toggle -->
+                    <div>
+                      <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Units</label>
+                      <div class="flex bg-slate-100 p-1 rounded-xl border border-slate-200">
+                        <button onclick="setUnit('metric')" id="unitMetricBtn" class="flex-1 py-1.5 rounded-lg text-xs font-bold text-slate-900 bg-white shadow-2xs transition">Metric</button>
+                        <button onclick="setUnit('imperial')" id="unitImperialBtn" class="flex-1 py-1.5 rounded-lg text-xs font-semibold text-slate-500 transition">Imperial</button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Age Slider -->
+                  <div class="p-3.5 rounded-xl border border-slate-200 bg-white">
+                    <div class="flex justify-between items-center mb-1.5">
+                      <span class="text-xs font-bold text-slate-700">Age</span>
+                      <span id="ageReadout" class="font-display text-base text-brandGreen">25 yrs</span>
+                    </div>
+                    <input type="range" id="ageSlider" min="16" max="75" value="25" oninput="updateBiometrics()">
+                  </div>
+
+                  <!-- Height Slider -->
+                  <div class="p-3.5 rounded-xl border border-slate-200 bg-white">
+                    <div class="flex justify-between items-center mb-1.5">
+                      <span class="text-xs font-bold text-slate-700">Height</span>
+                      <span id="heightReadout" class="font-display text-base text-brandGreen">172 cm</span>
+                    </div>
+                    <input type="range" id="heightSlider" min="120" max="220" value="172" oninput="updateBiometrics()">
+                  </div>
+
+                  <!-- Weight Slider -->
+                  <div class="p-3.5 rounded-xl border border-slate-200 bg-white">
+                    <div class="flex justify-between items-center mb-1.5">
+                      <span class="text-xs font-bold text-slate-700">Current Weight</span>
+                      <span id="weightReadout" class="font-display text-base text-brandGreen">70 kg</span>
+                    </div>
+                    <input type="range" id="weightSlider" min="40" max="160" value="70" oninput="updateBiometrics()">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Continue Button -->
+              <button onclick="nextStep()" class="w-full py-3.5 rounded-xl bg-brandGreen text-white font-display text-sm tracking-wider uppercase hover:bg-emerald-900 transition active:scale-98 shadow-md">
+                CONTINUE
+              </button>
+            </section>
+
+            <!-- STEP 3: LOCATION & CITY -->
+            <section class="w-[393px] h-full flex flex-col justify-between px-5 pt-4 pb-6 overflow-y-auto no-scrollbar">
+              <div>
+                <h2 class="font-display text-[20px] text-brandGreen uppercase leading-tight">
+                  WHERE'S YOUR KITCHEN?
+                </h2>
+                <p class="font-sans text-[13px] text-slateSubtext mt-1.5 font-medium">
+                  Used for exact Suhoor/Iftar prayer clocks and local market grocery prices.
+                </p>
+
+                <!-- Default Locked Country Pill -->
+                <div class="mt-4 flex items-center justify-between p-3 rounded-xl bg-emerald-50 border border-brandGreen/30 text-brandGreen">
+                  <div class="flex items-center gap-2 font-bold text-xs">
+                    <span class="text-base">🇵🇰</span> Pakistan (Default Market)
+                  </div>
+                  <span class="text-[10px] font-extrabold uppercase bg-brandGreen text-graphiteYellow px-2 py-0.5 rounded-full">Active</span>
+                </div>
+
+                <!-- Quick Tap City Chips -->
+                <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mt-5 mb-2">Select Your City</label>
+                <div id="cityChipsContainer" class="flex flex-wrap gap-2">
+                  <button onclick="selectCity('Karachi', this)" class="city-chip px-3.5 py-2 rounded-xl text-xs font-semibold card-unselected text-slate-800">Karachi</button>
+                  <button onclick="selectCity('Lahore', this)" class="city-chip px-3.5 py-2 rounded-xl text-xs font-semibold card-selected text-brandGreen">Lahore</button>
+                  <button onclick="selectCity('Islamabad', this)" class="city-chip px-3.5 py-2 rounded-xl text-xs font-semibold card-unselected text-slate-800">Islamabad</button>
+                  <button onclick="selectCity('Rawalpindi', this)" class="city-chip px-3.5 py-2 rounded-xl text-xs font-semibold card-unselected text-slate-800">Rawalpindi</button>
+                  <button onclick="selectCity('Peshawar', this)" class="city-chip px-3.5 py-2 rounded-xl text-xs font-semibold card-unselected text-slate-800">Peshawar</button>
+                  <button onclick="selectCity('Multan', this)" class="city-chip px-3.5 py-2 rounded-xl text-xs font-semibold card-unselected text-slate-800">Multan</button>
+                  <button onclick="selectCity('Faisalabad', this)" class="city-chip px-3.5 py-2 rounded-xl text-xs font-semibold card-unselected text-slate-800">Faisalabad</button>
+                  <button onclick="selectCity('Quetta', this)" class="city-chip px-3.5 py-2 rounded-xl text-xs font-semibold card-unselected text-slate-800">Quetta</button>
+                </div>
+
+                <!-- Fallback Search Input -->
+                <div class="mt-4">
+                  <input type="text" id="cityInput" oninput="handleCityCustom(this.value)" placeholder="Or type your city..." class="w-full px-3.5 py-3 rounded-xl border border-slate-300 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-brandGreen bg-white">
+                </div>
+              </div>
+
+              <!-- Continue Button -->
+              <button onclick="nextStep()" class="w-full py-3.5 rounded-xl bg-brandGreen text-white font-display text-sm tracking-wider uppercase hover:bg-emerald-900 transition active:scale-98 shadow-md">
+                CONTINUE
+              </button>
+            </section>
+
+            <!-- STEP 4: DAILY KITCHEN ROUTINE (Auto-Advance) -->
+            <section class="w-[393px] h-full flex flex-col justify-between px-5 pt-4 pb-6 overflow-y-auto no-scrollbar">
+              <div>
+                <h2 class="font-display text-[20px] text-brandGreen uppercase leading-tight">
+                  HOW DO YOU TYPICALLY EAT?
+                </h2>
+                <p class="font-sans text-[13px] text-slateSubtext mt-1.5 font-medium">
+                  Adjusts oil buffers and grocery shopping models.
+                </p>
+
+                <!-- 4 Cards -->
+                <div class="space-y-2.5 mt-5">
+                  <div onclick="selectKitchen('home_family', this)" class="card-unselected p-3.5 rounded-2xl cursor-pointer flex items-center gap-3 group">
+                    <span class="text-2xl">🏠</span>
+                    <div class="flex-1">
+                      <h3 class="font-sans font-bold text-xs text-slate-900 group-hover:text-brandGreen">Home / Family Food</h3>
+                      <p class="font-sans text-[11px] text-slateSubtext">Ammi or family cooks — includes Desi oil buffers</p>
+                    </div>
+                  </div>
+
+                  <div onclick="selectKitchen('cook_myself', this)" class="card-unselected p-3.5 rounded-2xl cursor-pointer flex items-center gap-3 group">
+                    <span class="text-2xl">👨‍🍳</span>
+                    <div class="flex-1">
+                      <h3 class="font-sans font-bold text-xs text-slate-900 group-hover:text-brandGreen">I Cook For Myself</h3>
+                      <p class="font-sans text-[11px] text-slateSubtext">Unlocks the Bachat grocery planner</p>
+                    </div>
+                  </div>
+
+                  <div onclick="selectKitchen('hostel_mess', this)" class="card-unselected p-3.5 rounded-2xl cursor-pointer flex items-center gap-3 group">
+                    <span class="text-2xl">🥡</span>
+                    <div class="flex-1">
+                      <h3 class="font-sans font-bold text-xs text-slate-900 group-hover:text-brandGreen">Hostel / Mess / Canteen</h3>
+                      <p class="font-sans text-[11px] text-slateSubtext">Optimized for mixed curries & canteen staples</p>
+                    </div>
+                  </div>
+
+                  <div onclick="selectKitchen('takeout', this)" class="card-unselected p-3.5 rounded-2xl cursor-pointer flex items-center gap-3 group">
+                    <span class="text-2xl">🛵</span>
+                    <div class="flex-1">
+                      <h3 class="font-sans font-bold text-xs text-slate-900 group-hover:text-brandGreen">Takeout Dominant</h3>
+                      <p class="font-sans text-[11px] text-slateSubtext">Pre-loads local restaurant menus & street food</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <p class="text-[11px] text-center text-slate-400 font-medium">⚡ Tap any option to auto-advance</p>
+            </section>
+
+            <!-- STEP 5: CULTURAL & HEALTH OVERLAYS (Multi-Select) -->
+            <section class="w-[393px] h-full flex flex-col justify-between px-5 pt-4 pb-6 overflow-y-auto no-scrollbar">
+              <div>
+                <h2 class="font-display text-[20px] text-brandGreen uppercase leading-tight">
+                  ROUTINES & CONDITIONS
+                </h2>
+                <p class="font-sans text-[13px] text-slateSubtext mt-1.5 font-medium">
+                  Select all that apply to activate custom AI safety filters.
+                </p>
+
+                <!-- Multi-select Cards -->
+                <div class="space-y-2.5 mt-5">
+                  <div onclick="toggleCondition('ramadan', this)" class="card-unselected p-3.5 rounded-2xl cursor-pointer flex items-center gap-3">
+                    <span class="text-xl">🌙</span>
+                    <div class="flex-1">
+                      <h3 class="font-sans font-bold text-xs text-slate-900">Ramadan & Sunnah Fasting</h3>
+                      <p class="font-sans text-[11px] text-slateSubtext">Automated fasting schedules & hydration timers</p>
+                    </div>
+                    <input type="checkbox" class="w-4 h-4 accent-brandGreen pointer-events-none">
+                  </div>
+
+                  <div onclick="toggleCondition('diabetes', this)" class="card-unselected p-3.5 rounded-2xl cursor-pointer flex items-center gap-3">
+                    <span class="text-xl">🩺</span>
+                    <div class="flex-1">
+                      <h3 class="font-sans font-bold text-xs text-slate-900">Diabetes Monitoring</h3>
+                      <p class="font-sans text-[11px] text-slateSubtext">Real-time carb overload alerts</p>
+                    </div>
+                    <input type="checkbox" class="w-4 h-4 accent-brandGreen pointer-events-none">
+                  </div>
+
+                  <div onclick="toggleCondition('bp', this)" class="card-unselected p-3.5 rounded-2xl cursor-pointer flex items-center gap-3">
+                    <span class="text-xl">🧂</span>
+                    <div class="flex-1">
+                      <h3 class="font-sans font-bold text-xs text-slate-900">Blood Pressure / Sodium Watch</h3>
+                      <p class="font-sans text-[11px] text-slateSubtext">High-salt spice mix warnings</p>
+                    </div>
+                    <input type="checkbox" class="w-4 h-4 accent-brandGreen pointer-events-none">
+                  </div>
+
+                  <div onclick="toggleCondition('standard', this)" class="card-selected p-3.5 rounded-2xl cursor-pointer flex items-center gap-3">
+                    <span class="text-xl">🌿</span>
+                    <div class="flex-1">
+                      <h3 class="font-sans font-bold text-xs text-brandGreen">Standard Routine</h3>
+                      <p class="font-sans text-[11px] text-slateSubtext">No special medical or fasting modes</p>
+                    </div>
+                    <input type="checkbox" checked class="w-4 h-4 accent-brandGreen pointer-events-none">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Continue Button -->
+              <button onclick="nextStep()" class="w-full py-3.5 rounded-xl bg-brandGreen text-white font-display text-sm tracking-wider uppercase hover:bg-emerald-900 transition active:scale-98 shadow-md">
+                CONTINUE
+              </button>
+            </section>
+
+            <!-- STEP 6: COACH PERSONALITY & TONE (Auto-Advance) -->
+            <section class="w-[393px] h-full flex flex-col justify-between px-5 pt-4 pb-6 overflow-y-auto no-scrollbar">
+              <div>
+                <h2 class="font-display text-[20px] text-brandGreen uppercase leading-tight">
+                  CHOOSE YOUR COACH
+                </h2>
+                <p class="font-sans text-[13px] text-slateSubtext mt-1.5 font-medium">
+                  How should notifications sound when you forget to log your food?
+                </p>
+
+                <!-- 3 Coach Cards -->
+                <div class="space-y-3 mt-5">
+                  <!-- Desi Ammi Mode -->
+                  <div onclick="selectCoach('ammi', this)" class="card-unselected p-4 rounded-2xl cursor-pointer flex flex-col gap-2 group">
+                    <div class="flex items-center justify-between">
+                      <div class="flex items-center gap-2.5">
+                        <span class="text-2xl">🧕</span>
+                        <h3 class="font-sans font-bold text-xs text-slate-900 group-hover:text-brandGreen">Desi Ammi Mode</h3>
+                      </div>
+                      <button onclick="event.stopPropagation(); playCoachVoice('ammi')" class="px-2 py-1 rounded-lg bg-emerald-100 text-brandGreen text-[10px] font-bold flex items-center gap-1 hover:bg-emerald-200">
+                        🔊 Sample
+                      </button>
+                    </div>
+                    <p class="font-sans text-xs italic text-slate-700 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                      "Beta, dopahar se kuch nahi khaya? Phone uthao aur log karo!"
+                    </p>
+                  </div>
+
+                  <!-- Direct & Firm -->
+                  <div onclick="selectCoach('direct', this)" class="card-unselected p-4 rounded-2xl cursor-pointer flex flex-col gap-2 group">
+                    <div class="flex items-center justify-between">
+                      <div class="flex items-center gap-2.5">
+                        <span class="text-2xl">🥊</span>
+                        <h3 class="font-sans font-bold text-xs text-slate-900 group-hover:text-brandGreen">Direct & Firm</h3>
+                      </div>
+                      <button onclick="event.stopPropagation(); playCoachVoice('direct')" class="px-2 py-1 rounded-lg bg-slate-100 text-slate-700 text-[10px] font-bold flex items-center gap-1 hover:bg-slate-200">
+                        🔊 Sample
+                      </button>
+                    </div>
+                    <p class="font-sans text-xs italic text-slate-700 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                      "No excuses. You missed your logging window. Record it now."
+                    </p>
+                  </div>
+
+                  <!-- Gentle Guide -->
+                  <div onclick="selectCoach('gentle', this)" class="card-unselected p-4 rounded-2xl cursor-pointer flex flex-col gap-2 group">
+                    <div class="flex items-center justify-between">
+                      <div class="flex items-center gap-2.5">
+                        <span class="text-2xl">🧘</span>
+                        <h3 class="font-sans font-bold text-xs text-slate-900 group-hover:text-brandGreen">Gentle Guide</h3>
+                      </div>
+                      <button onclick="event.stopPropagation(); playCoachVoice('gentle')" class="px-2 py-1 rounded-lg bg-blue-50 text-blue-800 text-[10px] font-bold flex items-center gap-1 hover:bg-blue-100">
+                        🔊 Sample
+                      </button>
+                    </div>
+                    <p class="font-sans text-xs italic text-slate-700 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                      "Take your time. Record your meal whenever you're ready."
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <p class="text-[11px] text-center text-slate-400 font-medium">⚡ Tap any option to auto-advance</p>
+            </section>
+
+            <!-- STEP 7: THE 3-SECOND CALCULATION ENGINE ("Aha!" Screen) -->
+            <section class="w-[393px] h-full flex flex-col justify-center items-center px-6 pt-4 pb-6 text-center">
+              <h2 class="font-display text-[18px] text-brandGreen uppercase leading-tight">
+                CALIBRATING YOUR BLUEPRINT...
+              </h2>
+              <p class="font-sans text-xs text-slateSubtext mt-1 font-medium">
+                Creating your custom metabolic model
+              </p>
+
+              <!-- Circular Progress Ring (3.0s Engine) -->
+              <div class="relative w-36 h-36 my-8 flex items-center justify-center">
+                <svg class="w-full h-full" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="42" stroke="#e2e8f0" stroke-width="8" fill="none" />
+                  <circle id="calcCircle" class="calc-ring-circle" cx="50" cy="50" r="42" stroke="#144D24" stroke-width="8" stroke-linecap="round" fill="none" stroke-dasharray="263.89" stroke-dashoffset="263.89" />
+                </svg>
+                <div class="absolute flex flex-col items-center">
+                  <span id="calcPercentText" class="font-display text-2xl text-brandGreen">0%</span>
+                  <span class="text-[9px] font-bold uppercase tracking-wider text-graphiteYellow bg-slate-900 px-2 py-0.5 rounded-full mt-1">Sehat AI</span>
+                </div>
+              </div>
+
+              <!-- Dynamic Ticking Checklist -->
+              <div class="w-full max-w-xs space-y-2.5 text-left text-xs">
+                <div id="check1" class="flex items-center gap-2.5 text-slate-400 transition-colors">
+                  <span class="w-5 h-5 rounded-full border border-slate-300 flex items-center justify-center text-[10px] font-bold icon">⏳</span>
+                  <span class="font-medium">Computing Mifflin-St Jeor baseline...</span>
+                </div>
+
+                <div id="check2" class="flex items-center gap-2.5 text-slate-400 transition-colors">
+                  <span class="w-5 h-5 rounded-full border border-slate-300 flex items-center justify-center text-[10px] font-bold icon">⏳</span>
+                  <span class="font-medium">Aligning market prices & Bachat index...</span>
+                </div>
+
+                <div id="check3" class="flex items-center gap-2.5 text-slate-400 transition-colors">
+                  <span class="w-5 h-5 rounded-full border border-slate-300 flex items-center justify-center text-[10px] font-bold icon">⏳</span>
+                  <span class="font-medium">Configuring prayer & coach timers...</span>
+                </div>
+              </div>
+            </section>
+
+            <!-- STEP 8: TAILORED PLAN REVEAL & CLAIM -->
+            <section class="w-[393px] h-full flex flex-col justify-between px-5 pt-4 pb-6 overflow-y-auto no-scrollbar relative">
+              <div>
+                <div class="flex justify-between items-start">
+                  <div>
+                    <h2 class="font-display text-[20px] text-brandGreen uppercase leading-tight">
+                      YOUR CUSTOM PLAN IS READY
+                    </h2>
+                    <p class="font-sans text-xs text-slateSubtext mt-1 font-medium">
+                      Calibrated specifically for your biometrics
+                    </p>
+                  </div>
+                  <span class="text-xs bg-graphiteYellow text-slate-950 font-extrabold px-2.5 py-1 rounded-lg">100% Match</span>
+                </div>
+
+                <!-- Center Hero Card (White surface, 2px solid #144D24) -->
+                <div class="mt-5 p-5 rounded-2xl bg-white border-2 border-brandGreen shadow-lg relative overflow-hidden">
+                  <div class="absolute top-0 right-0 w-20 h-20 bg-emerald-50 rounded-bl-full pointer-events-none"></div>
+
+                  <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Daily Calorie Target</span>
+                  <div class="flex items-baseline gap-2 mt-1">
+                    <span id="computedCalorieTarget" class="font-display text-3xl text-brandGreen">1,820</span>
+                    <span class="font-display text-base text-brandGreen">kcal / day</span>
+                  </div>
+
+                  <!-- Macros Breakdown -->
+                  <div class="grid grid-cols-3 gap-2 my-4 pt-3 border-t border-slate-100 text-center">
+                    <div class="bg-slate-50 p-2 rounded-xl">
+                      <span class="text-[10px] text-slate-400 block font-semibold">Protein</span>
+                      <span id="proteinGrams" class="font-extrabold text-xs text-slate-800">140g</span>
+                    </div>
+                    <div class="bg-slate-50 p-2 rounded-xl">
+                      <span class="text-[10px] text-slate-400 block font-semibold">Carbs</span>
+                      <span id="carbsGrams" class="font-extrabold text-xs text-slate-800">180g</span>
+                    </div>
+                    <div class="bg-slate-50 p-2 rounded-xl">
+                      <span class="text-[10px] text-slate-400 block font-semibold">Healthy Fat</span>
+                      <span id="fatGrams" class="font-extrabold text-xs text-slate-800">50g</span>
+                    </div>
+                  </div>
+
+                  <!-- Target Date Badge -->
+                  <div class="flex items-center gap-2 p-2.5 rounded-xl bg-amber-50 border border-amber-200">
+                    <span class="text-sm">🎯</span>
+                    <span id="targetDateText" class="text-xs font-bold text-amber-900">Reach your goal by Nov 15, 2026</span>
+                  </div>
+
+                  <!-- Active Config Badges -->
+                  <div class="flex flex-wrap gap-1.5 mt-3">
+                    <span class="text-[10px] font-bold bg-emerald-100 text-brandGreen px-2 py-0.5 rounded-md">✓ Bachat Mode Active</span>
+                    <span id="coachBadgeText" class="text-[10px] font-bold bg-slate-100 text-slate-700 px-2 py-0.5 rounded-md">✓ Ammi Routine Active</span>
+                    <span id="cityBadgeText" class="text-[10px] font-bold bg-blue-50 text-blue-700 px-2 py-0.5 rounded-md">✓ Lahore Prices</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Bottom CTA Button -->
+              <div>
+                <button onclick="openAuthBottomSheet()" class="w-full py-4 rounded-xl bg-brandGreen border-2 border-graphiteYellow text-white font-display text-sm tracking-wider uppercase hover:bg-emerald-900 transition active:scale-98 shadow-xl flex items-center justify-center gap-2">
+                  CLAIM MY PLAN
+                  <svg class="w-4 h-4 text-graphiteYellow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                </button>
+                <p class="text-[10px] text-center text-slate-400 mt-2">7-Day Free Trial • Cancel Anytime</p>
+              </div>
+
+              <!-- SIMULATED SIGN-UP BOTTOM SHEET -->
+              <div id="authBottomSheet" class="absolute inset-x-0 bottom-0 bg-white rounded-t-3xl border-t-2 border-brandGreen p-6 shadow-2xl z-50 transform translate-y-full transition-transform duration-300">
+                <div class="w-12 h-1 bg-slate-300 rounded-full mx-auto mb-4"></div>
+                
+                <h3 class="font-display text-lg text-brandGreen uppercase text-center">CLAIM YOUR PLAN</h3>
+                <p class="text-xs text-slate-500 text-center mt-1">Create your free Sehat account to save your blueprint.</p>
+
+                <div class="space-y-3 mt-5">
+                  <!-- Google Auth Button -->
+                  <button onclick="completeAuth('Google')" class="w-full py-3 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 font-bold text-xs text-slate-800 flex items-center justify-center gap-2 shadow-2xs active:scale-98">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+                    Continue with Google
+                  </button>
+
+                  <!-- Phone Number Input & Submit -->
+                  <div class="flex gap-2">
+                    <input type="tel" placeholder="+92 300 1234567" class="flex-1 px-3.5 py-3 rounded-xl border border-slate-300 text-xs font-medium text-slate-900 focus:outline-none focus:border-brandGreen">
+                    <button onclick="completeAuth('Phone')" class="px-4 py-3 rounded-xl bg-brandGreen text-white font-bold text-xs uppercase hover:bg-emerald-900">
+                      Submit
+                    </button>
+                  </div>
+                </div>
+
+                <button onclick="closeAuthBottomSheet()" class="w-full mt-4 text-center text-xs text-slate-400 font-semibold py-1">
+                  Cancel
+                </button>
+              </div>
+
+            </section>
+
+          </div>
+        </div>
+
+        <!-- iOS Home Indicator Pill -->
+        <div class="w-[134px] h-[5px] bg-slate-800/80 rounded-full mx-auto my-2 z-30"></div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Prototype Info Footer -->
+  <footer class="w-full max-w-4xl flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-400 z-10 pt-3 border-t border-slate-800/80">
+    <div class="flex items-center gap-2">
+      <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+      <span>Sehat Coach Funnel Mechanics • Persistent Header • 150ms Selection Auto-Advance</span>
+    </div>
+    <div class="flex items-center gap-3 text-slate-500">
+      <span>Colors: #144D24 • #DFA623 • #646C7A</span>
+    </div>
+  </footer>
+
+  <!-- INTERACTIVE JAVASCRIPT CONTROLLER -->
+  <script>
+    // State Management Model
+    const onboardingState = {
+      currentStep: 1,
+      goal: 'drop_fat',
+      sex: 'male',
+      unit: 'metric',
+      age: 25,
+      height: 172,
+      weight: 70,
+      city: 'Lahore',
+      kitchen: 'home_family',
+      conditions: ['standard'],
+      coach: 'ammi',
+      calculatedCalories: 1820
+    };
+
+    // 1. Clock Display Dynamic Updater
+    function updateClock() {
+      const now = new Date();
+      let hours = now.getHours();
+      let minutes = now.getMinutes();
+      minutes = minutes < 10 ? '0' + minutes : minutes;
+      const clockEl = document.getElementById('clockDisplay');
+      if (clockEl) clockEl.innerText = hours + ':' + minutes;
+    }
+    updateClock();
+    setInterval(updateClock, 30000);
+
+    // 2. Sound & Haptic Synthesizer
+    let soundEnabled = true;
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    
+    function toggleAudioFx() {
+      soundEnabled = !soundEnabled;
+      document.getElementById('soundOnIcon').classList.toggle('hidden', !soundEnabled);
+      document.getElementById('soundOffIcon').classList.toggle('hidden', soundEnabled);
+      if (soundEnabled) playSound(800, 0.05);
+    }
+
+    function playSound(freq = 600, duration = 0.04) {
+      if (!soundEnabled || !audioCtx) return;
+      try {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    // 3. View Switcher (Splash vs Funnel)
+    function switchView(viewName) {
+      playSound(700, 0.05);
+      const splash = document.getElementById('splashView');
+      const funnel = document.getElementById('funnelView');
+      const splashBtn = document.getElementById('viewSplashBtn');
+      const funnelBtn = document.getElementById('viewFunnelBtn');
+
+      if (viewName === 'splash') {
+        funnel.classList.add('hidden');
+        splash.classList.remove('hidden');
+        splashBtn.className = "px-3 py-1.5 rounded-lg bg-brandGreen text-graphiteYellow font-semibold text-xs transition border border-graphiteYellow/40";
+        funnelBtn.className = "px-3 py-1.5 rounded-lg bg-slate-800 text-slate-200 font-medium text-xs transition border border-slate-700";
+      } else {
+        splash.classList.add('hidden');
+        funnel.classList.remove('hidden');
+        funnelBtn.className = "px-3 py-1.5 rounded-lg bg-brandGreen text-graphiteYellow font-semibold text-xs transition border border-graphiteYellow/40";
+        splashBtn.className = "px-3 py-1.5 rounded-lg bg-slate-800 text-slate-200 font-medium text-xs transition border border-slate-700";
+        updateStepUI();
+      }
+    }
+
+    // 4. Funnel Step Slider Navigation
+    function goToStep(stepNum) {
+      if (stepNum < 1 || stepNum > 8) return;
+      onboardingState.currentStep = stepNum;
+      playSound(650, 0.04);
+      
+      const slider = document.getElementById('stepSlider');
+      slider.style.transform = `translateX(-${(stepNum - 1) * 393}px)`;
+
+      updateStepUI();
+
+      // Trigger step 7 calculation engine if reached
+      if (stepNum === 7) {
+        runCalculationEngine();
+      }
+    }
+
+    function nextStep() {
+      if (onboardingState.currentStep < 8) {
+        goToStep(onboardingState.currentStep + 1);
+      }
+    }
+
+    function prevStep() {
+      if (onboardingState.currentStep > 1) {
+        goToStep(onboardingState.currentStep - 1);
+      }
+    }
+
+    function restartFunnel() {
+      goToStep(1);
+      switchView('funnel');
+    }
+
+    function updateStepUI() {
+      const step = onboardingState.currentStep;
+      // Progress Bar
+      const pct = (step / 8) * 100;
+      document.getElementById('funnelProgressBar').style.width = pct + '%';
+      document.getElementById('stepCounterText').innerText = step + '/8';
+
+      // Back Button state
+      const backBtn = document.getElementById('backBtn');
+      if (step > 1 && step < 8) {
+        backBtn.classList.remove('opacity-0', 'pointer-events-none');
+      } else {
+        backBtn.classList.add('opacity-0', 'pointer-events-none');
+      }
+    }
+
+    // 5. STEP 1: Goal Selection
+    function selectGoal(goalKey, cardEl) {
+      onboardingState.goal = goalKey;
+      playSound(850, 0.06);
+
+      // Card Selection Visuals
+      const cards = cardEl.parentElement.querySelectorAll('.card-unselected, .card-selected');
+      cards.forEach(c => {
+        c.className = 'card-unselected p-4 rounded-2xl cursor-pointer flex items-center gap-3.5 group';
+        const dot = c.querySelector('.check-dot div');
+        if (dot) dot.classList.add('opacity-0');
+      });
+
+      cardEl.className = 'card-selected p-4 rounded-2xl cursor-pointer flex items-center gap-3.5 group scale-[0.99]';
+      const activeDot = cardEl.querySelector('.check-dot div');
+      if (activeDot) activeDot.classList.remove('opacity-0');
+
+      // Auto Advance 150ms
+      setTimeout(() => {
+        cardEl.classList.remove('scale-[0.99]');
+        nextStep();
+      }, 150);
+    }
+
+    // 6. STEP 2: Biometrics Controls
+    function setSex(sexVal) {
+      onboardingState.sex = sexVal;
+      playSound(700, 0.04);
+      const maleBtn = document.getElementById('sexMaleBtn');
+      const femaleBtn = document.getElementById('sexFemaleBtn');
+      if (sexVal === 'male') {
+        maleBtn.className = "flex-1 py-1.5 rounded-lg text-xs font-bold text-slate-900 bg-white shadow-2xs transition";
+        femaleBtn.className = "flex-1 py-1.5 rounded-lg text-xs font-semibold text-slate-500 transition";
+      } else {
+        femaleBtn.className = "flex-1 py-1.5 rounded-lg text-xs font-bold text-slate-900 bg-white shadow-2xs transition";
+        maleBtn.className = "flex-1 py-1.5 rounded-lg text-xs font-semibold text-slate-500 transition";
+      }
+    }
+
+    function setUnit(unitVal) {
+      onboardingState.unit = unitVal;
+      playSound(700, 0.04);
+      const metricBtn = document.getElementById('unitMetricBtn');
+      const imperialBtn = document.getElementById('unitImperialBtn');
+      if (unitVal === 'metric') {
+        metricBtn.className = "flex-1 py-1.5 rounded-lg text-xs font-bold text-slate-900 bg-white shadow-2xs transition";
+        imperialBtn.className = "flex-1 py-1.5 rounded-lg text-xs font-semibold text-slate-500 transition";
+      } else {
+        imperialBtn.className = "flex-1 py-1.5 rounded-lg text-xs font-bold text-slate-900 bg-white shadow-2xs transition";
+        metricBtn.className = "flex-1 py-1.5 rounded-lg text-xs font-semibold text-slate-500 transition";
+      }
+      updateBiometrics();
+    }
+
+    function updateBiometrics() {
+      const ageVal = document.getElementById('ageSlider').value;
+      const heightVal = document.getElementById('heightSlider').value;
+      const weightVal = document.getElementById('weightSlider').value;
+
+      onboardingState.age = parseInt(ageVal);
+      onboardingState.height = parseInt(heightVal);
+      onboardingState.weight = parseInt(weightVal);
+
+      if (onboardingState.unit === 'metric') {
+        document.getElementById('ageReadout').innerText = ageVal + ' yrs';
+        document.getElementById('heightReadout').innerText = heightVal + ' cm';
+        document.getElementById('weightReadout').innerText = weightVal + ' kg';
+      } else {
+        // Imperial conversion readouts
+        const feet = Math.floor(heightVal / 30.48);
+        const inches = Math.round((heightVal % 30.48) / 2.54);
+        const lbs = Math.round(weightVal * 2.20462);
+        document.getElementById('ageReadout').innerText = ageVal + ' yrs';
+        document.getElementById('heightReadout').innerText = feet + "′ " + inches + "″";
+        document.getElementById('weightReadout').innerText = lbs + ' lbs';
+      }
+    }
+
+    // 7. STEP 3: Location Selection
+    function selectCity(cityName, btnEl) {
+      onboardingState.city = cityName;
+      playSound(750, 0.04);
+      const chips = document.querySelectorAll('.city-chip');
+      chips.forEach(c => c.className = 'city-chip px-3.5 py-2 rounded-xl text-xs font-semibold card-unselected text-slate-800');
+      if (btnEl) btnEl.className = 'city-chip px-3.5 py-2 rounded-xl text-xs font-semibold card-selected text-brandGreen';
+      document.getElementById('cityInput').value = '';
+    }
+
+    function handleCityCustom(val) {
+      if (val.trim()) {
+        onboardingState.city = val.trim();
+        const chips = document.querySelectorAll('.city-chip');
+        chips.forEach(c => c.className = 'city-chip px-3.5 py-2 rounded-xl text-xs font-semibold card-unselected text-slate-800');
+      }
+    }
+
+    // 8. STEP 4: Kitchen Routine
+    function selectKitchen(kitchenKey, cardEl) {
+      onboardingState.kitchen = kitchenKey;
+      playSound(850, 0.05);
+
+      const cards = cardEl.parentElement.children;
+      for (let c of cards) {
+        c.className = 'card-unselected p-3.5 rounded-2xl cursor-pointer flex items-center gap-3 group';
+      }
+      cardEl.className = 'card-selected p-3.5 rounded-2xl cursor-pointer flex items-center gap-3 group scale-[0.99]';
+
+      setTimeout(() => {
+        cardEl.classList.remove('scale-[0.99]');
+        nextStep();
+      }, 150);
+    }
+
+    // 9. STEP 5: Health & Cultural Overlays (Multi-select)
+    function toggleCondition(condKey, cardEl) {
+      playSound(750, 0.04);
+      const checkbox = cardEl.querySelector('input[type=checkbox]');
+
+      if (condKey === 'standard') {
+        onboardingState.conditions = ['standard'];
+        const siblings = cardEl.parentElement.children;
+        for (let s of siblings) {
+          s.className = 'card-unselected p-3.5 rounded-2xl cursor-pointer flex items-center gap-3';
+          s.querySelector('input').checked = false;
+        }
+        cardEl.className = 'card-selected p-3.5 rounded-2xl cursor-pointer flex items-center gap-3';
+        checkbox.checked = true;
+      } else {
+        // Remove 'standard' if selecting specific medical mode
+        onboardingState.conditions = onboardingState.conditions.filter(c => c !== 'standard');
+        const stdCard = cardEl.parentElement.querySelector('[onclick*="standard"]');
+        if (stdCard) {
+          stdCard.className = 'card-unselected p-3.5 rounded-2xl cursor-pointer flex items-center gap-3';
+          stdCard.querySelector('input').checked = false;
+        }
+
+        if (onboardingState.conditions.includes(condKey)) {
+          onboardingState.conditions = onboardingState.conditions.filter(c => c !== condKey);
+          cardEl.className = 'card-unselected p-3.5 rounded-2xl cursor-pointer flex items-center gap-3';
+          checkbox.checked = false;
+        } else {
+          onboardingState.conditions.push(condKey);
+          cardEl.className = 'card-selected p-3.5 rounded-2xl cursor-pointer flex items-center gap-3';
+          checkbox.checked = true;
+        }
+
+        if (onboardingState.conditions.length === 0) {
+          onboardingState.conditions = ['standard'];
+          if (stdCard) {
+            stdCard.className = 'card-selected p-3.5 rounded-2xl cursor-pointer flex items-center gap-3';
+            stdCard.querySelector('input').checked = true;
+          }
+        }
+      }
+    }
+
+    // 10. STEP 6: Coach Selection & Audio Preview
+    function selectCoach(coachKey, cardEl) {
+      onboardingState.coach = coachKey;
+      playSound(900, 0.06);
+
+      const cards = cardEl.parentElement.children;
+      for (let c of cards) {
+        c.className = 'card-unselected p-4 rounded-2xl cursor-pointer flex flex-col gap-2 group';
+      }
+      cardEl.className = 'card-selected p-4 rounded-2xl cursor-pointer flex flex-col gap-2 group scale-[0.99]';
+
+      playCoachVoice(coachKey);
+
+      setTimeout(() => {
+        cardEl.classList.remove('scale-[0.99]');
+        nextStep();
+      }, 150);
+    }
+
+    function playCoachVoice(coachKey) {
+      if (!soundEnabled) return;
+      if (coachKey === 'ammi') {
+        playSound(550, 0.1);
+        setTimeout(() => playSound(750, 0.12), 110);
+      } else if (coachKey === 'direct') {
+        playSound(400, 0.15);
+      } else {
+        playSound(850, 0.12);
+      }
+    }
+
+    // 11. STEP 7: 3-Second Calculation Engine ("Aha!" Screen)
+    let calcTimer = null;
+    function runCalculationEngine() {
+      const circle = document.getElementById('calcCircle');
+      const text = document.getElementById('calcPercentText');
+      const check1 = document.getElementById('check1');
+      const check2 = document.getElementById('check2');
+      const check3 = document.getElementById('check3');
+
+      // Reset
+      circle.style.strokeDashoffset = '263.89';
+      text.innerText = '0%';
+      [check1, check2, check3].forEach(c => {
+        c.className = 'flex items-center gap-2.5 text-slate-400 transition-colors';
+        c.querySelector('.icon').innerText = '⏳';
+      });
+
+      let startTime = Date.now();
+      const duration = 3000; // 3.0 seconds
+
+      if (calcTimer) clearInterval(calcTimer);
+
+      calcTimer = setInterval(() => {
+        let elapsed = Date.now() - startTime;
+        let progress = Math.min(1, elapsed / duration);
+        let pct = Math.floor(progress * 100);
+
+        text.innerText = pct + '%';
+        let offset = 263.89 - (263.89 * progress);
+        circle.style.strokeDashoffset = offset;
+
+        // Step Checklist Sequential Ticking
+        if (progress >= 0.33) {
+          check1.className = 'flex items-center gap-2.5 text-brandGreen font-semibold transition-colors';
+          check1.querySelector('.icon').innerText = '✔';
+        }
+        if (progress >= 0.66) {
+          check2.className = 'flex items-center gap-2.5 text-brandGreen font-semibold transition-colors';
+          check2.querySelector('.icon').innerText = '✔';
+        }
+        if (progress >= 0.95) {
+          check3.className = 'flex items-center gap-2.5 text-brandGreen font-semibold transition-colors';
+          check3.querySelector('.icon').innerText = '✔';
+        }
+
+        if (progress >= 1) {
+          clearInterval(calcTimer);
+          computeFinalBlueprint();
+          setTimeout(() => {
+            goToStep(8);
+          }, 250);
+        }
+      }, 30);
+    }
+
+    // 12. Dynamic BMR / Blueprint Calculator (Mifflin-St Jeor)
+    function computeFinalBlueprint() {
+      const s = onboardingState;
+      // Baseline BMR
+      let bmr = (10 * s.weight) + (6.25 * s.height) - (5 * s.age);
+      bmr += (s.sex === 'male') ? 5 : -161;
+
+      let tdee = bmr * 1.35; // Moderate activity default
+
+      if (s.goal === 'drop_fat') tdee -= 450;
+      else if (s.goal === 'build_muscle') tdee += 300;
+
+      s.calculatedCalories = Math.round(tdee);
+
+      // Macro breakdown
+      const protein = Math.round((s.calculatedCalories * 0.3) / 4);
+      const carbs = Math.round((s.calculatedCalories * 0.45) / 4);
+      const fat = Math.round((s.calculatedCalories * 0.25) / 9);
+
+      // UI Updates
+      document.getElementById('computedCalorieTarget').innerText = s.calculatedCalories.toLocaleString();
+      document.getElementById('proteinGrams').innerText = protein + 'g';
+      document.getElementById('carbsGrams').innerText = carbs + 'g';
+      document.getElementById('fatGrams').innerText = fat + 'g';
+
+      // City & Coach Badges
+      document.getElementById('cityBadgeText').innerText = '✓ ' + s.city + ' Prices';
+      const coachNames = { ammi: 'Ammi Routine', direct: 'Direct Coach', gentle: 'Gentle Coach' };
+      document.getElementById('coachBadgeText').innerText = '✓ ' + coachNames[s.coach] + ' Active';
+
+      // Target Date Calculation (12 weeks out)
+      const targetDate = new Date();
+      targetDate.setDate(targetDate.getDate() + 84);
+      const dateOptions = { month: 'short', day: 'numeric', year: 'numeric' };
+      document.getElementById('targetDateText').innerText = 'Reach your goal by ' + targetDate.toLocaleDateString('en-US', dateOptions);
+    }
+
+    // 13. STEP 8: Claim Plan Auth Bottom Sheet
+    function openAuthBottomSheet() {
+      playSound(900, 0.06);
+      const sheet = document.getElementById('authBottomSheet');
+      sheet.classList.remove('translate-y-full');
+    }
+
+    function closeAuthBottomSheet() {
+      playSound(500, 0.04);
+      const sheet = document.getElementById('authBottomSheet');
+      sheet.classList.add('translate-y-full');
+    }
+
+    function completeAuth(provider) {
+      playSound(1000, 0.08);
+      alert('🎉 Welcome to Sehat Coach! Account created via ' + provider + '. Your custom blueprint is now active.');
+      closeAuthBottomSheet();
+    }
+
+    // Interactive Dynamic Island
+    let islandExpanded = false;
+    function toggleIslandExpand() {
+      playSound(650, 0.04);
+      const island = document.getElementById('dynamicIsland');
+      const label = document.getElementById('islandLabel');
+      islandExpanded = !islandExpanded;
+      if (islandExpanded) {
+        island.style.width = '230px';
+        label.classList.remove('opacity-0');
+      } else {
+        island.style.width = '120px';
+        label.classList.add('opacity-0');
+      }
+    }
+
+    function triggerEmblemPulse() {
+      playSound(1000, 0.08);
+    }
+
+    function showHelpTooltip() {
+      playSound(700, 0.04);
+      alert('ℹ️ Sehat Coach Onboarding\n\n- Standard biometrics & Desi lifestyle questions.\n- Auto-advances single-choice cards in 150ms.\n- Computes metabolic baseline & local market Bachat prices.');
+    }
+  </script>
+</body>
+</html>
