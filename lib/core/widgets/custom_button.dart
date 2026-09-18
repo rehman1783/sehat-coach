@@ -23,6 +23,7 @@ class CustomButton extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.graphiteYellow,
           foregroundColor: AppColors.medicalBlue,
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         ),
         child: _buildChild(),
       );
@@ -33,6 +34,7 @@ class CustomButton extends StatelessWidget {
       style: OutlinedButton.styleFrom(
         foregroundColor: AppColors.primaryGreen,
         side: const BorderSide(color: AppColors.primaryGreen, width: 1.5),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       ),
       child: _buildChild(),
     );
@@ -43,12 +45,22 @@ class CustomButton extends StatelessWidget {
       return Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 20),
-          const SizedBox(width: 8),
-          Text(text),
+          Icon(icon, size: 18),
+          const SizedBox(width: 6),
+          Flexible(
+            child: Text(
+              text,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
         ],
       );
     }
-    return Text(text);
+    return Text(
+      text,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+    );
   }
 }

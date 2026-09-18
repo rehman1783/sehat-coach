@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../home/presentation/screens/home_screen.dart';
 import '../controllers/onboarding_controller.dart';
@@ -47,6 +48,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   void _goToStep(int step) {
     if (step < 1 || step > 8) return;
+    HapticFeedback.selectionClick();
     setState(() {
       _currentStep = step;
     });
@@ -58,6 +60,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   void _nextStepWithAutoAdvance() {
+    HapticFeedback.lightImpact();
     Future.delayed(const Duration(milliseconds: 150), () {
       if (mounted && _currentStep < 8) {
         _goToStep(_currentStep + 1);
@@ -66,13 +69,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   void _openAuthBottomSheet() {
+    HapticFeedback.mediumImpact();
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (ctx) => AuthBottomSheet(
         onComplete: () {
-          // Navigate to HomeScreen after completing onboarding
+          HapticFeedback.lightImpact();
           Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(builder: (context) => const HomeScreen()),
@@ -90,80 +94,97 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     return Scaffold(
       backgroundColor: AppColors.surface,
       body: SafeArea(
-        child: Column(
-          children: [
-            // Segmented Progress Header
-            ProgressHeader(
-              currentStep: _currentStep,
-              totalSteps: 8,
-              onBack: () => _goToStep(_currentStep - 1),
-            ),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 480),
+            child: Column(
+              children: [
+                // Segmented Progress Header
+                ProgressHeader(
+                  currentStep: _currentStep,
+                  totalSteps: 8,
+                  onBack: () => _goToStep(_currentStep - 1),
+                ),
 
-            // Main PageView for 8 Steps
-            Expanded(
-              child: PageView(
-                controller: _pageController,
-                physics: const NeverScrollableScrollPhysics(), // Controlled via buttons
-                onPageChanged: (index) {
-                  setState(() {
-                    _currentStep = index + 1;
-                  });
-                },
-                children: [
-                  Step1GoalStep(
-                    selectedGoal: state.goal,
-                    onSelectGoal: (g) {
-                      _controller.setGoal(g);
-                      _nextStepWithAutoAdvance();
+                // Main PageView for 8 Steps
+                Expanded(
+                  child: PageView(
+                    controller: _pageController,
+                    physics: const NeverScrollableScrollPhysics(),
+                    onPageChanged: (index) {
+                      setState(() {
+                        _currentStep = index + 1;
+                      });
                     },
+                    children: [
+                      Step1GoalStep(
+                        selectedGoal: state.goal,
+                        onSelectGoal: (g) {
+                          _controller.setGoal(g);
+                          _nextStepWithAutoAdvance();
+                        },
+                      ),
+                      Step2BiometricsStep(
+                        state: state,
+                        onSexChanged: (s) {
+                          HapticFeedback.selectionClick();
+                          _controller.setSex(s);
+                        },
+                        onUnitChanged: (u) {
+                          HapticFeedback.selectionClick();
+                          _controller.setUnit(u);
+                        },
+                        onAgeChanged: _controller.setAge,
+                        onHeightChanged: _controller.setHeight,
+                        onWeightChanged: _controller.setWeight,
+                        onContinue: () => _goToStep(3),
+                      ),
+                      Step3LocationStep(
+                        selectedCity: state.city,
+                        onSelectCity: (c) {
+                          HapticFeedback.selectionClick();
+                          _controller.setCity(c);
+                        },
+                        onContinue: () => _goToStep(4),
+                      ),
+                      Step4KitchenStep(
+                        selectedKitchen: state.kitchen,
+                        onSelectKitchen: (k) {
+                          _controller.setKitchen(k);
+                          _nextStepWithAutoAdvance();
+                        },
+                      ),
+                      Step5ConditionsStep(
+                        selectedConditions: state.conditions,
+                        onToggleCondition: (c) {
+                          HapticFeedback.selectionClick();
+                          _controller.toggleCondition(c);
+                        },
+                        onContinue: () => _goToStep(6),
+                      ),
+                      Step6CoachStep(
+                        selectedCoach: state.coach,
+                        onSelectCoach: (c) {
+                          _controller.setCoach(c);
+                          _nextStepWithAutoAdvance();
+                        },
+                      ),
+                      Step7CalculationStep(
+                        onCompleted: () {
+                          _controller.computeFinalBlueprint();
+                          _goToStep(8);
+                        },
+                      ),
+                      Step8PlanRevealStep(
+                        state: state,
+                        onClaimPlan: _openAuthBottomSheet,
+                      ),
+                    ],
                   ),
-                  Step2BiometricsStep(
-                    state: state,
-                    onSexChanged: _controller.setSex,
-                    onUnitChanged: _controller.setUnit,
-                    onAgeChanged: _controller.setAge,
-                    onHeightChanged: _controller.setHeight,
-                    onWeightChanged: _controller.setWeight,
-                    onContinue: () => _goToStep(3),
-                  ),
-                  Step3LocationStep(
-                    selectedCity: state.city,
-                    onSelectCity: _controller.setCity,
-                    onContinue: () => _goToStep(4),
-                  ),
-                  Step4KitchenStep(
-                    selectedKitchen: state.kitchen,
-                    onSelectKitchen: (k) {
-                      _controller.setKitchen(k);
-                      _nextStepWithAutoAdvance();
-                    },
-                  ),
-                  Step5ConditionsStep(
-                    selectedConditions: state.conditions,
-                    onToggleCondition: _controller.toggleCondition,
-                    onContinue: () => _goToStep(6),
-                  ),
-                  Step6CoachStep(
-                    selectedCoach: state.coach,
-                    onSelectCoach: (c) {
-                      _controller.setCoach(c);
-                      _nextStepWithAutoAdvance();
-                    },
-                  ),
-                  Step7CalculationStep(
-                    onCompleted: () {
-                      _controller.computeFinalBlueprint();
-                      _goToStep(8);
-                    },
-                  ),
-                  Step8PlanRevealStep(
-                    state: state,
-                    onClaimPlan: _openAuthBottomSheet,
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

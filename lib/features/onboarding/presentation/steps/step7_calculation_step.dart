@@ -56,106 +56,110 @@ class _Step7CalculationStepState extends State<Step7CalculationStep> {
 
     return Padding(
       padding: const EdgeInsets.all(24.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Text(
-            'CALIBRATING YOUR BLUEPRINT...',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: AppColors.primaryGreen,
-              letterSpacing: 0.5,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 6),
-          const Text(
-            'Creating your custom metabolic model',
-            style: TextStyle(
-              fontSize: 13,
-              color: AppColors.textSecondary,
-            ),
-          ),
-          const SizedBox(height: 36),
-
-          // Circular Ring Progress
-          SizedBox(
-            width: 150,
-            height: 150,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                SizedBox(
-                  width: 150,
-                  height: 150,
-                  child: CircularProgressIndicator(
-                    value: _progress,
-                    strokeWidth: 10,
-                    backgroundColor: const Color(0xFFE2E8F0),
-                    valueColor: const AlwaysStoppedAnimation<Color>(
-                      AppColors.primaryGreen,
-                    ),
-                    strokeCap: StrokeCap.round,
-                  ),
+      child: Center(
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                'CALIBRATING YOUR BLUEPRINT...',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primaryGreen,
+                  letterSpacing: 0.5,
                 ),
-                Column(
-                  mainAxisSize: MainAxisSize.min,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 6),
+              const Text(
+                'Creating your custom metabolic model',
+                style: TextStyle(
+                  fontSize: 13,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+              const SizedBox(height: 36),
+
+              // Circular Ring Progress
+              SizedBox(
+                width: 150,
+                height: 150,
+                child: Stack(
+                  alignment: Alignment.center,
                   children: [
-                    Text(
-                      '$percent%',
-                      style: const TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.primaryGreen,
+                    SizedBox(
+                      width: 150,
+                      height: 150,
+                      child: CircularProgressIndicator(
+                        value: _progress,
+                        strokeWidth: 10,
+                        backgroundColor: const Color(0xFFE2E8F0),
+                        valueColor: const AlwaysStoppedAnimation<Color>(
+                          AppColors.primaryGreen,
+                        ),
+                        strokeCap: StrokeCap.round,
                       ),
                     ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.medicalBlue,
-                        borderRadius: BorderRadius.circular(99),
-                      ),
-                      child: const Text(
-                        'SEHAT AI',
-                        style: TextStyle(
-                          fontSize: 9,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.graphiteYellow,
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          '$percent%',
+                          style: const TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primaryGreen,
+                          ),
                         ),
-                      ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.medicalBlue,
+                            borderRadius: BorderRadius.circular(99),
+                          ),
+                          child: const Text(
+                            'SEHAT AI',
+                            style: TextStyle(
+                              fontSize: 9,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.graphiteYellow,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 40),
-
-          // Ticking Checklist
-          Column(
-            children: [
-              _CheckItem(
-                text: 'Computing Mifflin-St Jeor baseline...',
-                isDone: _progress >= 0.33,
               ),
-              const SizedBox(height: 12),
-              _CheckItem(
-                text: 'Aligning market prices & Bachat index...',
-                isDone: _progress >= 0.66,
-              ),
-              const SizedBox(height: 12),
-              _CheckItem(
-                text: 'Configuring prayer & coach timers...',
-                isDone: _progress >= 0.95,
+
+              const SizedBox(height: 40),
+
+              // Ticking Checklist
+              Column(
+                children: [
+                  _CheckItem(
+                    text: 'Computing Mifflin-St Jeor baseline...',
+                    isDone: _progress >= 0.33,
+                  ),
+                  const SizedBox(height: 12),
+                  _CheckItem(
+                    text: 'Aligning market prices & Bachat index...',
+                    isDone: _progress >= 0.66,
+                  ),
+                  const SizedBox(height: 12),
+                  _CheckItem(
+                    text: 'Configuring prayer & coach timers...',
+                    isDone: _progress >= 0.95,
+                  ),
+                ],
               ),
             ],
           ),
-        ],
+        ),
       ),
     );
   }
