@@ -200,12 +200,15 @@ class _CheckItem extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 10),
-        Text(
-          text,
-          style: TextStyle(
-            fontSize: 13,
-            fontWeight: isDone ? FontWeight.w600 : FontWeight.normal,
-            color: isDone ? AppColors.primaryGreen : AppColors.textSecondary,
+        Expanded(
+          child: Text(
+            text,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: isDone ? FontWeight.w600 : FontWeight.normal,
+              color: isDone ? AppColors.primaryGreen : AppColors.textSecondary,
+            ),
+            softWrap: true,
           ),
         ),
       ],
