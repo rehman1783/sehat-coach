@@ -95,20 +95,11 @@ class _SplashScreenState extends State<SplashScreen>
                             ),
                           ],
                         ),
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            const EmblemIcon(
-                              size: 56,
-                              color: AppColors.graphiteYellow,
-                            ),
-                            Image.asset(
-                              AppConstants.logoPath,
-                              fit: BoxFit.contain,
-                              errorBuilder: (context, error, stackTrace) =>
-                                  const SizedBox(),
-                            ),
-                          ],
+                        child: const Center(
+                          child: EmblemIcon(
+                            size: 52,
+                            color: AppColors.graphiteYellow,
+                          ),
                         ),
                       ),
                     ),
