@@ -23,9 +23,12 @@ class ColorPalettePreview extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 8),
-                Text(
-                  'SehatCoach Color Scheme',
-                  style: Theme.of(context).textTheme.titleLarge,
+                Expanded(
+                  child: Text(
+                    'SehatCoach Color Scheme',
+                    style: Theme.of(context).textTheme.titleLarge,
+                    softWrap: true,
+                  ),
                 ),
               ],
             ),

@@ -20,7 +20,7 @@ class HealthStatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: AppColors.background,
         borderRadius: BorderRadius.circular(16),
@@ -39,47 +39,56 @@ class HealthStatCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  color: AppColors.textSecondary,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
+              Expanded(
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    color: AppColors.textSecondary,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
+              const SizedBox(width: 4),
               Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
                   color: iconColor.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: Icon(icon, color: iconColor, size: 20),
+                child: Icon(icon, color: iconColor, size: 18),
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.baseline,
-            textBaseline: TextBaseline.alphabetic,
-            children: [
-              Text(
-                value,
-                style: const TextStyle(
-                  color: AppColors.medicalBlue,
-                  fontSize: 26,
-                  fontWeight: FontWeight.bold,
+          const SizedBox(height: 10),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              children: [
+                Text(
+                  value,
+                  style: const TextStyle(
+                    color: AppColors.medicalBlue,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 4),
-              Text(
-                unit,
-                style: const TextStyle(
-                  color: AppColors.textSecondary,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
+                const SizedBox(width: 4),
+                Text(
+                  unit,
+                  style: const TextStyle(
+                    color: AppColors.textSecondary,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),

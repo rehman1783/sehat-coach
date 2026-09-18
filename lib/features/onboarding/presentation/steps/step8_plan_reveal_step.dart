@@ -32,28 +32,33 @@ class Step8PlanRevealStep extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
-                          Text(
-                            'YOUR CUSTOM PLAN IS READY',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.primaryGreen,
-                              letterSpacing: 0.5,
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: const [
+                            Text(
+                              'YOUR CUSTOM PLAN IS READY',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.primaryGreen,
+                                letterSpacing: 0.5,
+                              ),
+                              softWrap: true,
                             ),
-                          ),
-                          SizedBox(height: 4),
-                          Text(
-                            'Calibrated specifically for your biometrics',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: AppColors.textSecondary,
+                            SizedBox(height: 4),
+                            Text(
+                              'Calibrated specifically for your biometrics',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: AppColors.textSecondary,
+                              ),
+                              softWrap: true,
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
+                      const SizedBox(width: 8),
                       Container(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 10, vertical: 4),
