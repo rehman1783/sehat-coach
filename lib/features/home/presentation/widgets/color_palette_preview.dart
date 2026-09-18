@@ -128,6 +128,7 @@ class _SwatchTile extends StatelessWidget {
               fontWeight: FontWeight.bold,
               fontSize: 11,
             ),
+            softWrap: true,
           ),
           const SizedBox(height: 6),
           Text(
@@ -137,6 +138,7 @@ class _SwatchTile extends StatelessWidget {
               fontSize: 12,
               fontWeight: FontWeight.w500,
             ),
+            softWrap: true,
           ),
         ],
       ),
