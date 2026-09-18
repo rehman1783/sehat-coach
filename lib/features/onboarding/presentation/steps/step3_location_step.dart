@@ -60,7 +60,7 @@ class Step3LocationStep extends StatelessWidget {
                 color: AppColors.primaryGreen.withValues(alpha: 0.3),
               ),
             ),
-            child: const Row(
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(

@@ -2,11 +2,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:sehat_coach/main.dart';
 
 void main() {
-  testWidgets('SehatCoach app smoke test', (WidgetTester tester) async {
-    // Build SehatCoachApp and trigger a frame.
+  testWidgets('SehatCoach splash screen smoke test', (WidgetTester tester) async {
     await tester.pumpWidget(const SehatCoachApp());
-
-    // Verify app title loads.
-    expect(find.text('Welcome to SehatCoach'), findsOneWidget);
+    expect(find.text('SEHAT COACH'), findsOneWidget);
+    expect(find.text('START ONBOARDING'), findsOneWidget);
   });
 }

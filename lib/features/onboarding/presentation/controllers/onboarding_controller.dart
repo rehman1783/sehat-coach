@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import '../../domain/models/onboarding_state.dart';
 
 class OnboardingController extends ChangeNotifier {
-  OnboardingState _state = OnboardingState();
+  final OnboardingState _state = OnboardingState();
 
   OnboardingState get state => _state;
 
