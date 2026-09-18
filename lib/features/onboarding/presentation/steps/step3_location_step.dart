@@ -68,20 +68,26 @@ class Step3LocationStep extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Row(
-                          children: [
-                            Text('🇵🇰', style: TextStyle(fontSize: 18)),
-                            SizedBox(width: 8),
-                            Text(
-                              'Pakistan (Default Market)',
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.primaryGreen,
+                        const Expanded(
+                          child: Row(
+                            children: [
+                              Text('🇵🇰', style: TextStyle(fontSize: 18)),
+                              SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  'Pakistan (Default Market)',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.primaryGreen,
+                                  ),
+                                  softWrap: true,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
+                        const SizedBox(width: 8),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                           decoration: const BoxDecoration(
