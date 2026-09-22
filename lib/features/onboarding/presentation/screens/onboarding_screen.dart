@@ -140,7 +140,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         onContinue: () => _goToStep(3),
                       ),
                       Step3LocationStep(
+                        selectedCountry: state.country,
                         selectedCity: state.city,
+                        onSelectCountry: (countryData) {
+                          HapticFeedback.selectionClick();
+                          _controller.setCountry(
+                            countryData.name,
+                            countryData.flag,
+                            defaultCity: countryData.cities.first,
+                          );
+                        },
                         onSelectCity: (c) {
                           HapticFeedback.selectionClick();
                           _controller.setCity(c);

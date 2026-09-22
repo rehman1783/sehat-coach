@@ -18,6 +18,8 @@ class OnboardingState {
   int age;
   int heightCm;
   int weightKg;
+  String country;
+  String countryFlag;
   String city;
   KitchenRoutine kitchen;
   List<HealthCondition> conditions;
@@ -32,6 +34,8 @@ class OnboardingState {
     this.age = 25,
     this.heightCm = 172,
     this.weightKg = 70,
+    this.country = 'Pakistan',
+    this.countryFlag = '🇵🇰',
     this.city = 'Lahore',
     this.kitchen = KitchenRoutine.homeFamily,
     List<HealthCondition>? conditions,
@@ -63,6 +67,8 @@ class OnboardingState {
     int? age,
     int? heightCm,
     int? weightKg,
+    String? country,
+    String? countryFlag,
     String? city,
     KitchenRoutine? kitchen,
     List<HealthCondition>? conditions,
@@ -77,6 +83,8 @@ class OnboardingState {
       age: age ?? this.age,
       heightCm: heightCm ?? this.heightCm,
       weightKg: weightKg ?? this.weightKg,
+      country: country ?? this.country,
+      countryFlag: countryFlag ?? this.countryFlag,
       city: city ?? this.city,
       kitchen: kitchen ?? this.kitchen,
       conditions: conditions ?? this.conditions,

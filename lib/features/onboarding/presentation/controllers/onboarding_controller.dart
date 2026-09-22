@@ -36,6 +36,15 @@ class OnboardingController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setCountry(String country, String flag, {String? defaultCity}) {
+    _state.country = country;
+    _state.countryFlag = flag;
+    if (defaultCity != null && defaultCity.isNotEmpty) {
+      _state.city = defaultCity;
+    }
+    notifyListeners();
+  }
+
   void setCity(String city) {
     _state.city = city;
     notifyListeners();

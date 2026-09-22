@@ -208,7 +208,7 @@ class Step8PlanRevealStep extends StatelessWidget {
                               textColor: AppColors.medicalBlue,
                             ),
                             _BadgeChip(
-                              label: '✓ ${state.city} Prices',
+                              label: '✓ ${state.countryFlag} ${state.city}, ${state.country} Prices',
                               bgColor: const Color(0xFFEFF6FF),
                               textColor: const Color(0xFF1E40AF),
                             ),
