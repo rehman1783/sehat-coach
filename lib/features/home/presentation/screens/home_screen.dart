@@ -16,19 +16,11 @@ class HomeScreen extends StatelessWidget {
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              width: 28,
-              height: 28,
-              decoration: BoxDecoration(
-                color: AppColors.primaryGreen,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Center(
-                child: EmblemIcon(size: 18, color: AppColors.graphiteYellow),
-              ),
+            Image.asset(
+              AppConstants.logoPath,
+              height: 36,
+              fit: BoxFit.contain,
             ),
-            const SizedBox(width: 8),
-            const Text(AppConstants.appName),
           ],
         ),
         actions: [
@@ -71,20 +63,23 @@ class HomeScreen extends StatelessWidget {
                       children: [
                         Center(
                           child: Container(
-                            width: 72,
-                            height: 72,
-                            padding: const EdgeInsets.all(12),
+                            width: 84,
+                            height: 84,
+                            padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
-                              color: AppColors.primaryGreen,
-                              borderRadius: BorderRadius.circular(18),
-                              border: Border.all(
-                                color: AppColors.graphiteYellow
-                                    .withValues(alpha: 0.4),
-                              ),
+                              color: AppColors.white,
+                              borderRadius: BorderRadius.circular(20),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.1),
+                                  blurRadius: 12,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
                             ),
-                            child: const EmblemIcon(
-                              size: 44,
-                              color: AppColors.graphiteYellow,
+                            child: Image.asset(
+                              AppConstants.logoPath,
+                              fit: BoxFit.contain,
                             ),
                           ),
                         ),

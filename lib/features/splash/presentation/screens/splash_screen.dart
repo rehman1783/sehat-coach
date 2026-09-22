@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../../../../core/constants/app_constants.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/emblem_icon.dart';
 import '../../../onboarding/presentation/screens/onboarding_screen.dart';
@@ -67,7 +68,7 @@ class _SplashScreenState extends State<SplashScreen>
                 children: [
                   const Spacer(),
 
-                  // Animated Emblem Container (96x96 px, Brand Green, 1.5px Border)
+                  // Animated Official Logo Container
                   ScaleTransition(
                     scale: _scaleAnim,
                     child: GestureDetector(
@@ -75,29 +76,31 @@ class _SplashScreenState extends State<SplashScreen>
                         HapticFeedback.selectionClick();
                       },
                       child: Container(
-                        width: 96,
-                        height: 96,
+                        width: 140,
+                        height: 140,
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: AppColors.primaryGreen,
-                          borderRadius: BorderRadius.circular(24),
+                          color: AppColors.white,
+                          borderRadius: BorderRadius.circular(28),
                           border: Border.all(
-                            color: AppColors.border,
+                            color: AppColors.border.withValues(alpha: 0.3),
                             width: 1.5,
                           ),
                           boxShadow: [
                             BoxShadow(
                               color: AppColors.primaryGreen
-                                  .withValues(alpha: 0.25),
-                              blurRadius: 20,
-                              offset: const Offset(0, 8),
+                                  .withValues(alpha: 0.15),
+                              blurRadius: 24,
+                              offset: const Offset(0, 10),
                             ),
                           ],
                         ),
-                        child: const Center(
-                          child: EmblemIcon(
-                            size: 52,
-                            color: AppColors.graphiteYellow,
+                        child: Center(
+                          child: Image.asset(
+                            AppConstants.logoPath,
+                            width: 110,
+                            height: 110,
+                            fit: BoxFit.contain,
                           ),
                         ),
                       ),
@@ -114,7 +117,7 @@ class _SplashScreenState extends State<SplashScreen>
                         const Text(
                           'SEHAT COACH',
                           style: TextStyle(
-                            fontSize: 28,
+                            fontSize: 26,
                             fontWeight: FontWeight.w900,
                             color: AppColors.primaryGreen,
                             letterSpacing: 1.2,
