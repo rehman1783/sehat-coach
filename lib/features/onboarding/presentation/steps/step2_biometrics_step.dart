@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../domain/models/onboarding_state.dart';
 
@@ -246,6 +247,51 @@ class _TogglePill extends StatelessWidget {
   }
 }
 
+class _StepButton extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback? onTap;
+
+  const _StepButton({
+    required this.icon,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final bool isDisabled = onTap == null;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
+        child: Container(
+          width: 32,
+          height: 32,
+          decoration: BoxDecoration(
+            color: isDisabled
+                ? const Color(0xFFF1F5F9)
+                : AppColors.primaryGreen.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: isDisabled
+                  ? AppColors.border
+                  : AppColors.primaryGreen.withValues(alpha: 0.3),
+            ),
+          ),
+          alignment: Alignment.center,
+          child: Icon(
+            icon,
+            size: 16,
+            color: isDisabled
+                ? AppColors.textSecondary.withValues(alpha: 0.4)
+                : AppColors.primaryGreen,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _SliderCard extends StatelessWidget {
   final String title;
   final String valueText;
@@ -285,16 +331,42 @@ class _SliderCard extends StatelessWidget {
                   color: AppColors.medicalBlue,
                 ),
               ),
-              Text(
-                valueText,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primaryGreen,
-                ),
+              Row(
+                children: [
+                  _StepButton(
+                    icon: Icons.remove,
+                    onTap: value > min
+                        ? () {
+                            HapticFeedback.selectionClick();
+                            onChanged((value - 1).clamp(min, max));
+                          }
+                        : null,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Text(
+                      valueText,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primaryGreen,
+                      ),
+                    ),
+                  ),
+                  _StepButton(
+                    icon: Icons.add,
+                    onTap: value < max
+                        ? () {
+                            HapticFeedback.selectionClick();
+                            onChanged((value + 1).clamp(min, max));
+                          }
+                        : null,
+                  ),
+                ],
               ),
             ],
           ),
+          const SizedBox(height: 6),
           SliderTheme(
             data: SliderTheme.of(context).copyWith(
               activeTrackColor: AppColors.primaryGreen,
