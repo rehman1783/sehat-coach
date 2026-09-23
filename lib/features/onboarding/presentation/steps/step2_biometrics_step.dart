@@ -148,7 +148,7 @@ class Step2BiometricsStep extends StatelessWidget {
                     title: 'Age',
                     valueText: '${state.age} yrs',
                     value: state.age.toDouble(),
-                    min: 16,
+                    min: 14,
                     max: 75,
                     onChanged: (v) => onAgeChanged(v.round()),
                   ),
@@ -176,7 +176,7 @@ class Step2BiometricsStep extends StatelessWidget {
                         ? '${state.weightKg} kg'
                         : '${(state.weightKg * 2.20462).round()} lbs',
                     value: state.weightKg.toDouble(),
-                    min: 40,
+                    min: 30,
                     max: 160,
                     onChanged: (v) => onWeightChanged(v.round()),
                   ),
