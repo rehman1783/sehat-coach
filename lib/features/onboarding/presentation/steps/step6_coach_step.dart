@@ -3,12 +3,12 @@ import '../../../../core/theme/app_colors.dart';
 import '../../domain/models/onboarding_state.dart';
 
 class Step6CoachStep extends StatelessWidget {
-  final CoachPersonality selectedCoach;
+  final CoachPersonality? selectedCoach;
   final ValueChanged<CoachPersonality> onSelectCoach;
 
   const Step6CoachStep({
     super.key,
-    required this.selectedCoach,
+    this.selectedCoach,
     required this.onSelectCoach,
   });
 

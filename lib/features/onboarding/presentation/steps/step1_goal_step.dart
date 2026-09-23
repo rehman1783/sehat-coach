@@ -4,12 +4,12 @@ import '../../domain/models/onboarding_state.dart';
 import '../widgets/option_card.dart';
 
 class Step1GoalStep extends StatelessWidget {
-  final GoalType selectedGoal;
+  final GoalType? selectedGoal;
   final ValueChanged<GoalType> onSelectGoal;
 
   const Step1GoalStep({
     super.key,
-    required this.selectedGoal,
+    this.selectedGoal,
     required this.onSelectGoal,
   });
 

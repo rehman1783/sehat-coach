@@ -12,7 +12,7 @@ enum CoachPersonality { ammi, direct, gentle }
 
 class OnboardingState {
   int currentStep;
-  GoalType goal;
+  GoalType? goal;
   BiologicalSex sex;
   UnitType unit;
   int age;
@@ -21,14 +21,14 @@ class OnboardingState {
   String country;
   String countryFlag;
   String city;
-  KitchenRoutine kitchen;
+  KitchenRoutine? kitchen;
   List<HealthCondition> conditions;
-  CoachPersonality coach;
+  CoachPersonality? coach;
   int calculatedCalories;
 
   OnboardingState({
     this.currentStep = 1,
-    this.goal = GoalType.dropFat,
+    this.goal,
     this.sex = BiologicalSex.male,
     this.unit = UnitType.metric,
     this.age = 25,
@@ -37,11 +37,11 @@ class OnboardingState {
     this.country = 'Pakistan',
     this.countryFlag = '🇵🇰',
     this.city = 'Lahore',
-    this.kitchen = KitchenRoutine.homeFamily,
+    this.kitchen,
     List<HealthCondition>? conditions,
-    this.coach = CoachPersonality.ammi,
+    this.coach,
     this.calculatedCalories = 1820,
-  }) : conditions = conditions ?? [HealthCondition.standard];
+  }) : conditions = conditions ?? [];
 
   // Calculated getters
   int get proteinGrams => ((calculatedCalories * 0.30) / 4).round();
@@ -56,6 +56,8 @@ class OnboardingState {
         return 'Direct Coach';
       case CoachPersonality.gentle:
         return 'Gentle Coach';
+      case null:
+        return 'Ammi Routine';
     }
   }
 

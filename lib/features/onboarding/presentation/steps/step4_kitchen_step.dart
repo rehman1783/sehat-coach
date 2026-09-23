@@ -4,12 +4,12 @@ import '../../domain/models/onboarding_state.dart';
 import '../widgets/option_card.dart';
 
 class Step4KitchenStep extends StatelessWidget {
-  final KitchenRoutine selectedKitchen;
+  final KitchenRoutine? selectedKitchen;
   final ValueChanged<KitchenRoutine> onSelectKitchen;
 
   const Step4KitchenStep({
     super.key,
-    required this.selectedKitchen,
+    this.selectedKitchen,
     required this.onSelectKitchen,
   });
 
