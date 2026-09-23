@@ -216,7 +216,7 @@ class _SplashScreenState extends State<SplashScreen>
                         const SizedBox(height: 16),
 
                         const Text(
-                          'POWERED BY AI • BUILT FOR PAKISTAN',
+                          'POWERED BY AI • HYBRID DESI & GLOBAL',
                           style: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.bold,

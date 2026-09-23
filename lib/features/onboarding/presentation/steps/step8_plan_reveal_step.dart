@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../../core/theme/app_colors.dart';
 import '../../domain/models/onboarding_state.dart';
 
@@ -61,7 +62,9 @@ class Step8PlanRevealStep extends StatelessWidget {
                       const SizedBox(width: 8),
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 4),
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: AppColors.graphiteYellow,
                           borderRadius: BorderRadius.circular(8),
@@ -85,8 +88,10 @@ class Step8PlanRevealStep extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: AppColors.background,
                       borderRadius: BorderRadius.circular(20),
-                      border:
-                          Border.all(color: AppColors.primaryGreen, width: 2),
+                      border: Border.all(
+                        color: AppColors.primaryGreen,
+                        width: 2,
+                      ),
                       boxShadow: [
                         BoxShadow(
                           color: AppColors.primaryGreen.withValues(alpha: 0.1),
@@ -198,8 +203,9 @@ class Step8PlanRevealStep extends StatelessWidget {
                           children: [
                             _BadgeChip(
                               label: '✓ Bachat Mode Active',
-                              bgColor: AppColors.primaryGreen
-                                  .withValues(alpha: 0.1),
+                              bgColor: AppColors.primaryGreen.withValues(
+                                alpha: 0.1,
+                              ),
                               textColor: AppColors.primaryGreen,
                             ),
                             _BadgeChip(
@@ -208,7 +214,8 @@ class Step8PlanRevealStep extends StatelessWidget {
                               textColor: AppColors.medicalBlue,
                             ),
                             _BadgeChip(
-                              label: '✓ ${state.countryFlag} ${state.city}, ${state.country} Prices',
+                              label:
+                                  '✓ ${state.countryFlag} ${state.city}, ${state.country} Prices',
                               bgColor: const Color(0xFFEFF6FF),
                               textColor: const Color(0xFF1E40AF),
                             ),
@@ -259,11 +266,8 @@ class Step8PlanRevealStep extends StatelessWidget {
           const SizedBox(height: 6),
           const Center(
             child: Text(
-              '7-Day Free Trial • Cancel Anytime',
-              style: TextStyle(
-                fontSize: 11,
-                color: AppColors.textSecondary,
-              ),
+              '7-Day Free • Cancel Anytime',
+              style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
             ),
           ),
         ],
@@ -273,8 +277,18 @@ class Step8PlanRevealStep extends StatelessWidget {
 
   static String _monthName(int m) {
     const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
     return months[m - 1];
   }
