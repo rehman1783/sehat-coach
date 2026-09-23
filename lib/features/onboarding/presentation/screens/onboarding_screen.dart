@@ -4,9 +4,11 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../home/presentation/screens/home_screen.dart';
 import '../controllers/onboarding_controller.dart';
 import '../steps/step1_goal_step.dart';
+import '../steps/reward1_empathy_step.dart';
 import '../steps/step2_biometrics_step.dart';
 import '../steps/step3_location_step.dart';
 import '../steps/step4_kitchen_step.dart';
+import '../steps/reward2_freedom_step.dart';
 import '../steps/step5_conditions_step.dart';
 import '../steps/step6_coach_step.dart';
 import '../steps/step7_calculation_step.dart';
@@ -55,7 +57,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   void _goToStep(int step) {
-    if (step < 1 || step > 8) return;
+    if (step < 1 || step > 10) return;
     HapticFeedback.selectionClick();
     setState(() {
       _currentStep = step;
@@ -70,7 +72,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   void _nextStepWithAutoAdvance() {
     HapticFeedback.lightImpact();
     Future.delayed(const Duration(milliseconds: 150), () {
-      if (mounted && _currentStep < 8) {
+      if (mounted && _currentStep < 10) {
         _goToStep(_currentStep + 1);
       }
     });
@@ -110,7 +112,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 // Segmented Progress Header
                 ProgressHeader(
                   currentStep: _currentStep,
-                  totalSteps: 8,
+                  totalSteps: 10,
                   language: state.language,
                   onLanguageChanged: (lang) {
                     HapticFeedback.selectionClick();
@@ -119,7 +121,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   onBack: () => _goToStep(_currentStep - 1),
                 ),
 
-                // Main PageView for 8 Steps
+                // Main PageView for 10 Steps
                 Expanded(
                   child: PageView(
                     controller: _pageController,
@@ -130,6 +132,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       });
                     },
                     children: [
+                      // Step 1: Goal Selection
                       Step1GoalStep(
                         selectedGoal: state.goal,
                         language: state.language,
@@ -138,6 +141,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           _nextStepWithAutoAdvance();
                         },
                       ),
+
+                      // Step 2 (NEW): Interstitial Reward 1 - Empathy Anchor
+                      Reward1EmpathyStep(
+                        state: state,
+                        onContinue: () => _goToStep(3),
+                      ),
+
+                      // Step 3: Biometrics (Sex, Age, Height, Weight)
                       Step2BiometricsStep(
                         state: state,
                         onSexChanged: (s) {
@@ -151,8 +162,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         onAgeChanged: _controller.setAge,
                         onHeightChanged: _controller.setHeight,
                         onWeightChanged: _controller.setWeight,
-                        onContinue: () => _goToStep(3),
+                        onContinue: () => _goToStep(4),
                       ),
+
+                      // Step 4: Region & Location
                       Step3LocationStep(
                         selectedCountry: state.country,
                         selectedCity: state.city,
@@ -169,8 +182,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           HapticFeedback.selectionClick();
                           _controller.setCity(c);
                         },
-                        onContinue: () => _goToStep(4),
+                        onContinue: () => _goToStep(5),
                       ),
+
+                      // Step 5: Kitchen Setup
                       Step4KitchenStep(
                         selectedKitchen: state.kitchen,
                         language: state.language,
@@ -179,6 +194,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           _nextStepWithAutoAdvance();
                         },
                       ),
+
+                      // Step 6 (NEW): Interstitial Reward 2 - Freedom Validation
+                      Reward2FreedomStep(
+                        state: state,
+                        onContinue: () => _goToStep(7),
+                      ),
+
+                      // Step 7: Fasting & Health Overlays
                       Step5ConditionsStep(
                         selectedConditions: state.conditions,
                         language: state.language,
@@ -186,8 +209,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           HapticFeedback.selectionClick();
                           _controller.setCondition(c);
                         },
-                        onContinue: () => _goToStep(6),
+                        onContinue: () => _goToStep(8),
                       ),
+
+                      // Step 8: Coaching Style / Tone Selection
                       Step6CoachStep(
                         selectedCoach: state.coach,
                         language: state.language,
@@ -196,13 +221,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           _nextStepWithAutoAdvance();
                         },
                       ),
+
+                      // Step 9: 3-Second Calculation Engine
                       Step7CalculationStep(
                         language: state.language,
                         onCompleted: () {
                           _controller.computeFinalBlueprint();
-                          _goToStep(8);
+                          _goToStep(10);
                         },
                       ),
+
+                      // Step 10: Blueprint Reveal & Claim
                       Step8PlanRevealStep(
                         state: state,
                         onClaimPlan: _openAuthBottomSheet,
