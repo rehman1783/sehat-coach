@@ -55,22 +55,12 @@ class OnboardingController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void toggleCondition(HealthCondition cond) {
-    if (cond == HealthCondition.standard) {
-      _state.conditions = [HealthCondition.standard];
-    } else {
-      _state.conditions.remove(HealthCondition.standard);
-      if (_state.conditions.contains(cond)) {
-        _state.conditions.remove(cond);
-      } else {
-        _state.conditions.add(cond);
-      }
-      if (_state.conditions.isEmpty) {
-        _state.conditions = [HealthCondition.standard];
-      }
-    }
+  void setCondition(HealthCondition cond) {
+    _state.conditions = [cond];
     notifyListeners();
   }
+
+  void toggleCondition(HealthCondition cond) => setCondition(cond);
 
   void setCoach(CoachPersonality coach) {
     _state.coach = coach;

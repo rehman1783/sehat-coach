@@ -165,9 +165,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       ),
                       Step5ConditionsStep(
                         selectedConditions: state.conditions,
-                        onToggleCondition: (c) {
+                        onSelectCondition: (c) {
                           HapticFeedback.selectionClick();
-                          _controller.toggleCondition(c);
+                          _controller.setCondition(c);
                         },
                         onContinue: () => _goToStep(6),
                       ),
