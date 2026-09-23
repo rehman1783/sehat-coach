@@ -5,23 +5,27 @@ import '../../domain/models/onboarding_state.dart';
 class Step6CoachStep extends StatelessWidget {
   final CoachPersonality? selectedCoach;
   final ValueChanged<CoachPersonality> onSelectCoach;
+  final AppLanguage language;
 
   const Step6CoachStep({
     super.key,
     this.selectedCoach,
     required this.onSelectCoach,
+    this.language = AppLanguage.english,
   });
 
   @override
   Widget build(BuildContext context) {
+    final bool isEnglish = language == AppLanguage.english;
+
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'CHOOSE YOUR COACH',
-            style: TextStyle(
+          Text(
+            isEnglish ? 'CHOOSE YOUR COACH' : 'APNA COACH CHUNEIN',
+            style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
               color: AppColors.primaryGreen,
@@ -29,9 +33,11 @@ class Step6CoachStep extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 6),
-          const Text(
-            'How should notifications sound when you forget to log your food?',
-            style: TextStyle(
+          Text(
+            isEnglish
+                ? 'How should notifications sound when you forget to log your food?'
+                : 'Jab khana log karna bhool jayein toh notifications kaisi hon?',
+            style: const TextStyle(
               fontSize: 13,
               color: AppColors.textSecondary,
             ),
@@ -41,22 +47,28 @@ class Step6CoachStep extends StatelessWidget {
             child: ListView(
               children: [
                 _CoachCard(
-                  title: 'Desi Ammi Mode',
-                  sampleText: '"Beta, dopahar se kuch nahi khaya? Phone uthao aur log karo!"',
-                  emoji: '🧕',
+                  title: isEnglish ? 'Caring Parent Mode' : 'Desi Ammi Mode',
+                  sampleText: isEnglish
+                      ? '"Haven\'t logged your meal yet? Open the app and track it!"'
+                      : '"Beta, dopahar se kuch nahi khaya? Phone uthao aur log karo!"',
+                  emoji: isEnglish ? '❤️' : '🧕',
                   isSelected: selectedCoach == CoachPersonality.ammi,
                   onTap: () => onSelectCoach(CoachPersonality.ammi),
                 ),
                 _CoachCard(
-                  title: 'Direct & Firm',
-                  sampleText: '"No excuses. You missed your logging window. Record it now."',
+                  title: isEnglish ? 'Direct & Firm' : 'Direct & Firm',
+                  sampleText: isEnglish
+                      ? '"No excuses. You missed your logging window. Record it now."'
+                      : '"Koi bahana nahi. Meal recording ka waqt nikal gaya, abhi log karein."',
                   emoji: '🥊',
                   isSelected: selectedCoach == CoachPersonality.direct,
                   onTap: () => onSelectCoach(CoachPersonality.direct),
                 ),
                 _CoachCard(
-                  title: 'Gentle Guide',
-                  sampleText: '"Take your time. Record your meal whenever you\'re ready."',
+                  title: isEnglish ? 'Gentle Guide' : 'Gentle Guide',
+                  sampleText: isEnglish
+                      ? '"Take your time. Record your meal whenever you\'re ready."'
+                      : '"Aram se karein. Jab aap tayyar hon tab apna khana log karein."',
                   emoji: '🧘',
                   isSelected: selectedCoach == CoachPersonality.gentle,
                   onTap: () => onSelectCoach(CoachPersonality.gentle),
@@ -64,10 +76,10 @@ class Step6CoachStep extends StatelessWidget {
               ],
             ),
           ),
-          const Center(
+          Center(
             child: Text(
-              '⚡ Tap any option to auto-advance',
-              style: TextStyle(
+              isEnglish ? '⚡ Tap any option to auto-advance' : '⚡ Kisi bhi option par tap karein auto-advance ke liye',
+              style: const TextStyle(
                 fontSize: 11,
                 color: AppColors.textLight,
                 fontWeight: FontWeight.w500,

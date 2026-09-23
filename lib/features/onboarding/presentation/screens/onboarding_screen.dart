@@ -14,8 +14,15 @@ import '../steps/step8_plan_reveal_step.dart';
 import '../widgets/auth_bottom_sheet.dart';
 import '../widgets/progress_header.dart';
 
+import '../../domain/models/onboarding_state.dart';
+
 class OnboardingScreen extends StatefulWidget {
-  const OnboardingScreen({super.key});
+  final AppLanguage initialLanguage;
+
+  const OnboardingScreen({
+    super.key,
+    this.initialLanguage = AppLanguage.english,
+  });
 
   @override
   State<OnboardingScreen> createState() => _OnboardingScreenState();
@@ -30,6 +37,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   void initState() {
     super.initState();
     _controller = OnboardingController();
+    _controller.setLanguage(widget.initialLanguage);
     _pageController = PageController();
     _controller.addListener(_onControllerChanged);
   }
@@ -103,6 +111,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 ProgressHeader(
                   currentStep: _currentStep,
                   totalSteps: 8,
+                  language: state.language,
+                  onLanguageChanged: (lang) {
+                    HapticFeedback.selectionClick();
+                    _controller.setLanguage(lang);
+                  },
                   onBack: () => _goToStep(_currentStep - 1),
                 ),
 
@@ -119,6 +132,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     children: [
                       Step1GoalStep(
                         selectedGoal: state.goal,
+                        language: state.language,
                         onSelectGoal: (g) {
                           _controller.setGoal(g);
                           _nextStepWithAutoAdvance();
@@ -142,6 +156,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       Step3LocationStep(
                         selectedCountry: state.country,
                         selectedCity: state.city,
+                        language: state.language,
                         onSelectCountry: (countryData) {
                           HapticFeedback.selectionClick();
                           _controller.setCountry(
@@ -158,6 +173,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       ),
                       Step4KitchenStep(
                         selectedKitchen: state.kitchen,
+                        language: state.language,
                         onSelectKitchen: (k) {
                           _controller.setKitchen(k);
                           _nextStepWithAutoAdvance();
@@ -165,6 +181,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       ),
                       Step5ConditionsStep(
                         selectedConditions: state.conditions,
+                        language: state.language,
                         onSelectCondition: (c) {
                           HapticFeedback.selectionClick();
                           _controller.setCondition(c);
@@ -173,12 +190,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       ),
                       Step6CoachStep(
                         selectedCoach: state.coach,
+                        language: state.language,
                         onSelectCoach: (c) {
                           _controller.setCoach(c);
                           _nextStepWithAutoAdvance();
                         },
                       ),
                       Step7CalculationStep(
+                        language: state.language,
                         onCompleted: () {
                           _controller.computeFinalBlueprint();
                           _goToStep(8);

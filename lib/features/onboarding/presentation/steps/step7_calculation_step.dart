@@ -1,13 +1,16 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../domain/models/onboarding_state.dart';
 
 class Step7CalculationStep extends StatefulWidget {
   final VoidCallback onCompleted;
+  final AppLanguage language;
 
   const Step7CalculationStep({
     super.key,
     required this.onCompleted,
+    this.language = AppLanguage.english,
   });
 
   @override
@@ -53,6 +56,7 @@ class _Step7CalculationStepState extends State<Step7CalculationStep> {
   @override
   Widget build(BuildContext context) {
     final int percent = (_progress * 100).floor();
+    final bool isEnglish = widget.language == AppLanguage.english;
 
     return Padding(
       padding: const EdgeInsets.all(24.0),
@@ -61,9 +65,9 @@ class _Step7CalculationStepState extends State<Step7CalculationStep> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text(
-                'CALIBRATING YOUR BLUEPRINT...',
-                style: TextStyle(
+              Text(
+                isEnglish ? 'CALIBRATING YOUR BLUEPRINT...' : 'METABOLIC BLUEPRINT CALCULATE HO RAHA HAI...',
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: AppColors.primaryGreen,
@@ -72,9 +76,11 @@ class _Step7CalculationStepState extends State<Step7CalculationStep> {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 6),
-              const Text(
-                'Creating your custom metabolic model',
-                style: TextStyle(
+              Text(
+                isEnglish
+                    ? 'Creating your custom metabolic model'
+                    : 'Aapka custom metabolic model ban raha hai',
+                style: const TextStyle(
                   fontSize: 13,
                   color: AppColors.textSecondary,
                 ),
@@ -142,17 +148,23 @@ class _Step7CalculationStepState extends State<Step7CalculationStep> {
               Column(
                 children: [
                   _CheckItem(
-                    text: 'Computing Mifflin-St Jeor baseline...',
+                    text: isEnglish
+                        ? 'Computing Mifflin-St Jeor baseline...'
+                        : 'Biometrics aur goals analyze ho rahe hain...',
                     isDone: _progress >= 0.33,
                   ),
                   const SizedBox(height: 12),
                   _CheckItem(
-                    text: 'Aligning market prices & Bachat index...',
+                    text: isEnglish
+                        ? 'Aligning market prices & budget index...'
+                        : 'Daily calories aur Bachat index set ho rahe hain...',
                     isDone: _progress >= 0.66,
                   ),
                   const SizedBox(height: 12),
                   _CheckItem(
-                    text: 'Configuring prayer & coach timers...',
+                    text: isEnglish
+                        ? 'Configuring prayer & coach timers...'
+                        : 'Timers aur coach notifications set ho rahi hain...',
                     isDone: _progress >= 0.95,
                   ),
                 ],

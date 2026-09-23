@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../domain/models/location_data.dart';
+import '../../domain/models/onboarding_state.dart';
 
 class Step3LocationStep extends StatefulWidget {
   final String selectedCountry;
@@ -8,6 +9,7 @@ class Step3LocationStep extends StatefulWidget {
   final ValueChanged<CountryData> onSelectCountry;
   final ValueChanged<String> onSelectCity;
   final VoidCallback onContinue;
+  final AppLanguage language;
 
   const Step3LocationStep({
     super.key,
@@ -16,6 +18,7 @@ class Step3LocationStep extends StatefulWidget {
     required this.onSelectCountry,
     required this.onSelectCity,
     required this.onContinue,
+    this.language = AppLanguage.english,
   });
 
   @override
@@ -189,6 +192,7 @@ class _Step3LocationStepState extends State<Step3LocationStep> {
     final topCities = currentCountry.cities.take(8).toList();
     final bool isSelectedCityInList = currentCountry.cities.any(
         (c) => c.toLowerCase() == widget.selectedCity.toLowerCase());
+    final bool isEnglish = widget.language == AppLanguage.english;
 
     return Padding(
       padding: const EdgeInsets.all(20.0),
@@ -200,9 +204,9 @@ class _Step3LocationStepState extends State<Step3LocationStep> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    "WHERE'S YOUR KITCHEN?",
-                    style: TextStyle(
+                  Text(
+                    isEnglish ? "WHERE'S YOUR KITCHEN?" : "AAPKA KITCHEN KAHAN HAI?",
+                    style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                       color: AppColors.primaryGreen,
@@ -210,9 +214,11 @@ class _Step3LocationStepState extends State<Step3LocationStep> {
                     ),
                   ),
                   const SizedBox(height: 6),
-                  const Text(
-                    'Used for exact Suhoor/Iftar prayer clocks and local market grocery prices.',
-                    style: TextStyle(
+                  Text(
+                    isEnglish
+                        ? 'Used for exact fasting prayer clocks and local market grocery prices.'
+                        : 'Fasting clocks aur muqami market grocery prices ke liye zaroori hai.',
+                    style: const TextStyle(
                       fontSize: 13,
                       color: AppColors.textSecondary,
                     ),
@@ -220,9 +226,9 @@ class _Step3LocationStepState extends State<Step3LocationStep> {
                   const SizedBox(height: 16),
 
                   // Country Selection Dropdown Header
-                  const Text(
-                    'SELECT YOUR COUNTRY',
-                    style: TextStyle(
+                  Text(
+                    isEnglish ? 'SELECT YOUR COUNTRY' : 'APNA MULK SELECT KAREIN',
+                    style: const TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
                       color: AppColors.textSecondary,
@@ -288,9 +294,9 @@ class _Step3LocationStepState extends State<Step3LocationStep> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        'SELECT YOUR CITY',
-                        style: TextStyle(
+                      Text(
+                        isEnglish ? 'SELECT YOUR CITY' : 'APNA SHEHAR SELECT KAREIN',
+                        style: const TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.bold,
                           color: AppColors.textSecondary,
@@ -307,7 +313,9 @@ class _Step3LocationStepState extends State<Step3LocationStep> {
                               const Icon(Icons.search, size: 14, color: AppColors.primaryGreen),
                               const SizedBox(width: 4),
                               Text(
-                                'Search All (${currentCountry.cities.length} cities)',
+                                isEnglish
+                                    ? 'Search All (${currentCountry.cities.length} cities)'
+                                    : 'Tamam Shehar (${currentCountry.cities.length})',
                                 style: const TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.bold,
@@ -430,7 +438,7 @@ class _Step3LocationStepState extends State<Step3LocationStep> {
                 foregroundColor: AppColors.white,
                 padding: const EdgeInsets.symmetric(vertical: 16),
               ),
-              child: const Text('CONTINUE'),
+              child: Text(isEnglish ? 'CONTINUE' : 'AAGE BADHEIN'),
             ),
           ),
         ],

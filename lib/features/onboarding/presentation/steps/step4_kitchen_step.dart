@@ -6,23 +6,27 @@ import '../widgets/option_card.dart';
 class Step4KitchenStep extends StatelessWidget {
   final KitchenRoutine? selectedKitchen;
   final ValueChanged<KitchenRoutine> onSelectKitchen;
+  final AppLanguage language;
 
   const Step4KitchenStep({
     super.key,
     this.selectedKitchen,
     required this.onSelectKitchen,
+    this.language = AppLanguage.english,
   });
 
   @override
   Widget build(BuildContext context) {
+    final bool isEnglish = language == AppLanguage.english;
+
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'HOW DO YOU TYPICALLY EAT?',
-            style: TextStyle(
+          Text(
+            isEnglish ? 'HOW DO YOU TYPICALLY EAT?' : 'AAP KHANA KAISE KHATE HAIN?',
+            style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
               color: AppColors.primaryGreen,
@@ -30,9 +34,11 @@ class Step4KitchenStep extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 6),
-          const Text(
-            'Adjusts oil buffers and grocery shopping models.',
-            style: TextStyle(
+          Text(
+            isEnglish
+                ? 'Adjusts cooking oil buffers and grocery shopping models.'
+                : 'Cooking oil buffers aur grocery model adjust honge.',
+            style: const TextStyle(
               fontSize: 13,
               color: AppColors.textSecondary,
             ),
@@ -42,29 +48,37 @@ class Step4KitchenStep extends StatelessWidget {
             child: ListView(
               children: [
                 OptionCard(
-                  title: 'Home / Family Food',
-                  subtitle: 'Ammi or family cooks — includes Desi oil buffers',
+                  title: isEnglish ? 'Home / Family Meals' : 'Ghar Ka Khana',
+                  subtitle: isEnglish
+                      ? 'Cooked at home — includes cooking oil buffers'
+                      : 'Ammi ya family pakati hai — includes Desi oil buffers',
                   iconEmoji: '🏠',
                   isSelected: selectedKitchen == KitchenRoutine.homeFamily,
                   onTap: () => onSelectKitchen(KitchenRoutine.homeFamily),
                 ),
                 OptionCard(
-                  title: 'I Cook For Myself',
-                  subtitle: 'Unlocks the Bachat grocery planner',
+                  title: isEnglish ? 'Self-Cooked Meals' : 'Khud Pakata Hoon',
+                  subtitle: isEnglish
+                      ? 'Unlocks smart budget grocery planning'
+                      : 'Bachat grocery planner unlock karein',
                   iconEmoji: '👨‍🍳',
                   isSelected: selectedKitchen == KitchenRoutine.cookMyself,
                   onTap: () => onSelectKitchen(KitchenRoutine.cookMyself),
                 ),
                 OptionCard(
-                  title: 'Hostel / Mess / Canteen',
-                  subtitle: 'Optimized for mixed curries & canteen staples',
+                  title: isEnglish ? 'Hostel / Cafeteria' : 'Hostel / Mess / Canteen',
+                  subtitle: isEnglish
+                      ? 'Optimized for daily cafeteria & mess staples'
+                      : 'Canteen aur mess staples ke liye optimized',
                   iconEmoji: '🥡',
                   isSelected: selectedKitchen == KitchenRoutine.hostelMess,
                   onTap: () => onSelectKitchen(KitchenRoutine.hostelMess),
                 ),
                 OptionCard(
-                  title: 'Takeout Dominant',
-                  subtitle: 'Pre-loads local restaurant menus & street food',
+                  title: isEnglish ? 'Dining Out / Takeout' : 'Bahar Ka Khana / Takeout',
+                  subtitle: isEnglish
+                      ? 'Pre-loads restaurant & local dining menus'
+                      : 'Local restaurant menus aur street food pre-loaded',
                   iconEmoji: '🛵',
                   isSelected: selectedKitchen == KitchenRoutine.takeout,
                   onTap: () => onSelectKitchen(KitchenRoutine.takeout),
@@ -72,10 +86,10 @@ class Step4KitchenStep extends StatelessWidget {
               ],
             ),
           ),
-          const Center(
+          Center(
             child: Text(
-              '⚡ Tap any option to auto-advance',
-              style: TextStyle(
+              isEnglish ? '⚡ Tap any option to auto-advance' : '⚡ Kisi bhi option par tap karein auto-advance ke liye',
+              style: const TextStyle(
                 fontSize: 11,
                 color: AppColors.textLight,
                 fontWeight: FontWeight.w500,

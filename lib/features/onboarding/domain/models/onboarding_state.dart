@@ -10,8 +10,11 @@ enum HealthCondition { ramadan, diabetes, bp, standard }
 
 enum CoachPersonality { ammi, direct, gentle }
 
+enum AppLanguage { english, romanUrdu }
+
 class OnboardingState {
   int currentStep;
+  AppLanguage language;
   GoalType? goal;
   BiologicalSex sex;
   UnitType unit;
@@ -28,6 +31,7 @@ class OnboardingState {
 
   OnboardingState({
     this.currentStep = 1,
+    this.language = AppLanguage.english,
     this.goal,
     this.sex = BiologicalSex.male,
     this.unit = UnitType.metric,
@@ -49,15 +53,28 @@ class OnboardingState {
   int get fatGrams => ((calculatedCalories * 0.25) / 9).round();
 
   String get coachName {
-    switch (coach) {
-      case CoachPersonality.ammi:
-        return 'Ammi Routine';
-      case CoachPersonality.direct:
-        return 'Direct Coach';
-      case CoachPersonality.gentle:
-        return 'Gentle Coach';
-      case null:
-        return 'Ammi Routine';
+    if (language == AppLanguage.english) {
+      switch (coach) {
+        case CoachPersonality.ammi:
+          return 'Caring Parent';
+        case CoachPersonality.direct:
+          return 'Direct Coach';
+        case CoachPersonality.gentle:
+          return 'Gentle Coach';
+        case null:
+          return 'Caring Parent';
+      }
+    } else {
+      switch (coach) {
+        case CoachPersonality.ammi:
+          return 'Desi Ammi Mode';
+        case CoachPersonality.direct:
+          return 'Direct Coach';
+        case CoachPersonality.gentle:
+          return 'Gentle Coach';
+        case null:
+          return 'Desi Ammi Mode';
+      }
     }
   }
 

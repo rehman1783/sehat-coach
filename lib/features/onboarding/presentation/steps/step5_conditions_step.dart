@@ -7,24 +7,28 @@ class Step5ConditionsStep extends StatelessWidget {
   final List<HealthCondition> selectedConditions;
   final ValueChanged<HealthCondition> onSelectCondition;
   final VoidCallback onContinue;
+  final AppLanguage language;
 
   const Step5ConditionsStep({
     super.key,
     required this.selectedConditions,
     required this.onSelectCondition,
     required this.onContinue,
+    this.language = AppLanguage.english,
   });
 
   @override
   Widget build(BuildContext context) {
+    final bool isEnglish = language == AppLanguage.english;
+
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'ROUTINES & CONDITIONS',
-            style: TextStyle(
+          Text(
+            isEnglish ? 'ROUTINES & CONDITIONS' : 'ROUTINES & SEHAT',
+            style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
               color: AppColors.primaryGreen,
@@ -32,9 +36,11 @@ class Step5ConditionsStep extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 6),
-          const Text(
-            'Select an option to activate custom AI safety filters.',
-            style: TextStyle(
+          Text(
+            isEnglish
+                ? 'Select an option to activate custom AI safety filters.'
+                : 'AI safety filters activate karne ke liye option chunein.',
+            style: const TextStyle(
               fontSize: 13,
               color: AppColors.textSecondary,
             ),
@@ -44,7 +50,7 @@ class Step5ConditionsStep extends StatelessWidget {
             child: ListView(
               children: [
                 OptionCard(
-                  title: 'Ramadan & Sunnah Fasting',
+                  title: isEnglish ? 'Ramadan & Fasting Schedule' : 'Ramzan & Fasting',
                   subtitle: 'Automated fasting schedules & hydration timers',
                   iconEmoji: '🌙',
                   isSelected: selectedConditions.contains(HealthCondition.ramadan),
@@ -58,15 +64,19 @@ class Step5ConditionsStep extends StatelessWidget {
                   onTap: () => onSelectCondition(HealthCondition.diabetes),
                 ),
                 OptionCard(
-                  title: 'Blood Pressure / Sodium Watch',
-                  subtitle: 'High-salt spice mix warnings',
+                  title: 'Blood Pressure Watch',
+                  subtitle: isEnglish
+                      ? 'High-sodium & spice alerts'
+                      : 'Zyada namak aur masale ke warnings',
                   iconEmoji: '🧂',
                   isSelected: selectedConditions.contains(HealthCondition.bp),
                   onTap: () => onSelectCondition(HealthCondition.bp),
                 ),
                 OptionCard(
                   title: 'Standard Routine',
-                  subtitle: 'No special medical or fasting modes',
+                  subtitle: isEnglish
+                      ? 'No special medical or fasting modes'
+                      : 'Koi khass medical ya fasting mode nahi',
                   iconEmoji: '🌿',
                   isSelected: selectedConditions.contains(HealthCondition.standard),
                   onTap: () => onSelectCondition(HealthCondition.standard),
@@ -84,7 +94,7 @@ class Step5ConditionsStep extends StatelessWidget {
                 foregroundColor: AppColors.white,
                 padding: const EdgeInsets.symmetric(vertical: 16),
               ),
-              child: const Text('CONTINUE'),
+              child: Text(isEnglish ? 'CONTINUE' : 'AAGE BADHEIN'),
             ),
           ),
         ],

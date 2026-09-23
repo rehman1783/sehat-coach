@@ -25,14 +25,16 @@ class Step2BiometricsStep extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isEnglish = state.language == AppLanguage.english;
+
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'CALIBRATE YOUR BIOLOGY',
-            style: TextStyle(
+          Text(
+            isEnglish ? 'CALIBRATE YOUR BIOLOGY' : 'BIOLOGY CALIBRATE KAREIN',
+            style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
               color: AppColors.primaryGreen,
@@ -40,9 +42,11 @@ class Step2BiometricsStep extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 6),
-          const Text(
-            'Precision metrics for accurate energy expenditure.',
-            style: TextStyle(
+          Text(
+            isEnglish
+                ? 'Precision metrics for accurate energy expenditure.'
+                : 'Sahi energy output ke liye zaroori metrics.',
+            style: const TextStyle(
               fontSize: 13,
               color: AppColors.textSecondary,
             ),
@@ -59,9 +63,9 @@ class Step2BiometricsStep extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              'BIOLOGICAL SEX',
-                              style: TextStyle(
+                            Text(
+                              isEnglish ? 'BIOLOGICAL SEX' : 'JINS (SEX)',
+                              style: const TextStyle(
                                 fontSize: 10,
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.textSecondary,
@@ -78,14 +82,14 @@ class Step2BiometricsStep extends StatelessWidget {
                                 children: [
                                   Expanded(
                                     child: _TogglePill(
-                                      label: 'Male 👨',
+                                      label: isEnglish ? 'Male 👨' : 'Mard 👨',
                                       isSelected: state.sex == BiologicalSex.male,
                                       onTap: () => onSexChanged(BiologicalSex.male),
                                     ),
                                   ),
                                   Expanded(
                                     child: _TogglePill(
-                                      label: 'Female 👩',
+                                      label: isEnglish ? 'Female 👩' : 'Aurat 👩',
                                       isSelected: state.sex == BiologicalSex.female,
                                       onTap: () => onSexChanged(BiologicalSex.female),
                                     ),
@@ -145,8 +149,8 @@ class Step2BiometricsStep extends StatelessWidget {
 
                   // Age Slider
                   _SliderCard(
-                    title: 'Age',
-                    valueText: '${state.age} yrs',
+                    title: isEnglish ? 'Age' : 'Umar',
+                    valueText: isEnglish ? '${state.age} yrs' : '${state.age} saal',
                     value: state.age.toDouble(),
                     min: 14,
                     max: 75,
@@ -157,7 +161,7 @@ class Step2BiometricsStep extends StatelessWidget {
 
                   // Height Slider
                   _SliderCard(
-                    title: 'Height',
+                    title: isEnglish ? 'Height' : 'Kadd (Height)',
                     valueText: state.unit == UnitType.metric
                         ? '${state.heightCm} cm'
                         : '${(state.heightCm / 30.48).floor()}′ ${(((state.heightCm % 30.48) / 2.54)).round()}″',
@@ -171,7 +175,7 @@ class Step2BiometricsStep extends StatelessWidget {
 
                   // Weight Slider
                   _SliderCard(
-                    title: 'Current Weight',
+                    title: isEnglish ? 'Current Weight' : 'Wazan (Weight)',
                     valueText: state.unit == UnitType.metric
                         ? '${state.weightKg} kg'
                         : '${(state.weightKg * 2.20462).round()} lbs',
@@ -194,7 +198,7 @@ class Step2BiometricsStep extends StatelessWidget {
                 foregroundColor: AppColors.white,
                 padding: const EdgeInsets.symmetric(vertical: 16),
               ),
-              child: const Text('CONTINUE'),
+              child: Text(isEnglish ? 'CONTINUE' : 'AAGE BADHEIN'),
             ),
           ),
         ],

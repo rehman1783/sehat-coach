@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../domain/models/onboarding_state.dart';
 
 class ProgressHeader extends StatelessWidget {
   final int currentStep;
   final int totalSteps;
+  final AppLanguage language;
+  final ValueChanged<AppLanguage>? onLanguageChanged;
   final VoidCallback? onBack;
   final VoidCallback? onHelp;
 
@@ -11,6 +14,8 @@ class ProgressHeader extends StatelessWidget {
     super.key,
     required this.currentStep,
     this.totalSteps = 8,
+    this.language = AppLanguage.english,
+    this.onLanguageChanged,
     this.onBack,
     this.onHelp,
   });
@@ -18,6 +23,7 @@ class ProgressHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double progress = currentStep / totalSteps;
+    final bool isEnglish = language == AppLanguage.english;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -72,6 +78,34 @@ class ProgressHeader extends StatelessWidget {
                 ],
               ),
             ),
+            const SizedBox(width: 8),
+
+            // Language Toggle Pill
+            GestureDetector(
+              onTap: () {
+                final nextLang = isEnglish ? AppLanguage.romanUrdu : AppLanguage.english;
+                onLanguageChanged?.call(nextLang);
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryGreen.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: AppColors.primaryGreen.withValues(alpha: 0.2),
+                  ),
+                ),
+                child: Text(
+                  isEnglish ? 'EN' : 'UR',
+                  style: const TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primaryGreen,
+                  ),
+                ),
+              ),
+            ),
+
             const SizedBox(width: 4),
 
             // Help Icon
@@ -83,9 +117,11 @@ class ProgressHeader extends StatelessWidget {
                     showDialog(
                       context: context,
                       builder: (ctx) => AlertDialog(
-                        title: const Text('Sehat Coach Onboarding'),
-                        content: const Text(
-                          'Select your goals & biometrics to calibrate your custom metabolic model and local grocery Bachat index.',
+                        title: Text(isEnglish ? 'Sehat Coach Onboarding' : 'Sehat Coach Onboarding'),
+                        content: Text(
+                          isEnglish
+                              ? 'Select your goals & biometrics to calibrate your custom metabolic model and grocery budget index.'
+                              : 'Apne goals aur biometrics select karein taake apka custom metabolic model aur grocery Bachat index calibrate ho sakay.',
                         ),
                         actions: [
                           TextButton(

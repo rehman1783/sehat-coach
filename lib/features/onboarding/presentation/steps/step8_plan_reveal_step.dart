@@ -15,6 +15,8 @@ class Step8PlanRevealStep extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isEnglish = state.language == AppLanguage.english;
+
     // Target date 12 weeks out
     final targetDate = DateTime.now().add(const Duration(days: 84));
     final dateStr =
@@ -36,10 +38,12 @@ class Step8PlanRevealStep extends StatelessWidget {
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
+                          children: [
                             Text(
-                              'YOUR CUSTOM PLAN IS READY',
-                              style: TextStyle(
+                              isEnglish
+                                  ? 'YOUR CUSTOM PLAN IS READY'
+                                  : 'AAPKA CUSTOM PLAN TAYYAR HAI',
+                              style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.primaryGreen,
@@ -47,10 +51,12 @@ class Step8PlanRevealStep extends StatelessWidget {
                               ),
                               softWrap: true,
                             ),
-                            SizedBox(height: 4),
+                            const SizedBox(height: 4),
                             Text(
-                              'Calibrated specifically for your biometrics',
-                              style: TextStyle(
+                              isEnglish
+                                  ? 'Calibrated specifically for your biometrics'
+                                  : 'Aapke biometrics ke mutabiq tayyar kiya gaya hai',
+                              style: const TextStyle(
                                 fontSize: 12,
                                 color: AppColors.textSecondary,
                               ),
@@ -145,21 +151,21 @@ class Step8PlanRevealStep extends StatelessWidget {
                           children: [
                             Expanded(
                               child: _MacroBox(
-                                label: 'Protein',
+                                label: isEnglish ? 'Protein' : 'Protein',
                                 val: '${state.proteinGrams}g',
                               ),
                             ),
                             const SizedBox(width: 8),
                             Expanded(
                               child: _MacroBox(
-                                label: 'Carbs',
+                                label: isEnglish ? 'Carbs' : 'Carbs',
                                 val: '${state.carbsGrams}g',
                               ),
                             ),
                             const SizedBox(width: 8),
                             Expanded(
                               child: _MacroBox(
-                                label: 'Healthy Fat',
+                                label: isEnglish ? 'Healthy Fat' : 'Healthy Fat',
                                 val: '${state.fatGrams}g',
                               ),
                             ),
@@ -182,7 +188,9 @@ class Step8PlanRevealStep extends StatelessWidget {
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
-                                  'Reach your goal by $dateStr',
+                                  isEnglish
+                                      ? 'Reach your goal by $dateStr'
+                                      : 'Apna goal $dateStr tak hasil karein',
                                   style: const TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.bold,
@@ -202,7 +210,7 @@ class Step8PlanRevealStep extends StatelessWidget {
                           runSpacing: 6,
                           children: [
                             _BadgeChip(
-                              label: '✓ Bachat Mode Active',
+                              label: isEnglish ? '✓ Smart Budget Active' : '✓ Bachat Mode Active',
                               bgColor: AppColors.primaryGreen.withValues(
                                 alpha: 0.1,
                               ),
@@ -246,28 +254,28 @@ class Step8PlanRevealStep extends StatelessWidget {
                 ),
                 elevation: 4,
               ),
-              child: const Row(
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'CLAIM MY PLAN',
-                    style: TextStyle(
+                    isEnglish ? 'CLAIM MY PLAN' : 'APNA PLAN HASIL KAREIN',
+                    style: const TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 0.5,
                     ),
                   ),
-                  SizedBox(width: 8),
-                  Icon(Icons.arrow_forward, color: AppColors.graphiteYellow),
+                  const SizedBox(width: 8),
+                  const Icon(Icons.arrow_forward, color: AppColors.graphiteYellow),
                 ],
               ),
             ),
           ),
           const SizedBox(height: 6),
-          const Center(
+          Center(
             child: Text(
-              '7-Day Free • Cancel Anytime',
-              style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
+              isEnglish ? '7-Day Free • Cancel Anytime' : '7 Din Free • Kabhi Bhi Cancel Karein',
+              style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
             ),
           ),
         ],

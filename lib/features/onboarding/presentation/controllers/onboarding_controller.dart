@@ -6,6 +6,11 @@ class OnboardingController extends ChangeNotifier {
 
   OnboardingState get state => _state;
 
+  void setLanguage(AppLanguage lang) {
+    _state.language = lang;
+    notifyListeners();
+  }
+
   void setGoal(GoalType goal) {
     _state.goal = goal;
     notifyListeners();
