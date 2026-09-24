@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../../../../core/constants/app_constants.dart';
 import '../../../onboarding/domain/models/onboarding_state.dart';
 import '../../../onboarding/presentation/screens/onboarding_screen.dart';
 
@@ -87,38 +86,11 @@ class _SplashScreenState extends State<SplashScreen>
                           onTap: () {
                             HapticFeedback.selectionClick();
                           },
-                          child: Container(
-                            width: 130,
-                            height: 130,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(28),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: const Color(0xFF14532D).withValues(alpha: 0.12),
-                                  blurRadius: 20,
-                                  offset: const Offset(0, 8),
-                                ),
-                              ],
-                            ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(28),
-                              child: Center(
-                                child: SizedBox(
-                                  width: 110,
-                                  height: 82,
-                                  child: ClipRect(
-                                    child: Image.asset(
-                                      AppConstants.logoPath,
-                                      width: 110,
-                                      height: 110,
-                                      fit: BoxFit.cover,
-                                      alignment: Alignment.topCenter,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
+                          child: Image.asset(
+                            'assets/icon/Layer 1 (2) copy.png',
+                            width: 140,
+                            height: 140,
+                            fit: BoxFit.contain,
                           ),
                         ),
                       ),
