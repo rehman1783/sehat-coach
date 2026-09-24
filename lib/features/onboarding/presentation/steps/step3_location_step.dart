@@ -242,8 +242,12 @@ class _Step3LocationStepState extends State<Step3LocationStep> {
                         Flexible(
                           child: Text(
                             isEnglish
-                                ? 'Auto-Detected Market (${currentCountry.name})'
-                                : 'Automatic Detect Hua Mulk (${currentCountry.name})',
+                                ? (widget.selectedCity.isNotEmpty
+                                    ? 'Auto-Detected Location (${widget.selectedCity}, ${currentCountry.name})'
+                                    : 'Auto-Detected Market (${currentCountry.name})')
+                                : (widget.selectedCity.isNotEmpty
+                                    ? 'Automatic Detect Hua Shehar (${widget.selectedCity}, ${currentCountry.name})'
+                                    : 'Automatic Detect Hua Mulk (${currentCountry.name})'),
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
                               fontSize: 11,

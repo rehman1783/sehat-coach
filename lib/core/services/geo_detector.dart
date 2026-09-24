@@ -93,11 +93,12 @@ class GeoDetector {
     return null;
   }
 
-  /// Tier 2: Network IP Fallback (Lightweight HTTP request with 2s timeout)
+  /// Tier 2: Network IP Fallback (Lightweight HTTP request with 2.5s timeout)
   static Future<DetectedLocation?> detectTier2() async {
     final endpoints = [
       'http://ip-api.com/json',
       'https://ipapi.co/json/',
+      'https://get.geojs.io/v1/ip/geo.json',
     ];
 
     for (final url in endpoints) {
@@ -107,18 +108,18 @@ class GeoDetector {
               Uri.parse(url),
               headers: {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'},
             )
-            .timeout(const Duration(milliseconds: 2000));
+            .timeout(const Duration(milliseconds: 2500));
 
         if (response.statusCode == 200) {
           final data = json.decode(response.body);
           final String code = (data['countryCode'] ?? data['country_code'] ?? data['country'] ?? '')
               .toString()
               .toUpperCase();
-          final String city = (data['city'] ?? '').toString();
+          final String rawCity = (data['city'] ?? '').toString().trim();
 
           if (code.isNotEmpty && _countryMeta.containsKey(code)) {
             final defaultCity = _countryMeta[code]!['city']!;
-            final finalCity = city.isNotEmpty ? city : defaultCity;
+            final finalCity = rawCity.isNotEmpty ? _formatCity(rawCity) : defaultCity;
             return _buildResult(code, finalCity, 'ip_lookup');
           }
         }
@@ -133,18 +134,28 @@ class GeoDetector {
   static Future<DetectedLocation> detectLocation() async {
     // Attempt Tier 1
     final tier1Result = detectTier1();
-    if (tier1Result != null) {
-      return tier1Result;
-    }
 
-    // Attempt Tier 2
+    // Attempt Tier 2 (IP network detection for exact city)
     final tier2Result = await detectTier2();
     if (tier2Result != null) {
       return tier2Result;
     }
 
-    // Default fallback to Pakistan
+    if (tier1Result != null) {
+      return tier1Result;
+    }
+
+    // Default fallback to Pakistan / Lahore
     return _buildResult('PK', 'Lahore', 'default');
+  }
+
+  static String _formatCity(String raw) {
+    if (raw.isEmpty) return raw;
+    final words = raw.split(RegExp(r'\s+'));
+    return words
+        .where((w) => w.isNotEmpty)
+        .map((w) => '${w[0].toUpperCase()}${w.substring(1).toLowerCase()}')
+        .join(' ');
   }
 
   static DetectedLocation _buildResult(String code, String city, String source) {
