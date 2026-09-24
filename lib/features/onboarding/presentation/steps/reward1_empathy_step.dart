@@ -108,13 +108,16 @@ class Reward1EmpathyStep extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 8),
-                      Text(
-                        badgeText,
-                        style: const TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.primaryGreen,
-                          letterSpacing: 0.5,
+                      Flexible(
+                        child: Text(
+                          badgeText,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primaryGreen,
+                            letterSpacing: 0.5,
+                          ),
                         ),
                       ),
                     ],
