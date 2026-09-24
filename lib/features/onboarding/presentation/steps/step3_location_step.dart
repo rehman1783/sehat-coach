@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../domain/models/location_data.dart';
 import '../../domain/models/onboarding_state.dart';
@@ -478,7 +479,37 @@ class _Step3LocationStepState extends State<Step3LocationStep> {
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: widget.onContinue,
+              onPressed: () {
+                if (widget.selectedCity.trim().isEmpty) {
+                  HapticFeedback.vibrate();
+                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Row(
+                        children: [
+                          const Icon(Icons.error_outline, color: Colors.white, size: 20),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              isEnglish
+                                  ? 'Please select or enter your city to continue'
+                                  : 'Aage badhne ke liye apna shehar select ya enter karein!',
+                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                            ),
+                          ),
+                        ],
+                      ),
+                      backgroundColor: const Color(0xFFDC2626),
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      margin: const EdgeInsets.all(16),
+                      duration: const Duration(seconds: 2),
+                    ),
+                  );
+                  return;
+                }
+                widget.onContinue();
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primaryGreen,
                 foregroundColor: AppColors.white,

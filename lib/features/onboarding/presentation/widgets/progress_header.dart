@@ -40,11 +40,11 @@ class ProgressHeader extends StatelessWidget {
             // Back Button
             AnimatedOpacity(
               duration: const Duration(milliseconds: 200),
-              opacity: (currentStep > 1 && currentStep < totalSteps - 1) ? 1.0 : 0.0,
+              opacity: currentStep > 1 ? 1.0 : 0.0,
               child: IconButton(
                 icon: const Icon(Icons.arrow_back_ios_new, size: 18),
                 color: AppColors.medicalBlue,
-                onPressed: (currentStep > 1 && currentStep < totalSteps - 1) ? onBack : null,
+                onPressed: currentStep > 1 ? onBack : null,
               ),
             ),
             const SizedBox(width: 4),

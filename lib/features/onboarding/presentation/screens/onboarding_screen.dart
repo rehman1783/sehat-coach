@@ -56,8 +56,89 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     super.dispose();
   }
 
+  String? _validateStep(int step) {
+    final state = _controller.state;
+    final bool isEnglish = state.language == AppLanguage.english;
+
+    switch (step) {
+      case 1:
+        if (state.goal == null) {
+          return isEnglish
+              ? 'Please select a health goal to continue'
+              : 'Aage badhne ke liye apna goal select karein!';
+        }
+        break;
+      case 3:
+        if (state.age < 10 || state.age > 100) {
+          return isEnglish ? 'Please enter a valid age' : 'Barae karam sahi umar enter karein';
+        }
+        break;
+      case 4:
+        if (state.city.trim().isEmpty) {
+          return isEnglish
+              ? 'Please select or enter your city to continue'
+              : 'Aage badhne ke liye apna shehar select ya enter karein!';
+        }
+        break;
+      case 5:
+        if (state.kitchen == null) {
+          return isEnglish
+              ? 'Please select how you typically eat to continue'
+              : 'Aage badhne ke liye apna kitchen routine select karein!';
+        }
+        break;
+      case 7:
+        if (state.conditions.isEmpty) {
+          return isEnglish
+              ? 'Please select a condition or Standard Routine'
+              : 'Aage badhne ke liye kam az kam ek condition ya Standard select karein!';
+        }
+        break;
+      case 8:
+        if (state.coach == null) {
+          return isEnglish
+              ? 'Please choose a coach personality to continue'
+              : 'Aage badhne ke liye coach personality select karein!';
+        }
+        break;
+    }
+    return null;
+  }
+
   void _goToStep(int step) {
     if (step < 1 || step > 10) return;
+
+    // Validate step before advancing forward
+    if (step > _currentStep) {
+      final validationError = _validateStep(_currentStep);
+      if (validationError != null) {
+        HapticFeedback.vibrate();
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.error_outline, color: Colors.white, size: 20),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    validationError,
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                  ),
+                ),
+              ],
+            ),
+            backgroundColor: const Color(0xFFDC2626),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            margin: const EdgeInsets.all(16),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+        return;
+      }
+    }
+
     HapticFeedback.selectionClick();
     setState(() {
       _currentStep = step;
@@ -101,8 +182,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Widget build(BuildContext context) {
     final state = _controller.state;
 
-    return Scaffold(
-      backgroundColor: AppColors.surface,
+    return PopScope(
+      canPop: _currentStep == 1,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        if (_currentStep > 1) {
+          _goToStep(_currentStep - 1);
+        }
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.surface,
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(
@@ -244,6 +333,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }
