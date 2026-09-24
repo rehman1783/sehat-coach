@@ -88,9 +88,10 @@ class _SplashScreenState extends State<SplashScreen>
                             HapticFeedback.selectionClick();
                           },
                           child: Container(
-                            width: 140,
-                            height: 140,
+                            width: 130,
+                            height: 130,
                             decoration: BoxDecoration(
+                              color: Colors.white,
                               borderRadius: BorderRadius.circular(28),
                               boxShadow: [
                                 BoxShadow(
@@ -102,11 +103,20 @@ class _SplashScreenState extends State<SplashScreen>
                             ),
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(28),
-                              child: Image.asset(
-                                AppConstants.logoPath,
-                                width: 140,
-                                height: 140,
-                                fit: BoxFit.contain,
+                              child: Center(
+                                child: SizedBox(
+                                  width: 110,
+                                  height: 82,
+                                  child: ClipRect(
+                                    child: Image.asset(
+                                      AppConstants.logoPath,
+                                      width: 110,
+                                      height: 110,
+                                      fit: BoxFit.cover,
+                                      alignment: Alignment.topCenter,
+                                    ),
+                                  ),
+                                ),
                               ),
                             ),
                           ),
@@ -115,22 +125,11 @@ class _SplashScreenState extends State<SplashScreen>
 
                       const SizedBox(height: 28),
 
-                      // App Title & Subtitle Fade In
+                      // Subtitle & Language Selector Fade In
                       FadeTransition(
                         opacity: _fadeAnim,
                         child: Column(
                           children: [
-                            const Text(
-                              'SEHAT COACH',
-                              style: TextStyle(
-                                fontSize: 28,
-                                fontWeight: FontWeight.w900,
-                                color: Color(0xFF14532D), // Deep dark green
-                                letterSpacing: 1.5,
-                                height: 1.1,
-                              ),
-                            ),
-                            const SizedBox(height: 10),
                             Text(
                               isEnglish
                                   ? 'Your Desi Life & Health Assistant'

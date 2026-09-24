@@ -239,14 +239,17 @@ class _Step3LocationStepState extends State<Step3LocationStep> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         const Text('⚡ ', style: TextStyle(fontSize: 11)),
-                        Text(
-                          isEnglish
-                              ? 'Auto-Detected Market (${currentCountry.name})'
-                              : 'Automatic Detect Hua Mulk (${currentCountry.name})',
-                          style: const TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.primaryGreen,
+                        Flexible(
+                          child: Text(
+                            isEnglish
+                                ? 'Auto-Detected Market (${currentCountry.name})'
+                                : 'Automatic Detect Hua Mulk (${currentCountry.name})',
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.primaryGreen,
+                            ),
                           ),
                         ),
                       ],
@@ -323,35 +326,45 @@ class _Step3LocationStepState extends State<Step3LocationStep> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        isEnglish ? 'SELECT YOUR CITY' : 'APNA SHEHAR SELECT KAREIN',
-                        style: const TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textSecondary,
-                          letterSpacing: 0.5,
+                      Expanded(
+                        child: Text(
+                          isEnglish ? 'SELECT YOUR CITY' : 'APNA SHEHAR SELECT KAREIN',
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textSecondary,
+                            letterSpacing: 0.5,
+                          ),
                         ),
                       ),
-                      InkWell(
-                        onTap: () => _showCitySearchBottomSheet(context, currentCountry),
-                        borderRadius: BorderRadius.circular(8),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          child: Row(
-                            children: [
-                              const Icon(Icons.search, size: 14, color: AppColors.primaryGreen),
-                              const SizedBox(width: 4),
-                              Text(
-                                isEnglish
-                                    ? 'Search All (${currentCountry.cities.length} cities)'
-                                    : 'Tamam Shehar (${currentCountry.cities.length})',
-                                style: const TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.primaryGreen,
+                      const SizedBox(width: 8),
+                      Flexible(
+                        child: InkWell(
+                          onTap: () => _showCitySearchBottomSheet(context, currentCountry),
+                          borderRadius: BorderRadius.circular(8),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.search, size: 14, color: AppColors.primaryGreen),
+                                const SizedBox(width: 4),
+                                Flexible(
+                                  child: Text(
+                                    isEnglish
+                                        ? 'Search All (${currentCountry.cities.length} cities)'
+                                        : 'Tamam Shehar (${currentCountry.cities.length})',
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.primaryGreen,
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       ),
