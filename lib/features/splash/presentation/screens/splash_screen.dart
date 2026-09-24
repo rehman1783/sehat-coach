@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../../core/constants/app_constants.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../../onboarding/domain/models/onboarding_state.dart';
 import '../../../onboarding/presentation/screens/onboarding_screen.dart';
 
@@ -24,12 +23,12 @@ class _SplashScreenState extends State<SplashScreen>
     super.initState();
     _animController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1200),
+      duration: const Duration(milliseconds: 1000),
     );
 
     _scaleAnim = CurvedAnimation(
       parent: _animController,
-      curve: const Interval(0.0, 0.7, curve: Curves.elasticOut),
+      curve: const Interval(0.0, 0.7, curve: Curves.easeOutBack),
     );
 
     _fadeAnim = CurvedAnimation(
@@ -61,235 +60,218 @@ class _SplashScreenState extends State<SplashScreen>
     final bool isEnglish = _selectedLanguage == AppLanguage.english;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 480),
-            child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-              child: Column(
-                children: [
-                  const Spacer(),
+      backgroundColor: const Color(0xFFFAF8F3), // Off-white warm background
+      body: Stack(
+        children: [
+          // Background organic shapes matching reference design
+          Positioned.fill(
+            child: CustomPaint(
+              painter: _SplashOrganicBackgroundPainter(),
+            ),
+          ),
 
-                  // Animated Official Logo Container
-                  ScaleTransition(
-                    scale: _scaleAnim,
-                    child: GestureDetector(
-                      onTap: () {
-                        HapticFeedback.selectionClick();
-                      },
-                      child: Container(
-                        width: 140,
-                        height: 140,
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: AppColors.white,
-                          borderRadius: BorderRadius.circular(28),
-                          border: Border.all(
-                            color: AppColors.border.withValues(alpha: 0.3),
-                            width: 1.5,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.primaryGreen
-                                  .withValues(alpha: 0.15),
-                              blurRadius: 24,
-                              offset: const Offset(0, 10),
-                            ),
-                          ],
-                        ),
-                        child: Center(
-                          child: Image.asset(
-                            AppConstants.logoPath,
-                            width: 110,
-                            height: 110,
-                            fit: BoxFit.contain,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
+          SafeArea(
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 440),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 28.0, vertical: 20.0),
+                  child: Column(
+                    children: [
+                      const Spacer(flex: 3),
 
-                  const SizedBox(height: 24),
-
-                  // Title & Subtitle Fade In
-                  FadeTransition(
-                    opacity: _fadeAnim,
-                    child: Column(
-                      children: [
-                        const Text(
-                          'SEHAT COACH',
-                          style: TextStyle(
-                            fontSize: 26,
-                            fontWeight: FontWeight.w900,
-                            color: AppColors.primaryGreen,
-                            letterSpacing: 1.2,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          isEnglish
-                              ? 'Your Personal Life & Health Assistant'
-                              : 'Aapka Desi Life & Health Assistant',
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.textSecondary,
-                          ),
-                        ),
-                        const SizedBox(height: 18),
-
-                        // Badge
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 14,
-                            vertical: 6,
-                          ),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFF1F5F9),
-                            borderRadius: BorderRadius.circular(99),
-                            border: Border.all(color: const Color(0xFFE2E8F0)),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(
-                                Icons.circle,
-                                size: 8,
-                                color: AppColors.graphiteYellow,
-                              ),
-                              const SizedBox(width: 6),
-                              Text(
-                                isEnglish
-                                    ? 'ENGLISH • SMART BUDGET • HYBRID AI'
-                                    : 'URDU • BACHAT • DESI AI',
-                                style: const TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.medicalBlue,
-                                  letterSpacing: 0.5,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const Spacer(),
-
-                  // Bottom Section with Language Switcher
-                  FadeTransition(
-                    opacity: _fadeAnim,
-                    child: Column(
-                      children: [
-                        // Language Selection Row
-                        Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFF1F5F9),
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: const Color(0xFFE2E8F0)),
-                          ),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: _LangPill(
-                                  label: '🇬🇧 English',
-                                  isSelected: _selectedLanguage == AppLanguage.english,
-                                  onTap: () {
-                                    HapticFeedback.selectionClick();
-                                    setState(() => _selectedLanguage = AppLanguage.english);
-                                  },
-                                ),
-                              ),
-                              Expanded(
-                                child: _LangPill(
-                                  label: '🇵🇰 Roman Urdu',
-                                  isSelected: _selectedLanguage == AppLanguage.romanUrdu,
-                                  onTap: () {
-                                    HapticFeedback.selectionClick();
-                                    setState(() => _selectedLanguage = AppLanguage.romanUrdu);
-                                  },
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        const SizedBox(height: 14),
-
-                        // Start Onboarding CTA
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: _startOnboarding,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.primaryGreen,
-                              foregroundColor: AppColors.white,
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              elevation: 4,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  isEnglish ? 'START ONBOARDING' : 'ONBOARDING SHURU KAREIN',
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: 0.8,
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                const Icon(
-                                  Icons.arrow_forward,
-                                  color: AppColors.graphiteYellow,
-                                  size: 18,
+                      // Original Logo Icon with Entry Scale Animation
+                      ScaleTransition(
+                        scale: _scaleAnim,
+                        child: GestureDetector(
+                          onTap: () {
+                            HapticFeedback.selectionClick();
+                          },
+                          child: Container(
+                            width: 140,
+                            height: 140,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(28),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(0xFF14532D).withValues(alpha: 0.12),
+                                  blurRadius: 20,
+                                  offset: const Offset(0, 8),
                                 ),
                               ],
                             ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(28),
+                              child: Image.asset(
+                                AppConstants.logoPath,
+                                width: 140,
+                                height: 140,
+                                fit: BoxFit.contain,
+                              ),
+                            ),
                           ),
                         ),
+                      ),
 
-                        const SizedBox(height: 16),
+                      const SizedBox(height: 28),
 
-                        Text(
-                          isEnglish
-                              ? 'POWERED BY AI • HYBRID GLOBAL & LOCAL'
-                              : 'POWERED BY AI • HYBRID DESI & GLOBAL',
-                          style: const TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.textLight,
-                            letterSpacing: 1.2,
-                          ),
+                      // App Title & Subtitle Fade In
+                      FadeTransition(
+                        opacity: _fadeAnim,
+                        child: Column(
+                          children: [
+                            const Text(
+                              'SEHAT COACH',
+                              style: TextStyle(
+                                fontSize: 28,
+                                fontWeight: FontWeight.w900,
+                                color: Color(0xFF14532D), // Deep dark green
+                                letterSpacing: 1.5,
+                                height: 1.1,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              isEnglish
+                                  ? 'Your Desi Life & Health Assistant'
+                                  : 'Aapka Desi Life & Health Assistant',
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: Color(0xFF526070),
+                                letterSpacing: 0.2,
+                              ),
+                            ),
+                            const SizedBox(height: 28),
+
+                            // Language Selector Pill (English & Roman English)
+                            Container(
+                              height: 44,
+                              width: 260,
+                              padding: const EdgeInsets.all(4),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(30),
+                                border: Border.all(color: const Color(0xFFE2E8F0)),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.04),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 3),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: _LanguageOptionPill(
+                                      label: 'ROMAN ENGLISH',
+                                      isSelected: _selectedLanguage == AppLanguage.romanUrdu,
+                                      onTap: () {
+                                        HapticFeedback.selectionClick();
+                                        setState(() => _selectedLanguage = AppLanguage.romanUrdu);
+                                      },
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: _LanguageOptionPill(
+                                      label: 'ENGLISH',
+                                      isSelected: _selectedLanguage == AppLanguage.english,
+                                      onTap: () {
+                                        HapticFeedback.selectionClick();
+                                        setState(() => _selectedLanguage = AppLanguage.english);
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+
+                      const Spacer(flex: 4),
+
+                      // Bottom Action Button & Footer Text
+                      FadeTransition(
+                        opacity: _fadeAnim,
+                        child: Column(
+                          children: [
+                            // Start Onboarding CTA
+                            SizedBox(
+                              width: double.infinity,
+                              height: 56,
+                              child: ElevatedButton(
+                                onPressed: _startOnboarding,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF14532D),
+                                  foregroundColor: Colors.white,
+                                  elevation: 6,
+                                  shadowColor: const Color(0xFF14532D).withValues(alpha: 0.35),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(30),
+                                  ),
+                                ),
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        isEnglish ? 'START ONBOARDING' : 'ONBOARDING SHURU KAREIN',
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w800,
+                                          letterSpacing: 1.0,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      const Icon(
+                                        Icons.arrow_forward,
+                                        color: Color(0xFFEAA918),
+                                        size: 18,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+
+                            const SizedBox(height: 20),
+
+                            // Footer Tagline (Hybrid Health)
+                            const Text(
+                              'POWERED BY AI • HYBRID HEALTH',
+                              style: TextStyle(
+                                fontSize: 10.5,
+                                fontWeight: FontWeight.w800,
+                                color: Color(0xFF475569),
+                                letterSpacing: 1.2,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }
 }
 
-class _LangPill extends StatelessWidget {
+class _LanguageOptionPill extends StatelessWidget {
   final String label;
   final bool isSelected;
   final VoidCallback onTap;
 
-  const _LangPill({
+  const _LanguageOptionPill({
     required this.label,
     required this.isSelected,
     required this.onTap,
@@ -300,31 +282,105 @@ class _LangPill extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 150),
-        padding: const EdgeInsets.symmetric(vertical: 10),
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOut,
+        alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.white : Colors.transparent,
-          borderRadius: BorderRadius.circular(12),
+          color: isSelected ? const Color(0xFFFAF8F3) : Colors.transparent,
+          borderRadius: BorderRadius.circular(24),
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.06),
-                    blurRadius: 6,
+                    color: Colors.black.withValues(alpha: 0.04),
+                    blurRadius: 4,
                     offset: const Offset(0, 2),
                   ),
                 ]
               : [],
         ),
-        alignment: Alignment.center,
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-            color: isSelected ? AppColors.primaryGreen : AppColors.textSecondary,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 6.0),
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 11.5,
+                fontWeight: isSelected ? FontWeight.w900 : FontWeight.w600,
+                color: isSelected ? const Color(0xFF0C1E3C) : const Color(0xFF64748B),
+                letterSpacing: 0.5,
+              ),
+            ),
           ),
         ),
       ),
     );
   }
 }
+
+class _SplashOrganicBackgroundPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final double w = size.width;
+    final double h = size.height;
+
+    // 1. Top-Left Yellow Organic Blob
+    final Paint yellowBlobPaint = Paint()
+      ..color = const Color(0xFFF6ECD7)
+      ..style = PaintingStyle.fill;
+
+    final Path yellowBlobPath = Path();
+    yellowBlobPath.moveTo(0, 0);
+    yellowBlobPath.lineTo(w * 0.28, 0);
+    yellowBlobPath.cubicTo(
+      w * 0.28, h * 0.12,
+      w * 0.16, h * 0.18,
+      0, h * 0.16,
+    );
+    yellowBlobPath.close();
+    canvas.drawPath(yellowBlobPath, yellowBlobPaint);
+
+    // 2. Large Translucent Sage Green Leaf Contour (Top-Left Background)
+    final Paint leafBgPaint = Paint()
+      ..color = const Color(0xFFE2EBE0)
+      ..style = PaintingStyle.fill;
+
+    final Path leafBgPath = Path();
+    leafBgPath.moveTo(0, h * 0.08);
+    leafBgPath.cubicTo(
+      w * 0.55, h * 0.05,
+      w * 0.65, h * 0.35,
+      0, h * 0.45,
+    );
+    leafBgPath.close();
+    canvas.drawPath(leafBgPath, leafBgPaint);
+
+    // 3. Bottom-Right Cream/Yellow Rounded Block Structure
+    final Paint bottomStructPaint = Paint()
+      ..color = const Color(0xFFF5EBD4)
+      ..style = PaintingStyle.fill;
+
+    final Path bottomPath = Path();
+    final double brTop = h * 0.52;
+    bottomPath.moveTo(w, brTop);
+    bottomPath.cubicTo(
+      w * 0.45, brTop,
+      w * 0.42, brTop + 60,
+      w * 0.40, h,
+    );
+    bottomPath.lineTo(w, h);
+    bottomPath.close();
+    canvas.drawPath(bottomPath, bottomStructPaint);
+
+    // Inner White Cutout Circle/Oval in Bottom-Right structure
+    final Paint whiteCutoutPaint = Paint()
+      ..color = const Color(0xFFFAF8F3)
+      ..style = PaintingStyle.fill;
+
+    canvas.drawCircle(Offset(w * 0.72, h * 0.62), w * 0.14, whiteCutoutPaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+

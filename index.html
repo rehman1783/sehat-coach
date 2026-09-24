@@ -255,11 +255,11 @@
               <span id="selected-flag" class="text-xl">🇵🇰</span>
               <select id="country-select" onchange="handleCountryChange(this.value)"
                 class="bg-transparent text-xs font-bold text-neutral-800 w-full outline-none cursor-pointer">
+                <option value="CA">Canada (CAD $)</option>
                 <option value="PK">Pakistan (PKR ₨)</option>
+                <option value="AE">United Arab Emirates (AED د.إ)</option>
                 <option value="GB">United Kingdom (GBP £)</option>
                 <option value="US">United States (USD $)</option>
-                <option value="AE">United Arab Emirates (AED د.إ)</option>
-                <option value="CA">Canada (CAD $)</option>
               </select>
             </div>
 
@@ -584,44 +584,65 @@
     let isPakistan = true;
 
     const citiesByCountry = {
-      PK: ['Karachi', 'Lahore', 'Islamabad', 'Rawalpindi', 'Peshawar', 'Faisalabad'],
-      GB: ['London', 'Birmingham', 'Manchester', 'Leeds', 'Glasgow'],
-      US: ['New York', 'Dallas', 'Chicago', 'Houston', 'San Jose'],
-      AE: ['Dubai', 'Abu Dhabi', 'Sharjah', 'Ajman'],
-      CA: ['Toronto', 'Vancouver', 'Calgary', 'Montreal']
+      CA: ['Calgary', 'Montreal', 'Toronto', 'Vancouver'],
+      PK: ['Faisalabad', 'Islamabad', 'Karachi', 'Lahore', 'Peshawar', 'Rawalpindi'],
+      AE: ['Abu Dhabi', 'Ajman', 'Dubai', 'Sharjah'],
+      GB: ['Birmingham', 'Glasgow', 'Leeds', 'London', 'Manchester'],
+      US: ['Chicago', 'Dallas', 'Houston', 'New York', 'San Jose']
     };
 
     const flags = {
+      CA: '🇨🇦',
       PK: '🇵🇰',
-      GB: '🇬🇧',
-      US: '🇺🇸',
       AE: '🇦🇪',
-      CA: '🇨🇦'
+      GB: '🇬🇧',
+      US: '🇺🇸'
     };
 
-    // Auto-detect country via Timezone Offset
-    function detectLocale() {
-      const offset = -new Date().getTimezoneOffset() / 60;
+    // 3-Tier Cascade Geolocation Detection Engine
+    async function detectLocale() {
       const select = document.getElementById('country-select');
+      let detectedCode = 'PK';
+      let detectedVia = 'locale_timezone';
 
-      // Pakistan Standard Time is UTC+5
-      if (offset === 5) {
-        select.value = 'PK';
-        isPakistan = true;
+      // Tier 1: Zero-Permission Locale & Timezone Check (<50ms)
+      const navLang = (navigator.language || navigator.userLanguage || '').toUpperCase();
+      const offset = -new Date().getTimezoneOffset() / 60;
+
+      if (navLang.endsWith('PK')) {
+        detectedCode = 'PK';
+      } else if (offset === 5) {
+        detectedCode = 'PK';
       } else if (offset === 0 || offset === 1) {
-        select.value = 'GB';
-        isPakistan = false;
+        detectedCode = 'GB';
       } else if (offset === 4) {
-        select.value = 'AE';
-        isPakistan = false;
-      } else {
-        select.value = 'US';
-        isPakistan = false;
+        detectedCode = 'AE';
+      } else if (offset <= -4 && offset >= -8) {
+        detectedCode = 'US';
       }
-      handleCountryChange(select.value);
+
+      if (select) select.value = detectedCode;
+      handleCountryChange(detectedCode, detectedVia);
+
+      // Tier 2: Asynchronous IP Geolocation Fallback
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 1500);
+        const res = await fetch('https://ipapi.co/json/', { signal: controller.signal });
+        clearTimeout(timeoutId);
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.country_code && flags[data.country_code]) {
+            if (select) select.value = data.country_code;
+            handleCountryChange(data.country_code, 'ip_lookup');
+          }
+        }
+      } catch (err) {
+        // Tier 2 bypassed silently
+      }
     }
 
-    function handleCountryChange(code) {
+    function handleCountryChange(code, source = 'user_selected') {
       isPakistan = (code === 'PK');
       document.getElementById('selected-flag').innerText = flags[code] || '🌍';
       document.getElementById('geo-pill').innerText = `${code} ${flags[code] || ''}`;

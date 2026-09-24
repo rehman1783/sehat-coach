@@ -21,9 +21,13 @@ class OnboardingState {
   int age;
   int heightCm;
   int weightKg;
+  String countryCode;
   String country;
   String countryFlag;
   String city;
+  String detectedVia;
+  String currency;
+  bool isDesiMarket;
   KitchenRoutine? kitchen;
   List<HealthCondition> conditions;
   CoachPersonality? coach;
@@ -38,9 +42,13 @@ class OnboardingState {
     this.age = 25,
     this.heightCm = 172,
     this.weightKg = 70,
+    this.countryCode = 'PK',
     this.country = 'Pakistan',
     this.countryFlag = '🇵🇰',
     this.city = 'Lahore',
+    this.detectedVia = 'locale_timezone',
+    this.currency = 'PKR',
+    this.isDesiMarket = true,
     this.kitchen,
     List<HealthCondition>? conditions,
     this.coach,
@@ -78,6 +86,19 @@ class OnboardingState {
     }
   }
 
+  Map<String, dynamic> toProfileJson() {
+    return {
+      'location': {
+        'countryCode': countryCode,
+        'countryName': country,
+        'city': city,
+        'detectedVia': detectedVia,
+        'currency': currency,
+        'isDesiMarket': isDesiMarket,
+      }
+    };
+  }
+
   OnboardingState copyWith({
     int? currentStep,
     GoalType? goal,
@@ -86,9 +107,13 @@ class OnboardingState {
     int? age,
     int? heightCm,
     int? weightKg,
+    String? countryCode,
     String? country,
     String? countryFlag,
     String? city,
+    String? detectedVia,
+    String? currency,
+    bool? isDesiMarket,
     KitchenRoutine? kitchen,
     List<HealthCondition>? conditions,
     CoachPersonality? coach,
@@ -102,9 +127,13 @@ class OnboardingState {
       age: age ?? this.age,
       heightCm: heightCm ?? this.heightCm,
       weightKg: weightKg ?? this.weightKg,
+      countryCode: countryCode ?? this.countryCode,
       country: country ?? this.country,
       countryFlag: countryFlag ?? this.countryFlag,
       city: city ?? this.city,
+      detectedVia: detectedVia ?? this.detectedVia,
+      currency: currency ?? this.currency,
+      isDesiMarket: isDesiMarket ?? this.isDesiMarket,
       kitchen: kitchen ?? this.kitchen,
       conditions: conditions ?? this.conditions,
       coach: coach ?? this.coach,

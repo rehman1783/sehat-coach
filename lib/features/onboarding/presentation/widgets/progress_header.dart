@@ -96,7 +96,7 @@ class ProgressHeader extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  isEnglish ? 'EN' : 'UR',
+                  isEnglish ? 'EN' : 'ROMAN',
                   style: const TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.bold,

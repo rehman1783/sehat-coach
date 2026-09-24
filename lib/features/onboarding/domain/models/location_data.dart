@@ -20,7 +20,7 @@ class LocationRepository {
       name: 'Pakistan',
       code: 'PK',
       flag: '🇵🇰',
-      marketLabel: 'Pakistan (Default Market)',
+      marketLabel: 'Pakistan Market',
       cities: [
         'Karachi',
         'Lahore',
@@ -283,5 +283,35 @@ class LocationRepository {
     ),
   ];
 
-  static CountryData get defaultCountry => countries.first;
+  static List<CountryData>? _cachedSortedCountries;
+
+  static List<CountryData> get sortedCountries {
+    if (_cachedSortedCountries != null) return _cachedSortedCountries!;
+    final list = countries.map((c) {
+      final sortedCities = List<String>.from(c.cities)..sort((a, b) => a.compareTo(b));
+      return CountryData(
+        name: c.name,
+        code: c.code,
+        flag: c.flag,
+        marketLabel: c.marketLabel,
+        cities: sortedCities,
+      );
+    }).toList();
+    list.sort((a, b) => a.name.compareTo(b.name));
+    _cachedSortedCountries = list;
+    return list;
+  }
+
+  static CountryData get defaultCountry => sortedCountries.firstWhere(
+        (c) => c.code == 'PK',
+        orElse: () => sortedCountries.first,
+      );
+
+  static CountryData findByCode(String code) {
+    return sortedCountries.firstWhere(
+      (c) => c.code.toUpperCase() == code.toUpperCase(),
+      orElse: () => defaultCountry,
+    );
+  }
 }
+

@@ -50,7 +50,7 @@ class _Step3LocationStepState extends State<Step3LocationStep> {
   }
 
   CountryData get _currentCountry {
-    return LocationRepository.countries.firstWhere(
+    return LocationRepository.sortedCountries.firstWhere(
       (c) => c.name.toLowerCase() == widget.selectedCountry.toLowerCase(),
       orElse: () => LocationRepository.defaultCountry,
     );
@@ -142,7 +142,7 @@ class _Step3LocationStepState extends State<Step3LocationStep> {
                           )
                         : ListView.separated(
                             itemCount: filteredCities.length,
-                            separatorBuilder: (_, __) => const Divider(height: 1),
+                            separatorBuilder: (_, _) => const Divider(height: 1),
                             itemBuilder: (context, index) {
                               final city = filteredCities[index];
                               final isSelected = widget.selectedCity.toLowerCase() ==
@@ -223,7 +223,36 @@ class _Step3LocationStepState extends State<Step3LocationStep> {
                       color: AppColors.textSecondary,
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
+
+                  // Auto-Detected Zero-Permission Badge Indicator
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryGreen.withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: AppColors.primaryGreen.withValues(alpha: 0.2),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text('⚡ ', style: TextStyle(fontSize: 11)),
+                        Text(
+                          isEnglish
+                              ? 'Auto-Detected Market (${currentCountry.name})'
+                              : 'Automatic Detect Hua Mulk (${currentCountry.name})',
+                          style: const TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primaryGreen,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 12),
 
                   // Country Selection Dropdown Header
                   Text(
@@ -258,7 +287,7 @@ class _Step3LocationStepState extends State<Step3LocationStep> {
                           fontWeight: FontWeight.bold,
                           color: AppColors.textPrimary,
                         ),
-                        items: LocationRepository.countries.map((country) {
+                        items: LocationRepository.sortedCountries.map((country) {
                           return DropdownMenuItem<CountryData>(
                             value: country,
                             child: Row(

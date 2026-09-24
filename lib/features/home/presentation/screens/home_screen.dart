@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/custom_button.dart';
-import '../../../../core/widgets/emblem_icon.dart';
 import '../widgets/color_palette_preview.dart';
 import '../widgets/health_stat_card.dart';
 
