@@ -33,33 +33,29 @@ class ProgressHeader extends StatelessWidget {
         bottom: false,
         child: Row(
           children: [
-            // Circular Back Button (Figma Style)
-            AnimatedOpacity(
-              duration: const Duration(milliseconds: 200),
-              opacity: currentStep > 1 ? 1.0 : 0.0,
-              child: InkWell(
-                onTap: currentStep > 1 ? onBack : null,
-                borderRadius: BorderRadius.circular(99),
-                child: Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.05),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  alignment: Alignment.center,
-                  child: const Icon(
-                    Icons.chevron_left_rounded,
-                    size: 24,
-                    color: AppColors.primaryGreen,
-                  ),
+            // Circular Back Button (Always Visible Figma Style)
+            InkWell(
+              onTap: onBack ?? () => Navigator.of(context).maybePop(),
+              borderRadius: BorderRadius.circular(99),
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.06),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                alignment: Alignment.center,
+                child: const Icon(
+                  Icons.arrow_back_rounded,
+                  size: 20,
+                  color: AppColors.primaryGreen,
                 ),
               ),
             ),
@@ -106,22 +102,40 @@ class ProgressHeader extends StatelessWidget {
                                     ),
                                   ),
 
-                                  // Sleek Golden Yellow Knob Thumb Circle (10px)
+                                  // Golden Yellow Knob Thumb Circle with Rich Shade Gradient & Glow
                                   if (activeWidth > 0)
                                     AnimatedPositioned(
                                       duration: const Duration(milliseconds: 350),
                                       curve: Curves.easeOutCubic,
-                                      left: (activeWidth - 5.0).clamp(0.0, constraints.maxWidth - 10),
+                                      left: (activeWidth - 6.0).clamp(0.0, constraints.maxWidth - 12),
                                       child: Container(
-                                        width: 10,
-                                        height: 10,
+                                        width: 12,
+                                        height: 12,
                                         decoration: BoxDecoration(
-                                          color: const Color(0xFFF59E0B), // Golden Yellow Knob
                                           shape: BoxShape.circle,
+                                          gradient: const LinearGradient(
+                                            begin: Alignment.topLeft,
+                                            end: Alignment.bottomRight,
+                                            colors: [
+                                              Color(0xFFFCD34D), // Light Gold Highlight
+                                              Color(0xFFF59E0B), // Golden Yellow Core
+                                              Color(0xFFD97706), // Deep Amber Shade
+                                            ],
+                                          ),
+                                          border: Border.all(
+                                            color: Colors.white,
+                                            width: 1.5,
+                                          ),
                                           boxShadow: [
                                             BoxShadow(
-                                              color: const Color(0xFFF59E0B).withValues(alpha: 0.5),
-                                              blurRadius: 3,
+                                              color: const Color(0xFFF59E0B).withValues(alpha: 0.6),
+                                              blurRadius: 6,
+                                              spreadRadius: 1,
+                                              offset: const Offset(0, 1),
+                                            ),
+                                            BoxShadow(
+                                              color: Colors.black.withValues(alpha: 0.1),
+                                              blurRadius: 2,
                                               offset: const Offset(0, 1),
                                             ),
                                           ],

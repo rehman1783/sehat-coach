@@ -198,7 +198,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     HapticFeedback.selectionClick();
                     _controller.setLanguage(lang);
                   },
-                  onBack: () => _goToStep(_currentStep - 1),
+                  onBack: () {
+                    if (_currentStep > 1) {
+                      _goToStep(_currentStep - 1);
+                    } else {
+                      Navigator.of(context).maybePop();
+                    }
+                  },
                 ),
 
                 // Main PageView for 10 Steps
