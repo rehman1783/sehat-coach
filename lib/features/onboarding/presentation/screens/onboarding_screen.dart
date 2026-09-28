@@ -150,15 +150,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  void _nextStepWithAutoAdvance() {
-    HapticFeedback.lightImpact();
-    Future.delayed(const Duration(milliseconds: 150), () {
-      if (mounted && _currentStep < 10) {
-        _goToStep(_currentStep + 1);
-      }
-    });
-  }
-
   void _openAuthBottomSheet() {
     HapticFeedback.mediumImpact();
     showModalBottomSheet(
@@ -226,9 +217,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         selectedGoal: state.goal,
                         language: state.language,
                         onSelectGoal: (g) {
+                          HapticFeedback.selectionClick();
                           _controller.setGoal(g);
-                          _nextStepWithAutoAdvance();
                         },
+                        onContinue: () => _goToStep(2),
                       ),
 
                       // Step 2 (NEW): Interstitial Reward 1 - Empathy Anchor
@@ -279,9 +271,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         selectedKitchen: state.kitchen,
                         language: state.language,
                         onSelectKitchen: (k) {
+                          HapticFeedback.selectionClick();
                           _controller.setKitchen(k);
-                          _nextStepWithAutoAdvance();
                         },
+                        onContinue: () => _goToStep(6),
                       ),
 
                       // Step 6 (NEW): Interstitial Reward 2 - Freedom Validation
@@ -306,9 +299,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         selectedCoach: state.coach,
                         language: state.language,
                         onSelectCoach: (c) {
+                          HapticFeedback.selectionClick();
                           _controller.setCoach(c);
-                          _nextStepWithAutoAdvance();
                         },
+                        onContinue: () => _goToStep(9),
                       ),
 
                       // Step 9: 3-Second Calculation Engine

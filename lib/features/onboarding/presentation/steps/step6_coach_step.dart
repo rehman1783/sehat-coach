@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../domain/models/onboarding_state.dart';
 
 class Step6CoachStep extends StatelessWidget {
   final CoachPersonality? selectedCoach;
   final ValueChanged<CoachPersonality> onSelectCoach;
+  final VoidCallback onContinue;
   final AppLanguage language;
 
   const Step6CoachStep({
     super.key,
     this.selectedCoach,
     required this.onSelectCoach,
+    required this.onContinue,
     this.language = AppLanguage.english,
   });
 
@@ -76,14 +79,47 @@ class Step6CoachStep extends StatelessWidget {
               ],
             ),
           ),
-          Center(
-            child: Text(
-              isEnglish ? '⚡ Tap any option to auto-advance' : '⚡ Kisi bhi option par tap karein auto-advance ke liye',
-              style: const TextStyle(
-                fontSize: 11,
-                color: AppColors.textLight,
-                fontWeight: FontWeight.w500,
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () {
+                if (selectedCoach == null) {
+                  HapticFeedback.vibrate();
+                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Row(
+                        children: [
+                          const Icon(Icons.error_outline, color: Colors.white, size: 20),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              isEnglish
+                                  ? 'Please choose a coach personality to continue'
+                                  : 'Aage badhne ke liye coach personality select karein!',
+                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                            ),
+                          ),
+                        ],
+                      ),
+                      backgroundColor: const Color(0xFFDC2626),
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      margin: const EdgeInsets.all(16),
+                      duration: const Duration(seconds: 2),
+                    ),
+                  );
+                  return;
+                }
+                onContinue();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primaryGreen,
+                foregroundColor: AppColors.white,
+                padding: const EdgeInsets.symmetric(vertical: 16),
               ),
+              child: Text(isEnglish ? 'CONTINUE' : 'AAGE BADHEIN'),
             ),
           ),
         ],
