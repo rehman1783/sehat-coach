@@ -208,17 +208,17 @@ class _Step3LocationStepState extends State<Step3LocationStep> {
                   Text(
                     isEnglish ? "WHERE'S YOUR KITCHEN?" : "AAPKA KITCHEN KAHAN HAI?",
                     style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 22,
+                      fontWeight: FontWeight.w900,
                       color: AppColors.primaryGreen,
-                      letterSpacing: 0.5,
+                      letterSpacing: 0.8,
                     ),
                   ),
                   const SizedBox(height: 6),
                   Text(
                     isEnglish
-                        ? 'Used for exact fasting prayer clocks and local market grocery prices.'
-                        : 'Fasting clocks aur muqami market grocery prices ke liye zaroori hai.',
+                        ? 'Used for exact Suhoor/Iftar prayer clocks and local market grocery prices.'
+                        : 'Suhoor/Iftar prayer clocks aur muqami market grocery prices ke liye zaroori hai.',
                     style: const TextStyle(
                       fontSize: 13,
                       color: AppColors.textSecondary,
@@ -474,10 +474,12 @@ class _Step3LocationStepState extends State<Step3LocationStep> {
             ),
           ),
 
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
 
+          // Continue Button (Figma Style)
           SizedBox(
             width: double.infinity,
+            height: 54,
             child: ElevatedButton(
               onPressed: () {
                 if (widget.selectedCity.trim().isEmpty) {
@@ -508,14 +510,37 @@ class _Step3LocationStepState extends State<Step3LocationStep> {
                   );
                   return;
                 }
+                HapticFeedback.lightImpact();
                 widget.onContinue();
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primaryGreen,
                 foregroundColor: AppColors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
+                elevation: 4,
+                shadowColor: AppColors.primaryGreen.withValues(alpha: 0.3),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
               ),
-              child: Text(isEnglish ? 'CONTINUE' : 'AAGE BADHEIN'),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    isEnglish ? 'CONTINUE' : 'AAGE BADHEIN',
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 1.0,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  const Icon(
+                    Icons.arrow_forward_rounded,
+                    color: AppColors.graphiteYellow,
+                    size: 18,
+                  ),
+                ],
+              ),
             ),
           ),
         ],

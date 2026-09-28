@@ -1,24 +1,27 @@
 import 'package:flutter/material.dart';
 
-/// SehatCoach Design System Color Palette
+/// SehatCoach Design System Color Palette (Figma Revamp)
 abstract class AppColors {
-  /// Primary Green: Deep medical leaf green (`#165B29`)
-  static const Color primaryGreen = Color(0xFF165B29);
+  /// Primary Green: Figma Deep Forest Green (`#0C4E2B`)
+  static const Color primaryGreen = Color(0xFF0C4E2B);
 
-  /// Graphite Yellow: Mustard/Gold yellow (`#EAA918`)
-  static const Color graphiteYellow = Color(0xFFEAA918);
+  /// Dark Green Button: Deepest Forest Green (`#0F4725`)
+  static const Color darkGreen = Color(0xFF0F4725);
 
-  /// Background: Pure white background (`#FFFFFF`)
-  static const Color background = Color(0xFFFFFFFF);
+  /// Graphite Yellow / Gold: Warm Amber Gold (`#F59E0B` / `#EAA918`)
+  static const Color graphiteYellow = Color(0xFFF59E0B);
 
-  /// Off-white surface background (`#F8FAF9`)
-  static const Color surface = Color(0xFFF8FAF9);
+  /// Background: Soft warm sage off-white background (`#F6F8F6`)
+  static const Color background = Color(0xFFF6F8F6);
 
-  /// Border: Slate gray/blue border (`#758496`)
-  static const Color border = Color(0xFF758496);
+  /// Off-white surface background (`#FFFFFF`)
+  static const Color surface = Color(0xFFFFFFFF);
 
-  /// Medical Blue: Deep dark navy blue (`#0C1E3C`)
-  static const Color medicalBlue = Color(0xFF0C1E3C);
+  /// Border: Soft sage border (`#D5E3DA`)
+  static const Color border = Color(0xFFD5E3DA);
+
+  /// Medical Blue / Dark Text: Deep dark forest green navy (`#092E1B`)
+  static const Color medicalBlue = Color(0xFF092E1B);
 
   /// Warning Amber: Alert amber/orange (`#E55319`)
   static const Color warningAmber = Color(0xFFE55319);
@@ -27,8 +30,8 @@ abstract class AppColors {
   static const Color errorRed = Color(0xFFEE4343);
 
   // Neutral Tones
-  static const Color textPrimary = Color(0xFF0C1E3C);
-  static const Color textSecondary = Color(0xFF5A6B82);
+  static const Color textPrimary = Color(0xFF0A301A);
+  static const Color textSecondary = Color(0xFF5E7568);
   static const Color textLight = Color(0xFF8E9BAE);
   static const Color white = Color(0xFFFFFFFF);
   static const Color transparent = Colors.transparent;

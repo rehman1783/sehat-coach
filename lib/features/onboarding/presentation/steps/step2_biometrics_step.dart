@@ -28,17 +28,18 @@ class Step2BiometricsStep extends StatelessWidget {
     final bool isEnglish = state.language == AppLanguage.english;
 
     return Padding(
-      padding: const EdgeInsets.all(20.0),
+      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Header Title (Figma Style)
           Text(
             isEnglish ? 'CALIBRATE YOUR BIOLOGY' : 'BIOLOGY CALIBRATE KAREIN',
             style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+              fontSize: 22,
+              fontWeight: FontWeight.w900,
               color: AppColors.primaryGreen,
-              letterSpacing: 0.5,
+              letterSpacing: 0.8,
             ),
           ),
           const SizedBox(height: 6),
@@ -52,44 +53,47 @@ class Step2BiometricsStep extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 20),
+
           Expanded(
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  // Sex & Unit Toggles
+                  // GENDER & UNITS Toggles (Figma Style)
                   Row(
                     children: [
+                      // GENDER Toggle
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              isEnglish ? 'BIOLOGICAL SEX' : 'JINS (SEX)',
-                              style: const TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
+                            const Text(
+                              'GENDER',
+                              style: TextStyle(
+                                fontSize: 10.5,
+                                fontWeight: FontWeight.w800,
                                 color: AppColors.textSecondary,
+                                letterSpacing: 0.8,
                               ),
                             ),
-                            const SizedBox(height: 6),
+                            const SizedBox(height: 8),
                             Container(
-                              padding: const EdgeInsets.all(3),
+                              padding: const EdgeInsets.all(4),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFF1F5F9),
-                                borderRadius: BorderRadius.circular(12),
+                                color: const Color(0xFFE5EDE7),
+                                borderRadius: BorderRadius.circular(16),
                               ),
                               child: Row(
                                 children: [
                                   Expanded(
-                                    child: _TogglePill(
-                                      label: isEnglish ? 'Male 👨' : 'Mard 👨',
+                                    child: _FigmaTogglePill(
+                                      label: 'Male',
                                       isSelected: state.sex == BiologicalSex.male,
                                       onTap: () => onSexChanged(BiologicalSex.male),
                                     ),
                                   ),
                                   Expanded(
-                                    child: _TogglePill(
-                                      label: isEnglish ? 'Female 👩' : 'Aurat 👩',
+                                    child: _FigmaTogglePill(
+                                      label: 'Female',
                                       isSelected: state.sex == BiologicalSex.female,
                                       onTap: () => onSexChanged(BiologicalSex.female),
                                     ),
@@ -100,7 +104,9 @@ class Step2BiometricsStep extends StatelessWidget {
                           ],
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: 14),
+
+                      // UNITS Toggle
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -108,29 +114,30 @@ class Step2BiometricsStep extends StatelessWidget {
                             const Text(
                               'UNITS',
                               style: TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
+                                fontSize: 10.5,
+                                fontWeight: FontWeight.w800,
                                 color: AppColors.textSecondary,
+                                letterSpacing: 0.8,
                               ),
                             ),
-                            const SizedBox(height: 6),
+                            const SizedBox(height: 8),
                             Container(
-                              padding: const EdgeInsets.all(3),
+                              padding: const EdgeInsets.all(4),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFF1F5F9),
-                                borderRadius: BorderRadius.circular(12),
+                                color: const Color(0xFFE5EDE7),
+                                borderRadius: BorderRadius.circular(16),
                               ),
                               child: Row(
                                 children: [
                                   Expanded(
-                                    child: _TogglePill(
+                                    child: _FigmaTogglePill(
                                       label: 'Metric',
                                       isSelected: state.unit == UnitType.metric,
                                       onTap: () => onUnitChanged(UnitType.metric),
                                     ),
                                   ),
                                   Expanded(
-                                    child: _TogglePill(
+                                    child: _FigmaTogglePill(
                                       label: 'Imperial',
                                       isSelected: state.unit == UnitType.imperial,
                                       onTap: () => onUnitChanged(UnitType.imperial),
@@ -145,40 +152,46 @@ class Step2BiometricsStep extends StatelessWidget {
                     ],
                   ),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 20),
 
-                  // Age Slider
-                  _SliderCard(
+                  // Age Slider Card
+                  _FigmaSliderCard(
+                    iconEmoji: '🎂',
                     title: isEnglish ? 'Age' : 'Umar',
-                    valueText: isEnglish ? '${state.age} yrs' : '${state.age} saal',
+                    numberValue: '${state.age}',
+                    unitText: isEnglish ? 'yrs' : 'saal',
                     value: state.age.toDouble(),
                     min: 14,
                     max: 75,
                     onChanged: (v) => onAgeChanged(v.round()),
                   ),
 
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 14),
 
-                  // Height Slider
-                  _SliderCard(
-                    title: isEnglish ? 'Height' : 'Kadd (Height)',
-                    valueText: state.unit == UnitType.metric
-                        ? '${state.heightCm} cm'
+                  // Height Slider Card
+                  _FigmaSliderCard(
+                    iconEmoji: '📏',
+                    title: isEnglish ? 'Height' : 'Kadd',
+                    numberValue: state.unit == UnitType.metric
+                        ? '${state.heightCm}'
                         : '${(state.heightCm / 30.48).floor()}′ ${(((state.heightCm % 30.48) / 2.54)).round()}″',
+                    unitText: state.unit == UnitType.metric ? 'cm' : '',
                     value: state.heightCm.toDouble(),
                     min: 120,
                     max: 220,
                     onChanged: (v) => onHeightChanged(v.round()),
                   ),
 
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 14),
 
-                  // Weight Slider
-                  _SliderCard(
-                    title: isEnglish ? 'Current Weight' : 'Wazan (Weight)',
-                    valueText: state.unit == UnitType.metric
-                        ? '${state.weightKg} kg'
-                        : '${(state.weightKg * 2.20462).round()} lbs',
+                  // Weight Slider Card
+                  _FigmaSliderCard(
+                    iconEmoji: '⚖️',
+                    title: isEnglish ? 'Current Weight' : 'Wazan',
+                    numberValue: state.unit == UnitType.metric
+                        ? '${state.weightKg}'
+                        : '${(state.weightKg * 2.20462).round()}',
+                    unitText: state.unit == UnitType.metric ? 'kg' : 'lbs',
                     value: state.weightKg.toDouble(),
                     min: 30,
                     max: 160,
@@ -189,16 +202,44 @@ class Step2BiometricsStep extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
+
+          // Continue Button (Figma Style)
           SizedBox(
             width: double.infinity,
+            height: 54,
             child: ElevatedButton(
-              onPressed: onContinue,
+              onPressed: () {
+                HapticFeedback.lightImpact();
+                onContinue();
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primaryGreen,
                 foregroundColor: AppColors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
+                elevation: 4,
+                shadowColor: AppColors.primaryGreen.withValues(alpha: 0.3),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
               ),
-              child: Text(isEnglish ? 'CONTINUE' : 'AAGE BADHEIN'),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    isEnglish ? 'CONTINUE' : 'AAGE BADHEIN',
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 1.0,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  const Icon(
+                    Icons.arrow_forward_rounded,
+                    color: AppColors.graphiteYellow,
+                    size: 18,
+                  ),
+                ],
+              ),
             ),
           ),
         ],
@@ -207,12 +248,12 @@ class Step2BiometricsStep extends StatelessWidget {
   }
 }
 
-class _TogglePill extends StatelessWidget {
+class _FigmaTogglePill extends StatelessWidget {
   final String label;
   final bool isSelected;
   final VoidCallback onTap;
 
-  const _TogglePill({
+  const _FigmaTogglePill({
     required this.label,
     required this.isSelected,
     required this.onTap,
@@ -223,16 +264,17 @@ class _TogglePill extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 150),
-        padding: const EdgeInsets.symmetric(vertical: 8),
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.symmetric(vertical: 10),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.white : Colors.transparent,
-          borderRadius: BorderRadius.circular(9),
+          color: isSelected ? Colors.white : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
-                    blurRadius: 4,
+                    color: Colors.black.withValues(alpha: 0.06),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
                   ),
                 ]
               : [],
@@ -241,9 +283,9 @@ class _TogglePill extends StatelessWidget {
         child: Text(
           label,
           style: TextStyle(
-            fontSize: 12,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-            color: isSelected ? AppColors.medicalBlue : AppColors.textSecondary,
+            fontSize: 13,
+            fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+            color: isSelected ? AppColors.primaryGreen : AppColors.textSecondary,
           ),
         ),
       ),
@@ -251,62 +293,21 @@ class _TogglePill extends StatelessWidget {
   }
 }
 
-class _StepButton extends StatelessWidget {
-  final IconData icon;
-  final VoidCallback? onTap;
-
-  const _StepButton({
-    required this.icon,
-    this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final bool isDisabled = onTap == null;
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(8),
-        child: Container(
-          width: 32,
-          height: 32,
-          decoration: BoxDecoration(
-            color: isDisabled
-                ? const Color(0xFFF1F5F9)
-                : AppColors.primaryGreen.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: isDisabled
-                  ? AppColors.border
-                  : AppColors.primaryGreen.withValues(alpha: 0.3),
-            ),
-          ),
-          alignment: Alignment.center,
-          child: Icon(
-            icon,
-            size: 16,
-            color: isDisabled
-                ? AppColors.textSecondary.withValues(alpha: 0.4)
-                : AppColors.primaryGreen,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _SliderCard extends StatelessWidget {
+class _FigmaSliderCard extends StatelessWidget {
+  final String iconEmoji;
   final String title;
-  final String valueText;
+  final String numberValue;
+  final String unitText;
   final double value;
   final double min;
   final double max;
   final ValueChanged<double> onChanged;
 
-  const _SliderCard({
+  const _FigmaSliderCard({
+    required this.iconEmoji,
     required this.title,
-    required this.valueText,
+    required this.numberValue,
+    required this.unitText,
     required this.value,
     required this.min,
     required this.max,
@@ -316,73 +317,95 @@ class _SliderCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.background,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+        border: Border.all(color: const Color(0xFFE8F0EA)),
       ),
       child: Column(
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.medicalBlue,
-                ),
-              ),
               Row(
                 children: [
-                  _StepButton(
-                    icon: Icons.remove,
-                    onTap: value > min
-                        ? () {
-                            HapticFeedback.selectionClick();
-                            onChanged((value - 1).clamp(min, max));
-                          }
-                        : null,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                  Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFEBF5EE),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    alignment: Alignment.center,
                     child: Text(
-                      valueText,
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.primaryGreen,
-                      ),
+                      iconEmoji,
+                      style: const TextStyle(fontSize: 18),
                     ),
                   ),
-                  _StepButton(
-                    icon: Icons.add,
-                    onTap: value < max
-                        ? () {
-                            HapticFeedback.selectionClick();
-                            onChanged((value + 1).clamp(min, max));
-                          }
-                        : null,
+                  const SizedBox(width: 12),
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.textPrimary,
+                    ),
                   ),
+                ],
+              ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.baseline,
+                textBaseline: TextBaseline.alphabetic,
+                children: [
+                  Text(
+                    numberValue,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w900,
+                      color: AppColors.primaryGreen,
+                    ),
+                  ),
+                  if (unitText.isNotEmpty) ...[
+                    const SizedBox(width: 4),
+                    Text(
+                      unitText,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ],
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 10),
           SliderTheme(
             data: SliderTheme.of(context).copyWith(
+              trackHeight: 6,
               activeTrackColor: AppColors.primaryGreen,
-              inactiveTrackColor: const Color(0xFFE2E8F0),
+              inactiveTrackColor: const Color(0xFFE2E8E3),
               thumbColor: AppColors.graphiteYellow,
               overlayColor: AppColors.graphiteYellow.withValues(alpha: 0.2),
+              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 10),
             ),
             child: Slider(
               value: value,
               min: min,
               max: max,
-              onChanged: onChanged,
+              onChanged: (v) {
+                HapticFeedback.selectionClick();
+                onChanged(v);
+              },
             ),
           ),
         ],

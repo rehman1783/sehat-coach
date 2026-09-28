@@ -23,33 +23,49 @@ class ProgressHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double progress = currentStep / totalSteps;
+    final int percent = (progress * 100).round();
     final bool isEnglish = language == AppLanguage.english;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: const BoxDecoration(
-        color: AppColors.background,
-        border: Border(
-          bottom: BorderSide(color: Color(0xFFF1F5F9), width: 1),
-        ),
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      color: AppColors.background,
       child: SafeArea(
         bottom: false,
         child: Row(
           children: [
-            // Back Button
+            // Circular Back Button (Figma Style)
             AnimatedOpacity(
               duration: const Duration(milliseconds: 200),
               opacity: currentStep > 1 ? 1.0 : 0.0,
-              child: IconButton(
-                icon: const Icon(Icons.arrow_back_ios_new, size: 18),
-                color: AppColors.medicalBlue,
-                onPressed: currentStep > 1 ? onBack : null,
+              child: InkWell(
+                onTap: currentStep > 1 ? onBack : null,
+                borderRadius: BorderRadius.circular(99),
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.05),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  alignment: Alignment.center,
+                  child: const Icon(
+                    Icons.chevron_left_rounded,
+                    size: 24,
+                    color: AppColors.primaryGreen,
+                  ),
+                ),
               ),
             ),
-            const SizedBox(width: 4),
+            const SizedBox(width: 12),
 
-            // Segmented Progress Bar
+            // Figma Pill Progress Bar
             Expanded(
               child: Row(
                 children: [
@@ -58,66 +74,45 @@ class ProgressHeader extends StatelessWidget {
                       borderRadius: BorderRadius.circular(99),
                       child: LinearProgressIndicator(
                         value: progress,
-                        minHeight: 8,
-                        backgroundColor: const Color(0xFFF1F5F9),
+                        minHeight: 10,
+                        backgroundColor: const Color(0xFFE2E8E3),
                         valueColor: const AlwaysStoppedAnimation<Color>(
                           AppColors.primaryGreen,
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 10),
+                  const SizedBox(width: 12),
                   Text(
-                    '$currentStep/$totalSteps',
+                    '$percent%',
                     style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textSecondary,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w900,
+                      color: AppColors.primaryGreen,
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 12),
 
-            // Language Toggle Pill
-            GestureDetector(
-              onTap: () {
-                final nextLang = isEnglish ? AppLanguage.romanUrdu : AppLanguage.english;
-                onLanguageChanged?.call(nextLang);
-              },
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: AppColors.primaryGreen.withValues(alpha: 0.08),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: AppColors.primaryGreen.withValues(alpha: 0.2),
-                  ),
-                ),
-                child: Text(
-                  isEnglish ? 'EN' : 'ROMAN',
-                  style: const TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primaryGreen,
-                  ),
-                ),
-              ),
-            ),
-
-            const SizedBox(width: 4),
-
-            // Help Icon
-            IconButton(
-              icon: const Icon(Icons.info_outline, size: 20),
-              color: AppColors.border,
-              onPressed: onHelp ??
+            // Circular Info (i) Button (Figma Style)
+            InkWell(
+              onTap: onHelp ??
                   () {
                     showDialog(
                       context: context,
                       builder: (ctx) => AlertDialog(
-                        title: Text(isEnglish ? 'Sehat Coach Onboarding' : 'Sehat Coach Onboarding'),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        title: Text(
+                          isEnglish ? 'Sehat Coach Onboarding' : 'Sehat Coach Onboarding',
+                          style: const TextStyle(
+                            color: AppColors.primaryGreen,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                         content: Text(
                           isEnglish
                               ? 'Select your goals & biometrics to calibrate your custom metabolic model and grocery budget index.'
@@ -126,12 +121,40 @@ class ProgressHeader extends StatelessWidget {
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.pop(ctx),
-                            child: const Text('OK'),
+                            child: const Text(
+                              'OK',
+                              style: TextStyle(
+                                color: AppColors.primaryGreen,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ),
                         ],
                       ),
                     );
                   },
+              borderRadius: BorderRadius.circular(99),
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.05),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                alignment: Alignment.center,
+                child: const Icon(
+                  Icons.info_outline_rounded,
+                  size: 20,
+                  color: AppColors.primaryGreen,
+                ),
+              ),
             ),
           ],
         ),

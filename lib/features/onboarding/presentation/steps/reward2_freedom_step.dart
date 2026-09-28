@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../domain/models/onboarding_state.dart';
 
@@ -24,123 +25,102 @@ class Reward2FreedomStep extends StatelessWidget {
         ? "You don't need to quit home food to see results. Our AI accounts for real kitchen oils and sauces automatically."
         : 'Results paane ke liye ghar ka khana chorne ki zaroorat nahi. Hamari AI cooking oil aur saalan buffers khud calculate karti hai.';
 
-    final String badgeText = isEnglish
-        ? '+350 KCAL SAUCE/OIL BUFFER ACTIVATED'
-        : '+350 KCAL SAUCE/OIL BUFFER ACTIVATED';
-
     return Padding(
-      padding: const EdgeInsets.all(24.0),
+      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
       child: Column(
         children: [
           Expanded(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Glowing Flatbread Badge Container
+                // Figma Center Solid Green Rounded Badge Card
                 Container(
-                  width: 72,
-                  height: 72,
+                  width: 130,
+                  height: 130,
                   decoration: BoxDecoration(
-                    color: AppColors.graphiteYellow.withValues(alpha: 0.15),
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: AppColors.graphiteYellow.withValues(alpha: 0.5),
-                      width: 1.5,
-                    ),
+                    color: AppColors.primaryGreen,
+                    borderRadius: BorderRadius.circular(28),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.graphiteYellow.withValues(alpha: 0.35),
+                        blurRadius: 20,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
                   ),
                   alignment: Alignment.center,
                   child: const Text(
                     '🫓',
-                    style: TextStyle(fontSize: 32),
+                    style: TextStyle(fontSize: 48),
                   ),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 32),
 
-                // Headline
+                // Figma Headline
                 Text(
                   title,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w900,
                     color: AppColors.primaryGreen,
-                    letterSpacing: 0.5,
+                    letterSpacing: 0.8,
+                    height: 1.25,
                   ),
                 ),
-                const SizedBox(height: 14),
+                const SizedBox(height: 16),
 
-                // Copy
+                // Figma Copy
                 Text(
                   bodyText,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
-                    fontSize: 13,
+                    fontSize: 14,
                     height: 1.5,
                     color: AppColors.textSecondary,
-                  ),
-                ),
-                const SizedBox(height: 28),
-
-                // Active Buffer Badge Pill
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryGreen.withValues(alpha: 0.08),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: AppColors.primaryGreen.withValues(alpha: 0.3),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        width: 8,
-                        height: 8,
-                        decoration: const BoxDecoration(
-                          color: AppColors.primaryGreen,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Flexible(
-                        child: Text(
-                          badgeText,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.primaryGreen,
-                            letterSpacing: 0.5,
-                          ),
-                        ),
-                      ),
-                    ],
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ],
             ),
           ),
 
-          // Primary Button
+          // Primary Button (Figma Style)
           SizedBox(
             width: double.infinity,
+            height: 54,
             child: ElevatedButton(
-              onPressed: onContinue,
+              onPressed: () {
+                HapticFeedback.lightImpact();
+                onContinue();
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primaryGreen,
                 foregroundColor: AppColors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
+                elevation: 4,
+                shadowColor: AppColors.primaryGreen.withValues(alpha: 0.3),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(20),
                 ),
               ),
-              child: Text(
-                isEnglish ? 'CONTINUE' : 'AAGE BADHEIN',
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 0.8,
-                ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    isEnglish ? 'CONTINUE' : 'AAGE BADHEIN',
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 1.0,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  const Icon(
+                    Icons.arrow_forward_rounded,
+                    color: AppColors.graphiteYellow,
+                    size: 18,
+                  ),
+                ],
               ),
             ),
           ),

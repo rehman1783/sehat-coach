@@ -29,10 +29,10 @@ class Step6CoachStep extends StatelessWidget {
           Text(
             isEnglish ? 'CHOOSE YOUR COACH' : 'APNA COACH CHUNEIN',
             style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+              fontSize: 22,
+              fontWeight: FontWeight.w900,
               color: AppColors.primaryGreen,
-              letterSpacing: 0.5,
+              letterSpacing: 0.8,
             ),
           ),
           const SizedBox(height: 6),
@@ -82,6 +82,7 @@ class Step6CoachStep extends StatelessWidget {
           const SizedBox(height: 16),
           SizedBox(
             width: double.infinity,
+            height: 54,
             child: ElevatedButton(
               onPressed: () {
                 if (selectedCoach == null) {
@@ -112,14 +113,37 @@ class Step6CoachStep extends StatelessWidget {
                   );
                   return;
                 }
+                HapticFeedback.lightImpact();
                 onContinue();
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primaryGreen,
                 foregroundColor: AppColors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
+                elevation: 4,
+                shadowColor: AppColors.primaryGreen.withValues(alpha: 0.3),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
               ),
-              child: Text(isEnglish ? 'CONTINUE' : 'AAGE BADHEIN'),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    isEnglish ? 'CONTINUE' : 'AAGE BADHEIN',
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 1.0,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  const Icon(
+                    Icons.arrow_forward_rounded,
+                    color: AppColors.graphiteYellow,
+                    size: 18,
+                  ),
+                ],
+              ),
             ),
           ),
         ],
