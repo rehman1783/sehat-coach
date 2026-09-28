@@ -51,13 +51,6 @@ class Step5ConditionsStep extends StatelessWidget {
             child: ListView(
               children: [
                 OptionCard(
-                  title: isEnglish ? 'Ramadan & Fasting Schedule' : 'Ramzan & Fasting',
-                  subtitle: 'Automated fasting schedules & hydration timers',
-                  iconEmoji: '🌙',
-                  isSelected: selectedConditions.contains(HealthCondition.ramadan),
-                  onTap: () => onSelectCondition(HealthCondition.ramadan),
-                ),
-                OptionCard(
                   title: 'Diabetes Monitoring',
                   subtitle: 'Real-time carb overload alerts',
                   iconEmoji: '🩺',
