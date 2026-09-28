@@ -65,20 +65,74 @@ class ProgressHeader extends StatelessWidget {
             ),
             const SizedBox(width: 12),
 
-            // Figma Pill Progress Bar
+            // Figma Pill Progress Bar with Prominent Yellow Knob Thumb
             Expanded(
               child: Row(
                 children: [
                   Expanded(
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(99),
-                      child: LinearProgressIndicator(
-                        value: progress,
-                        minHeight: 10,
-                        backgroundColor: const Color(0xFFE2E8E3),
-                        valueColor: const AlwaysStoppedAnimation<Color>(
-                          AppColors.primaryGreen,
-                        ),
+                    child: SizedBox(
+                      height: 24,
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        alignment: Alignment.centerLeft,
+                        children: [
+                          // Track Background (Soft Mint/Grey Pill)
+                          Container(
+                            height: 8,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFE2E8E3),
+                              borderRadius: BorderRadius.circular(99),
+                            ),
+                          ),
+
+                          // Active Green Bar + Glowing Yellow Knob Thumb
+                          LayoutBuilder(
+                            builder: (context, constraints) {
+                              final double activeWidth = constraints.maxWidth * progress.clamp(0.0, 1.0);
+                              return Stack(
+                                clipBehavior: Clip.none,
+                                alignment: Alignment.centerLeft,
+                                children: [
+                                  // Solid Forest Green Progress Line
+                                  AnimatedContainer(
+                                    duration: const Duration(milliseconds: 350),
+                                    curve: Curves.easeOutCubic,
+                                    width: activeWidth,
+                                    height: 8,
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF0C4E2B), // Solid Forest Green
+                                      borderRadius: BorderRadius.circular(99),
+                                    ),
+                                  ),
+
+                                  // Sleek Golden Yellow Knob Thumb Circle (10px)
+                                  if (activeWidth > 0)
+                                    AnimatedPositioned(
+                                      duration: const Duration(milliseconds: 350),
+                                      curve: Curves.easeOutCubic,
+                                      left: (activeWidth - 5.0).clamp(0.0, constraints.maxWidth - 10),
+                                      child: Container(
+                                        width: 10,
+                                        height: 10,
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFF59E0B), // Golden Yellow Knob
+                                          shape: BoxShape.circle,
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: const Color(0xFFF59E0B).withValues(alpha: 0.5),
+                                              blurRadius: 3,
+                                              offset: const Offset(0, 1),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              );
+                            },
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -86,7 +140,7 @@ class ProgressHeader extends StatelessWidget {
                   Text(
                     '$percent%',
                     style: const TextStyle(
-                      fontSize: 13,
+                      fontSize: 14,
                       fontWeight: FontWeight.w900,
                       color: AppColors.primaryGreen,
                     ),

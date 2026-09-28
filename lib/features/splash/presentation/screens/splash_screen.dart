@@ -211,9 +211,9 @@ class _SplashScreenState extends State<SplashScreen>
 
                             const SizedBox(height: 20),
 
-                            // Footer Tagline (Figma Splash Style)
+                            // Footer Tagline (Hybrid Health)
                             const Text(
-                              'POWERED BY AI • BUILT FOR PAKISTAN',
+                              'POWERED BY AI • HYBRID HEALTH',
                               style: TextStyle(
                                 fontSize: 10.5,
                                 fontWeight: FontWeight.w800,
