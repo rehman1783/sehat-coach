@@ -27,7 +27,7 @@ class _Step7CalculationStepState extends State<Step7CalculationStep>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 3200),
+      duration: const Duration(milliseconds: 3600),
     );
 
     _animation = CurvedAnimation(
@@ -41,7 +41,7 @@ class _Step7CalculationStepState extends State<Step7CalculationStep>
 
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
-        Future.delayed(const Duration(milliseconds: 300), () {
+        Future.delayed(const Duration(milliseconds: 400), () {
           if (mounted) widget.onCompleted();
         });
       }
@@ -62,193 +62,336 @@ class _Step7CalculationStepState extends State<Step7CalculationStep>
     final int percent = (progress * 100).floor().clamp(0, 100);
     final bool isEnglish = widget.language == AppLanguage.english;
 
+    // Determine current active process step (0, 1, or 2)
+    final int activeStepIndex;
+    if (percent < 33) {
+      activeStepIndex = 0;
+    } else if (percent < 66) {
+      activeStepIndex = 1;
+    } else if (percent < 95) {
+      activeStepIndex = 2;
+    } else {
+      activeStepIndex = 3; // All completed
+    }
+
+    final List<String> stepsText = isEnglish
+        ? [
+            'Computing Mifflin-St Jeor baseline...',
+            'Aligning market prices & Bachat index...',
+            'Configuring prayer & coach timers...',
+          ]
+        : [
+            'Biometrics aur goals analyze ho rahe hain...',
+            'Daily calories aur Bachat index set ho rahe hain...',
+            'Timers aur coach notifications set ho rahi hain...',
+          ];
+
     return Padding(
-      padding: const EdgeInsets.all(24.0),
-      child: Center(
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Figma Card Design: Dark Green Rounded Box with Top-Right Badge
-              SizedBox(
-                width: 140,
-                height: 140,
-                child: Stack(
-                  clipBehavior: Clip.none,
+      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+      child: Column(
+        children: [
+          Expanded(
+            child: Center(
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Main Green Rounded Box
-                    Container(
-                      width: 140,
-                      height: 140,
-                      decoration: BoxDecoration(
-                        color: AppColors.primaryGreen,
-                        borderRadius: BorderRadius.circular(28),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.primaryGreen.withValues(alpha: 0.25),
-                            blurRadius: 20,
-                            offset: const Offset(0, 10),
+                    // Main Percentage Card with Top-Right Badge
+                    SizedBox(
+                      width: 130,
+                      height: 130,
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          Container(
+                            width: 130,
+                            height: 130,
+                            decoration: BoxDecoration(
+                              color: AppColors.primaryGreen,
+                              borderRadius: BorderRadius.circular(26),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.primaryGreen.withValues(alpha: 0.25),
+                                  blurRadius: 20,
+                                  offset: const Offset(0, 8),
+                                ),
+                              ],
+                            ),
+                            alignment: Alignment.center,
+                            child: Text(
+                              '$percent%',
+                              style: const TextStyle(
+                                fontSize: 40,
+                                fontWeight: FontWeight.w900,
+                                color: Colors.white,
+                                letterSpacing: -1,
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            top: -6,
+                            right: -6,
+                            child: Container(
+                              width: 36,
+                              height: 36,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: const Color(0xFF00A3FF),
+                                  width: 3.5,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.12),
+                                    blurRadius: 6,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              alignment: Alignment.center,
+                              child: const Text(
+                                'U',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.primaryGreen,
+                                ),
+                              ),
+                            ),
                           ),
                         ],
                       ),
-                      alignment: Alignment.center,
-                      child: Text(
-                        '$percent%',
-                        style: const TextStyle(
-                          fontSize: 42,
-                          fontWeight: FontWeight.w900,
-                          color: Colors.white,
-                          letterSpacing: -1,
-                        ),
-                      ),
                     ),
 
-                    // Top-Right User Badge (Matching Figma design screenshot)
-                    Positioned(
-                      top: -6,
-                      right: -6,
-                      child: Container(
-                        width: 38,
-                        height: 38,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: const Color(0xFF00A3FF),
-                            width: 3.5,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.12),
-                              blurRadius: 6,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        alignment: Alignment.center,
-                        child: const Text(
-                          'U',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.primaryGreen,
-                          ),
-                        ),
+                    const SizedBox(height: 32),
+
+                    // Section Heading
+                    Text(
+                      isEnglish
+                          ? 'CALIBRATING YOUR BLUEPRINT'
+                          : 'METABOLIC BLUEPRINT CALCULATE HO RAHA HAI',
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w900,
+                        color: AppColors.primaryGreen,
+                        letterSpacing: 0.5,
                       ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      isEnglish
+                          ? 'Creating your custom metabolic model'
+                          : 'Aapka custom metabolic model ban raha hai',
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: AppColors.textSecondary,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+
+                    const SizedBox(height: 32),
+
+                    // Process Steps List with Dropdown Active Green Box
+                    Column(
+                      children: List.generate(stepsText.length, (index) {
+                        final bool isDone = index < activeStepIndex;
+                        final bool isActive = index == activeStepIndex;
+
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 12.0),
+                          child: AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 350),
+                            switchInCurve: Curves.easeOutCubic,
+                            switchOutCurve: Curves.easeInCubic,
+                            child: isActive
+                                ? _ActiveProcessBox(
+                                    key: ValueKey('active_$index'),
+                                    text: stepsText[index],
+                                  )
+                                : _InactiveProcessRow(
+                                    key: ValueKey('inactive_$index'),
+                                    text: stepsText[index],
+                                    isDone: isDone,
+                                  ),
+                          ),
+                        );
+                      }),
                     ),
                   ],
                 ),
               ),
+            ),
+          ),
 
-              const SizedBox(height: 36),
-
-              // Title and Subtitle
-              Text(
-                isEnglish
-                    ? 'CALIBRATING YOUR BLUEPRINT...'
-                    : 'METABOLIC BLUEPRINT CALCULATE HO RAHA HAI...',
-                style: const TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primaryGreen,
-                  letterSpacing: 0.5,
+          // Bottom Continue Button (Active on Completion)
+          SizedBox(
+            width: double.infinity,
+            height: 52,
+            child: ElevatedButton(
+              onPressed: percent >= 100 ? widget.onCompleted : null,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primaryGreen,
+                disabledBackgroundColor: AppColors.primaryGreen.withValues(alpha: 0.4),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
                 ),
-                textAlign: TextAlign.center,
+                elevation: 0,
               ),
-              const SizedBox(height: 6),
-              Text(
-                isEnglish
-                    ? 'Creating your custom metabolic model'
-                    : 'Aapka custom metabolic model ban raha hai',
-                style: const TextStyle(
-                  fontSize: 13,
-                  color: AppColors.textSecondary,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 36),
-
-              // Real-Time Ticking Checklist
-              Column(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  _CheckItem(
-                    text: isEnglish
-                        ? 'Computing Mifflin-St Jeor baseline...'
-                        : 'Biometrics aur goals analyze ho rahe hain...',
-                    isDone: percent >= 33,
+                  Text(
+                    isEnglish ? 'CONTINUE' : 'AAGE BADHEIN',
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w900,
+                      color: Colors.white,
+                      letterSpacing: 1.0,
+                    ),
                   ),
-                  const SizedBox(height: 14),
-                  _CheckItem(
-                    text: isEnglish
-                        ? 'Aligning market prices & budget index...'
-                        : 'Daily calories aur Bachat index set ho rahe hain...',
-                    isDone: percent >= 66,
-                  ),
-                  const SizedBox(height: 14),
-                  _CheckItem(
-                    text: isEnglish
-                        ? 'Configuring prayer & coach timers...'
-                        : 'Timers aur coach notifications set ho rahi hain...',
-                    isDone: percent >= 95,
+                  const SizedBox(width: 8),
+                  const Icon(
+                    Icons.arrow_forward_rounded,
+                    color: Colors.white,
+                    size: 18,
                   ),
                 ],
               ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
 }
 
-class _CheckItem extends StatelessWidget {
+/// Highlighted Light Green Container for the Currently Active Calculation Process
+class _ActiveProcessBox extends StatelessWidget {
+  final String text;
+
+  const _ActiveProcessBox({
+    super.key,
+    required this.text,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          decoration: BoxDecoration(
+            color: const Color(0xFFD8F3E5), // Soft Light Green from Figma
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: const Color(0xFFA7F3D0),
+              width: 1.5,
+            ),
+          ),
+          child: Row(
+            children: [
+              const SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2.2,
+                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryGreen),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  text,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.primaryGreen,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        // Floating Badge on Right of Active Box
+        Positioned(
+          top: -6,
+          right: 12,
+          child: Container(
+            width: 28,
+            height: 28,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: const Color(0xFF00A3FF),
+                width: 2.5,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.1),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            alignment: Alignment.center,
+            child: const Text(
+              'U',
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: AppColors.primaryGreen,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Standard Row for Completed or Upcoming Steps Outside the Green Box
+class _InactiveProcessRow extends StatelessWidget {
   final String text;
   final bool isDone;
 
-  const _CheckItem({
+  const _InactiveProcessRow({
+    super.key,
     required this.text,
     required this.isDone,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        AnimatedContainer(
-          duration: const Duration(milliseconds: 250),
-          width: 24,
-          height: 24,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: isDone ? AppColors.primaryGreen : Colors.transparent,
-            border: Border.all(
-              color: isDone ? AppColors.primaryGreen : AppColors.border,
-              width: 1.5,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      child: Row(
+        children: [
+          Icon(
+            isDone ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded,
+            size: 18,
+            color: isDone ? AppColors.primaryGreen : AppColors.border,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              text,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: isDone ? FontWeight.w600 : FontWeight.normal,
+                color: isDone ? AppColors.primaryGreen : AppColors.textSecondary.withValues(alpha: 0.6),
+              ),
             ),
           ),
-          alignment: Alignment.center,
-          child: Text(
-            isDone ? '✓' : '⏳',
-            style: TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.bold,
-              color: isDone ? AppColors.white : AppColors.textSecondary,
-            ),
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Text(
-            text,
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: isDone ? FontWeight.w600 : FontWeight.normal,
-              color: isDone ? AppColors.primaryGreen : AppColors.textSecondary,
-            ),
-            softWrap: true,
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

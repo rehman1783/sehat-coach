@@ -467,35 +467,45 @@
 
       <!-- STEP 7: 3-SECOND CALCULATION ENGINE -->
       <section id="step-7"
-        class="step-container slide-right-out absolute inset-0 p-6 flex flex-col justify-center items-center text-center">
-        <!-- Figma Rounded Box Container with Badge -->
-        <div class="relative w-36 h-36 mb-8 flex items-center justify-center">
-          <div class="w-36 h-36 bg-brandGreen rounded-[28px] shadow-xl flex items-center justify-center">
-            <span id="calc-percent" class="font-display text-4xl text-white font-extrabold tracking-tight">0%</span>
+        class="step-container slide-right-out absolute inset-0 p-6 flex flex-col justify-between items-center text-center">
+        <div>
+          <!-- Figma Rounded Box Container with Badge -->
+          <div class="relative w-32 h-32 mb-6 mx-auto flex items-center justify-center">
+            <div class="w-32 h-32 bg-brandGreen rounded-[26px] shadow-xl flex items-center justify-center">
+              <span id="calc-percent" class="font-display text-4xl text-white font-extrabold tracking-tight">0%</span>
+            </div>
+            <!-- Top-Right Badge -->
+            <div class="absolute -top-1.5 -right-1.5 w-9 h-9 bg-white rounded-full border-[3.5px] border-[#00A3FF] flex items-center justify-center shadow-md">
+              <span class="text-sm font-bold text-brandGreen">U</span>
+            </div>
           </div>
-          <!-- Top-Right Badge -->
-          <div class="absolute -top-1.5 -right-1.5 w-9.5 h-9.5 bg-white rounded-full border-[3.5px] border-[#00A3FF] flex items-center justify-center shadow-md">
-            <span class="text-sm font-bold text-brandGreen">U</span>
+
+          <h3 class="font-display text-base text-brandGreen tracking-wide uppercase mb-1 font-bold">CALIBRATING YOUR BLUEPRINT</h3>
+          <p class="text-xs text-brandBorder mb-6">Creating your custom metabolic model</p>
+
+          <!-- Dropdown Active Box List -->
+          <div id="steps-list" class="w-full max-w-[320px] space-y-2 text-left">
+            <div id="check-1" class="relative p-3.5 bg-emerald-100/90 border border-emerald-300 rounded-2xl flex items-center gap-3 transition-all duration-300 shadow-sm">
+              <span class="w-4 h-4 rounded-full border-2 border-brandGreen border-t-transparent animate-spin"></span>
+              <span class="text-xs font-bold text-brandGreen">Computing Mifflin-St Jeor baseline...</span>
+              <span class="absolute -top-1.5 right-3 w-6 h-6 bg-white rounded-full border-2 border-[#00A3FF] flex items-center justify-center text-[10px] font-bold text-brandGreen shadow">U</span>
+            </div>
+            <div id="check-2" class="p-2 px-3 text-xs text-brandBorder/60 flex items-center gap-2.5 transition-all">
+              <span class="w-4 h-4 rounded-full border border-brandBorder/40 flex items-center justify-center text-[9px]">○</span>
+              <span>Aligning market prices & Bachat index...</span>
+            </div>
+            <div id="check-3" class="p-2 px-3 text-xs text-brandBorder/60 flex items-center gap-2.5 transition-all">
+              <span class="w-4 h-4 rounded-full border border-brandBorder/40 flex items-center justify-center text-[9px]">○</span>
+              <span>Configuring prayer & coach timers...</span>
+            </div>
           </div>
         </div>
 
-        <h3 class="font-display text-base text-brandGreen tracking-wide uppercase mb-1 font-bold">CALIBRATING YOUR BLUEPRINT...</h3>
-        <p class="text-xs text-brandBorder mb-6">Creating your custom metabolic model</p>
-
-        <div class="w-full max-w-[260px] space-y-3 text-left">
-          <div id="check-1" class="flex items-center gap-2.5 text-xs text-brandBorder transition-colors">
-            <span class="w-4 h-4 rounded-full border border-brandBorder/40 flex items-center justify-center text-[9px]">○</span>
-            <span>Computing Mifflin-St Jeor baseline...</span>
-          </div>
-          <div id="check-2" class="flex items-center gap-2.5 text-xs text-brandBorder transition-colors">
-            <span class="w-4 h-4 rounded-full border border-brandBorder/40 flex items-center justify-center text-[9px]">○</span>
-            <span>Aligning market prices & budget index...</span>
-          </div>
-          <div id="check-3" class="flex items-center gap-2.5 text-xs text-brandBorder transition-colors">
-            <span class="w-4 h-4 rounded-full border border-brandBorder/40 flex items-center justify-center text-[9px]">○</span>
-            <span>Configuring prayer & coach timers...</span>
-          </div>
-        </div>
+        <button id="calc-continue-btn" onclick="nextStep()"
+          class="w-full py-4 bg-brandGreen/50 text-white font-display text-xs tracking-wider rounded-2xl shadow-md uppercase transition-all cursor-not-allowed disabled flex items-center justify-center gap-2">
+          <span>CONTINUE</span>
+          <span>→</span>
+        </button>
       </section>
 
       <!-- STEP 8: BLUEPRINT REVEAL & CALL TO ACTION -->
@@ -742,35 +752,49 @@
     function runCalculationEngine() {
       let progress = 0;
       const text = document.getElementById('calc-percent');
+      const btn = document.getElementById('calc-continue-btn');
 
       const check1 = document.getElementById('check-1');
       const check2 = document.getElementById('check-2');
       const check3 = document.getElementById('check-3');
 
+      const activeBadgeHtml = `<span class="absolute -top-1.5 right-3 w-6 h-6 bg-white rounded-full border-2 border-[#00A3FF] flex items-center justify-center text-[10px] font-bold text-brandGreen shadow">U</span>`;
+      const spinnerHtml = `<span class="w-4 h-4 rounded-full border-2 border-brandGreen border-t-transparent animate-spin"></span>`;
+
       const interval = setInterval(() => {
         progress += 1;
         if (text) text.innerText = `${progress}%`;
 
-        if (progress >= 33) {
-          check1.className = 'flex items-center gap-2.5 text-xs text-brandGreen font-bold transition-colors';
-          check1.querySelector('span').innerText = '✓';
+        if (progress === 33) {
+          check1.className = 'p-2 px-3 text-xs text-brandGreen font-bold flex items-center gap-2.5 transition-all';
+          check1.innerHTML = `<span class="text-brandGreen font-bold">✓</span><span>Computing Mifflin-St Jeor baseline...</span>`;
+
+          check2.className = 'relative p-3.5 bg-emerald-100/90 border border-emerald-300 rounded-2xl flex items-center gap-3 transition-all duration-300 shadow-sm';
+          check2.innerHTML = `${spinnerHtml}<span class="text-xs font-bold text-brandGreen">Aligning market prices & Bachat index...</span>${activeBadgeHtml}`;
         }
-        if (progress >= 66) {
-          check2.className = 'flex items-center gap-2.5 text-xs text-brandGreen font-bold transition-colors';
-          check2.querySelector('span').innerText = '✓';
+        if (progress === 66) {
+          check2.className = 'p-2 px-3 text-xs text-brandGreen font-bold flex items-center gap-2.5 transition-all';
+          check2.innerHTML = `<span class="text-brandGreen font-bold">✓</span><span>Aligning market prices & Bachat index...</span>`;
+
+          check3.className = 'relative p-3.5 bg-emerald-100/90 border border-emerald-300 rounded-2xl flex items-center gap-3 transition-all duration-300 shadow-sm';
+          check3.innerHTML = `${spinnerHtml}<span class="text-xs font-bold text-brandGreen">Configuring prayer & coach timers...</span>${activeBadgeHtml}`;
         }
-        if (progress >= 95) {
-          check3.className = 'flex items-center gap-2.5 text-xs text-brandGreen font-bold transition-colors';
-          check3.querySelector('span').innerText = '✓';
+        if (progress === 95) {
+          check3.className = 'p-2 px-3 text-xs text-brandGreen font-bold flex items-center gap-2.5 transition-all';
+          check3.innerHTML = `<span class="text-brandGreen font-bold">✓</span><span>Configuring prayer & coach timers...</span>`;
         }
 
         if (progress >= 100) {
           clearInterval(interval);
+          if (btn) {
+            btn.className = 'w-full py-4 bg-brandGreen text-white font-display text-xs tracking-wider rounded-2xl shadow-lg hover:bg-brandGreen/90 transition-all uppercase flex items-center justify-center gap-2 cursor-pointer';
+            btn.disabled = false;
+          }
           setTimeout(() => {
             nextStep();
-          }, 350);
+          }, 450);
         }
-      }, 30); // ~3 seconds total smooth ticking
+      }, 30);
     }
 
     // Initialize Locale on DOM Load
