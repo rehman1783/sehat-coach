@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'app_colors.dart';
 
-/// App ThemeData configuration for SehatCoach
+/// App ThemeData configuration for SehatCoach exclusively using:
+/// 1. Inter (Body, Buttons, Labels, Inputs)
+/// 2. Dela Gothic One (Titles, Headings, Display text)
 class AppTheme {
   static ThemeData get lightTheme {
+    final TextTheme baseTextTheme = GoogleFonts.interTextTheme();
+
     return ThemeData(
       useMaterial3: true,
+      fontFamily: GoogleFonts.inter().fontFamily,
       scaffoldBackgroundColor: AppColors.surface,
       primaryColor: AppColors.primaryGreen,
       colorScheme: const ColorScheme.light(
@@ -20,18 +26,17 @@ class AppTheme {
         outline: AppColors.border,
       ),
 
-      // AppBar Theme
-      appBarTheme: const AppBarTheme(
+      // AppBar Theme with Dela Gothic One title
+      appBarTheme: AppBarTheme(
         backgroundColor: AppColors.background,
         elevation: 0,
         scrolledUnderElevation: 1,
         surfaceTintColor: AppColors.transparent,
         centerTitle: true,
-        iconTheme: IconThemeData(color: AppColors.medicalBlue),
-        titleTextStyle: TextStyle(
+        iconTheme: const IconThemeData(color: AppColors.medicalBlue),
+        titleTextStyle: GoogleFonts.delaGothicOne(
           color: AppColors.medicalBlue,
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
+          fontSize: 18,
         ),
       ),
 
@@ -46,7 +51,7 @@ class AppTheme {
         ),
       ),
 
-      // Button Themes
+      // Button Themes using Inter
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.graphiteYellow,
@@ -56,7 +61,7 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          textStyle: const TextStyle(
+          textStyle: GoogleFonts.inter(
             fontSize: 16,
             fontWeight: FontWeight.bold,
           ),
@@ -71,7 +76,7 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          textStyle: const TextStyle(
+          textStyle: GoogleFonts.inter(
             fontSize: 16,
             fontWeight: FontWeight.w600,
           ),
@@ -85,11 +90,13 @@ class AppTheme {
         elevation: 4,
       ),
 
-      // Input Decoration Theme
+      // Input Decoration Theme using Inter
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.background,
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        hintStyle: GoogleFonts.inter(color: AppColors.textSecondary, fontSize: 14),
+        labelStyle: GoogleFonts.inter(color: AppColors.textPrimary, fontSize: 14),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: AppColors.border),
@@ -108,34 +115,76 @@ class AppTheme {
         ),
       ),
 
-      // Text Theme
-      textTheme: const TextTheme(
-        displayLarge: TextStyle(
+      // Unified Text Theme combining Inter (Body/UI) and Dela Gothic One (Headings)
+      textTheme: baseTextTheme.copyWith(
+        displayLarge: GoogleFonts.delaGothicOne(
           color: AppColors.medicalBlue,
           fontSize: 32,
-          fontWeight: FontWeight.bold,
         ),
-        headlineMedium: TextStyle(
+        displayMedium: GoogleFonts.delaGothicOne(
+          color: AppColors.medicalBlue,
+          fontSize: 26,
+        ),
+        displaySmall: GoogleFonts.delaGothicOne(
+          color: AppColors.medicalBlue,
+          fontSize: 22,
+        ),
+        headlineLarge: GoogleFonts.delaGothicOne(
           color: AppColors.medicalBlue,
           fontSize: 24,
-          fontWeight: FontWeight.bold,
         ),
-        titleLarge: TextStyle(
+        headlineMedium: GoogleFonts.delaGothicOne(
           color: AppColors.medicalBlue,
           fontSize: 20,
-          fontWeight: FontWeight.w600,
         ),
-        bodyLarge: TextStyle(
+        headlineSmall: GoogleFonts.delaGothicOne(
+          color: AppColors.medicalBlue,
+          fontSize: 18,
+        ),
+        titleLarge: GoogleFonts.delaGothicOne(
+          color: AppColors.medicalBlue,
+          fontSize: 18,
+        ),
+        titleMedium: GoogleFonts.delaGothicOne(
+          color: AppColors.medicalBlue,
+          fontSize: 16,
+        ),
+        titleSmall: GoogleFonts.delaGothicOne(
+          color: AppColors.medicalBlue,
+          fontSize: 14,
+        ),
+        bodyLarge: GoogleFonts.inter(
           color: AppColors.textPrimary,
           fontSize: 16,
           fontWeight: FontWeight.normal,
         ),
-        bodyMedium: TextStyle(
+        bodyMedium: GoogleFonts.inter(
           color: AppColors.textSecondary,
           fontSize: 14,
           fontWeight: FontWeight.normal,
+        ),
+        bodySmall: GoogleFonts.inter(
+          color: AppColors.textSecondary,
+          fontSize: 12,
+          fontWeight: FontWeight.normal,
+        ),
+        labelLarge: GoogleFonts.inter(
+          color: AppColors.textPrimary,
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+        ),
+        labelMedium: GoogleFonts.inter(
+          color: AppColors.textSecondary,
+          fontSize: 12,
+          fontWeight: FontWeight.w500,
+        ),
+        labelSmall: GoogleFonts.inter(
+          color: AppColors.textSecondary,
+          fontSize: 10,
+          fontWeight: FontWeight.w500,
         ),
       ),
     );
   }
 }
+

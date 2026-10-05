@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../../../../core/services/geo_detector.dart';
 import '../../../onboarding/domain/models/onboarding_state.dart';
 import '../../../onboarding/presentation/screens/onboarding_screen.dart';
 
@@ -15,7 +16,9 @@ class _SplashScreenState extends State<SplashScreen>
   late final AnimationController _animController;
   late final Animation<double> _scaleAnim;
   late final Animation<double> _fadeAnim;
-  AppLanguage _selectedLanguage = AppLanguage.english;
+  AppLanguage _selectedLanguage = AppLanguage.romanUrdu;
+  DetectedLocation? _detectedLocation;
+  bool _isGeoLoading = true;
 
   @override
   void initState() {
@@ -36,6 +39,37 @@ class _SplashScreenState extends State<SplashScreen>
     );
 
     _animController.forward();
+    _initGeoDetection();
+  }
+
+  Future<void> _initGeoDetection() async {
+    // 1. Instant Tier 1 Detection (Locale & Timezone)
+    final tier1 = GeoDetector.detectTier1();
+    if (tier1 != null) {
+      if (mounted) {
+        setState(() {
+          _detectedLocation = tier1;
+          _isGeoLoading = false;
+          if (tier1.countryCode != 'PK') {
+            _selectedLanguage = AppLanguage.english;
+          } else {
+            _selectedLanguage = AppLanguage.romanUrdu;
+          }
+        });
+      }
+    }
+
+    // 2. Async IP Geolocation Detection
+    final location = await GeoDetector.detectLocation();
+    if (mounted) {
+      setState(() {
+        _detectedLocation = location;
+        _isGeoLoading = false;
+        if (location.countryCode != 'PK') {
+          _selectedLanguage = AppLanguage.english;
+        }
+      });
+    }
   }
 
   @override
@@ -56,6 +90,7 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
+    final bool isPakistan = _detectedLocation?.countryCode == 'PK' || (_detectedLocation == null && !_isGeoLoading);
     final bool isEnglish = _selectedLanguage == AppLanguage.english;
 
     return Scaffold(
@@ -114,50 +149,126 @@ class _SplashScreenState extends State<SplashScreen>
                                 letterSpacing: 0.2,
                               ),
                             ),
-                            const SizedBox(height: 28),
+                            const SizedBox(height: 16),
 
-                            // Language Selector Pill (English & Roman English)
-                            Container(
-                              height: 44,
-                              width: 260,
-                              padding: const EdgeInsets.all(4),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(30),
-                                border: Border.all(color: const Color(0xFFE2E8F0)),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.04),
-                                    blurRadius: 10,
-                                    offset: const Offset(0, 3),
+                            // Country Location Pill Badge
+                            if (_isGeoLoading)
+                              const Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Color(0xFF14532D),
                                   ),
-                                ],
-                              ),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: _LanguageOptionPill(
-                                      label: 'ROMAN ENGLISH',
-                                      isSelected: _selectedLanguage == AppLanguage.romanUrdu,
-                                      onTap: () {
-                                        HapticFeedback.selectionClick();
-                                        setState(() => _selectedLanguage = AppLanguage.romanUrdu);
-                                      },
+                                ),
+                              )
+                            else if (_detectedLocation != null)
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                                margin: const EdgeInsets.only(bottom: 12),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFE2EBE0),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(Icons.location_on_rounded, size: 13, color: Color(0xFF14532D)),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      'Detected: ${_detectedLocation!.countryName} (${_detectedLocation!.city})',
+                                      style: const TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w700,
+                                        color: Color(0xFF14532D),
+                                      ),
                                     ),
-                                  ),
-                                  Expanded(
-                                    child: _LanguageOptionPill(
-                                      label: 'ENGLISH',
-                                      isSelected: _selectedLanguage == AppLanguage.english,
-                                      onTap: () {
-                                        HapticFeedback.selectionClick();
-                                        setState(() => _selectedLanguage = AppLanguage.english);
-                                      },
-                                    ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
-                            ),
+
+                            // Country-dependent Language Options
+                            if (isPakistan)
+                              // Pakistan: Show URDU/ROMAN ENGLISH or ENGLISH toggle option
+                              Container(
+                                height: 44,
+                                width: 260,
+                                padding: const EdgeInsets.all(4),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(30),
+                                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withValues(alpha: 0.04),
+                                      blurRadius: 10,
+                                      offset: const Offset(0, 3),
+                                    ),
+                                  ],
+                                ),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: _LanguageOptionPill(
+                                        label: 'ROMAN URDU',
+                                        isSelected: _selectedLanguage == AppLanguage.romanUrdu,
+                                        onTap: () {
+                                          HapticFeedback.selectionClick();
+                                          setState(() => _selectedLanguage = AppLanguage.romanUrdu);
+                                        },
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: _LanguageOptionPill(
+                                        label: 'ENGLISH',
+                                        isSelected: _selectedLanguage == AppLanguage.english,
+                                        onTap: () {
+                                          HapticFeedback.selectionClick();
+                                          setState(() => _selectedLanguage = AppLanguage.english);
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            else
+                              // Non-Pakistan: Show ONLY English option
+                              Container(
+                                height: 44,
+                                width: 260,
+                                alignment: Alignment.center,
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(30),
+                                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withValues(alpha: 0.04),
+                                      blurRadius: 10,
+                                      offset: const Offset(0, 3),
+                                    ),
+                                  ],
+                                ),
+                                child: const Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.language_rounded, size: 16, color: Color(0xFF14532D)),
+                                    SizedBox(width: 8),
+                                    Text(
+                                      'LANGUAGE: ENGLISH',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w800,
+                                        color: Color(0xFF14532D),
+                                        letterSpacing: 0.5,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                           ],
                         ),
                       ),
