@@ -1,147 +1,210 @@
-import 'package:flutter/material.dart';
-import '../../../../core/theme/app_colors.dart';
+import 'dart:async';
 
-class AuthBottomSheet extends StatelessWidget {
-  final VoidCallback onComplete;
+import 'package:flutter/material.dart';
+
+import '../../domain/models/onboarding_state.dart';
+
+class AuthBottomSheet extends StatefulWidget {
+  final FutureOr<void> Function() onComplete;
+  final OnboardingState profile;
+  final ValueChanged<int> onEdit;
+  final bool persistsToAccount;
 
   const AuthBottomSheet({
     super.key,
     required this.onComplete,
+    required this.profile,
+    required this.onEdit,
+    this.persistsToAccount = false,
+  });
+
+  @override
+  State<AuthBottomSheet> createState() => _AuthBottomSheetState();
+}
+
+class _AuthBottomSheetState extends State<AuthBottomSheet> {
+  bool _saving = false;
+  String? _error;
+
+  @override
+  Widget build(BuildContext context) {
+    final profile = widget.profile;
+    final english = profile.language == AppLanguage.english;
+    String label(String name) {
+      final words = name.replaceAllMapped(
+        RegExp(r'([a-z])([A-Z])'),
+        (match) => '${match[1]} ${match[2]!.toLowerCase()}',
+      );
+      return '${words[0].toUpperCase()}${words.substring(1)}';
+    }
+
+    Widget review(String title, String value, int step) => _ReviewTile(
+      title: title,
+      value: value
+          .split(' • ')
+          .map((v) => v.isEmpty ? v : label(v))
+          .join(' • '),
+      editTooltip: english ? 'Edit $title' : '$title badlein',
+      step: step,
+      onEdit: () {
+        Navigator.pop(context);
+        widget.onEdit(step);
+      },
+    );
+    return SafeArea(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              english ? 'REVIEW YOUR PLAN' : 'APNA PLAN CHECK KAREIN',
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+            const SizedBox(height: 12),
+            Text(
+              widget.persistsToAccount
+                  ? (english
+                        ? 'Your answers will be saved securely to your account before Home opens.'
+                        : 'Home khulne se pehle aapke jawabat account mein mehfooz save honge.')
+                  : (english
+                        ? 'Preview only. No account is created and your answers are not saved when the app closes.'
+                        : 'Yeh preview hai. Account nahi banega aur app band hone par jawabat save nahi honge.'),
+            ),
+            review(english ? 'Goal' : 'Goal', profile.goal?.name ?? '—', 1),
+            review(
+              english ? 'Measurements & activity' : 'Measurements aur activity',
+              '${profile.age} • ${profile.heightCm} cm • ${profile.weightKg} kg\n'
+              '${profile.activityLevel.name} • ${profile.goalPace.name} • '
+              '${profile.targetWeightKg} kg',
+              3,
+            ),
+            review(
+              english ? 'City' : 'Shehar',
+              '${profile.city}, ${profile.country}',
+              4,
+            ),
+            review(
+              english ? 'Food routine' : 'Khane ka routine',
+              profile.kitchen?.name ?? '—',
+              5,
+            ),
+            review(
+              english ? 'Health preferences' : 'Health preferences',
+              profile.conditions.map((c) => c.name).join(', '),
+              7,
+            ),
+            review(english ? 'Coach' : 'Coach', profile.coachName, 8),
+            const SizedBox(height: 16),
+            if (_error != null) ...[
+              Semantics(
+                liveRegion: true,
+                label: 'Error: $_error',
+                excludeSemantics: true,
+                child: Text(
+                  _error!,
+                  style: TextStyle(color: Theme.of(context).colorScheme.error),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              const SizedBox(height: 12),
+            ],
+            ConstrainedBox(
+              constraints: const BoxConstraints(minHeight: 52),
+              child: FilledButton(
+                onPressed: _saving ? null : _complete,
+                child: Text(
+                  _saving
+                      ? (english
+                            ? 'Saving securely…'
+                            : 'Mehfooz save ho raha hai…')
+                      : widget.persistsToAccount
+                      ? (english
+                            ? 'Save and continue'
+                            : 'Save karke jari rakhein')
+                      : (english ? 'Preview my home' : 'Apna home dekhein'),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _complete() async {
+    setState(() {
+      _saving = true;
+      _error = null;
+    });
+    try {
+      await widget.onComplete();
+      if (mounted) Navigator.pop(context);
+    } on Object {
+      if (!mounted) return;
+      setState(() {
+        _saving = false;
+        _error =
+            'Your plan could not be saved. Nothing was lost. Please try again.';
+      });
+    }
+  }
+}
+
+class _ReviewTile extends StatelessWidget {
+  final String title;
+  final String value;
+  final String editTooltip;
+  final int step;
+  final VoidCallback onEdit;
+
+  const _ReviewTile({
+    required this.title,
+    required this.value,
+    required this.editTooltip,
+    required this.step,
+    required this.onEdit,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.only(
-        left: 24,
-        right: 24,
-        top: 16,
-        bottom: MediaQuery.of(context).viewInsets.bottom + 24,
-      ),
-      decoration: const BoxDecoration(
-        color: AppColors.background,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-        border: Border(
-          top: BorderSide(color: AppColors.primaryGreen, width: 2),
-        ),
-      ),
+    final editButton = IconButton(
+      key: ValueKey('edit-onboarding-step-$step'),
+      tooltip: editTooltip,
+      icon: const Icon(Icons.edit_outlined),
+      onPressed: onEdit,
+    );
+
+    if (MediaQuery.textScalerOf(context).scale(1) <= 1.3) {
+      return ListTile(
+        contentPadding: EdgeInsets.zero,
+        title: Text(title),
+        subtitle: Text(value),
+        trailing: editButton,
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Column(
-        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Drag handle pill
-          Container(
-            width: 48,
-            height: 5,
-            decoration: BoxDecoration(
-              color: AppColors.border.withValues(alpha: 0.5),
-              borderRadius: BorderRadius.circular(99),
-            ),
-          ),
-          const SizedBox(height: 20),
-
-          // Header Title
-          const Text(
-            'CLAIM YOUR PLAN',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: AppColors.primaryGreen,
-              letterSpacing: 0.5,
-            ),
-          ),
-          const SizedBox(height: 6),
-          const Text(
-            'Create your free Sehat account to save your blueprint.',
-            style: TextStyle(
-              fontSize: 13,
-              color: AppColors.textSecondary,
-            ),
-            textAlign: TextAlign.center,
-          ),
-
-          const SizedBox(height: 24),
-
-          // Google Auth Button
-          SizedBox(
-            width: double.infinity,
-            child: OutlinedButton(
-              onPressed: () {
-                Navigator.pop(context);
-                onComplete();
-              },
-              style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                side: const BorderSide(color: AppColors.border),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              child: const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.g_mobiledata, size: 28, color: Colors.red),
-                  SizedBox(width: 8),
-                  Text(
-                    'Continue with Google',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.medicalBlue,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 12),
-
-          // Phone Number Input & Submit
           Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Expanded(
-                child: TextField(
-                  keyboardType: TextInputType.phone,
-                  decoration: const InputDecoration(
-                    hintText: '+92 300 1234567',
-                    hintStyle: TextStyle(fontSize: 13, color: AppColors.border),
-                  ),
+                child: Text(
+                  title,
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
               ),
-              const SizedBox(width: 10),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  onComplete();
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryGreen,
-                  foregroundColor: AppColors.white,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 16,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: const Text(
-                  'SUBMIT',
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-                ),
-              ),
+              editButton,
             ],
           ),
-
-          const SizedBox(height: 16),
-
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text(
-              'Cancel',
-              style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
-            ),
-          ),
+          if (value.isNotEmpty)
+            Text(value, style: Theme.of(context).textTheme.bodyMedium),
         ],
       ),
     );

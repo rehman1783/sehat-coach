@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import 'app_colors.dart';
 
 /// App ThemeData configuration for SehatCoach exclusively using:
@@ -7,11 +8,11 @@ import 'app_colors.dart';
 /// 2. Dela Gothic One (Titles, Headings, Display text)
 class AppTheme {
   static ThemeData get lightTheme {
-    final TextTheme baseTextTheme = GoogleFonts.interTextTheme();
+    final TextTheme baseTextTheme = GoogleFonts.poppinsTextTheme();
 
     return ThemeData(
       useMaterial3: true,
-      fontFamily: GoogleFonts.inter().fontFamily,
+      fontFamily: GoogleFonts.poppins().fontFamily,
       scaffoldBackgroundColor: AppColors.surface,
       primaryColor: AppColors.primaryGreen,
       colorScheme: const ColorScheme.light(
@@ -94,9 +95,18 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.background,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        hintStyle: GoogleFonts.inter(color: AppColors.textSecondary, fontSize: 14),
-        labelStyle: GoogleFonts.inter(color: AppColors.textPrimary, fontSize: 14),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
+        hintStyle: GoogleFonts.inter(
+          color: AppColors.textSecondary,
+          fontSize: 14,
+        ),
+        labelStyle: GoogleFonts.inter(
+          color: AppColors.textPrimary,
+          fontSize: 14,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: AppColors.border),
@@ -153,17 +163,17 @@ class AppTheme {
           color: AppColors.medicalBlue,
           fontSize: 14,
         ),
-        bodyLarge: GoogleFonts.inter(
+        bodyLarge: GoogleFonts.poppins(
           color: AppColors.textPrimary,
           fontSize: 16,
           fontWeight: FontWeight.normal,
         ),
-        bodyMedium: GoogleFonts.inter(
+        bodyMedium: GoogleFonts.poppins(
           color: AppColors.textSecondary,
           fontSize: 14,
           fontWeight: FontWeight.normal,
         ),
-        bodySmall: GoogleFonts.inter(
+        bodySmall: GoogleFonts.poppins(
           color: AppColors.textSecondary,
           fontSize: 12,
           fontWeight: FontWeight.normal,
@@ -187,4 +197,3 @@ class AppTheme {
     );
   }
 }
-

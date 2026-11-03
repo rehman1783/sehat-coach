@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../theme/app_colors.dart';
 
 class CustomButton extends StatelessWidget {
@@ -48,19 +49,11 @@ class CustomButton extends StatelessWidget {
           Icon(icon, size: 18),
           const SizedBox(width: 6),
           Flexible(
-            child: Text(
-              text,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
+            child: Text(text, maxLines: 1, overflow: TextOverflow.ellipsis),
           ),
         ],
       );
     }
-    return Text(
-      text,
-      maxLines: 1,
-      overflow: TextOverflow.ellipsis,
-    );
+    return Text(text, maxLines: 1, overflow: TextOverflow.ellipsis);
   }
 }

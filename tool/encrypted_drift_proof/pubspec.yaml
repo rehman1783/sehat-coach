@@ -1,0 +1,11 @@
+name: sehat_encrypted_drift_proof
+publish_to: none
+environment:
+  sdk: ^3.13.3
+dependencies:
+  drift: ^2.35.0
+  sqlite3: ^3.7.1
+hooks:
+  user_defines:
+    sqlite3:
+      source: sqlite3mc

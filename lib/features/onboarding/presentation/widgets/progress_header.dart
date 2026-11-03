@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../../core/theme/app_colors.dart';
 import '../../domain/models/onboarding_state.dart';
 
@@ -85,7 +86,9 @@ class ProgressHeader extends StatelessWidget {
                           // Active Green Bar + Glowing Yellow Knob Thumb
                           LayoutBuilder(
                             builder: (context, constraints) {
-                              final double activeWidth = constraints.maxWidth * progress.clamp(0.0, 1.0);
+                              final double activeWidth =
+                                  constraints.maxWidth *
+                                  progress.clamp(0.0, 1.0);
                               return Stack(
                                 clipBehavior: Clip.none,
                                 alignment: Alignment.centerLeft,
@@ -97,7 +100,9 @@ class ProgressHeader extends StatelessWidget {
                                     width: activeWidth,
                                     height: 8,
                                     decoration: BoxDecoration(
-                                      color: const Color(0xFF0C4E2B), // Solid Forest Green
+                                      color: const Color(
+                                        0xFF0C4E2B,
+                                      ), // Solid Forest Green
                                       borderRadius: BorderRadius.circular(99),
                                     ),
                                   ),
@@ -105,9 +110,14 @@ class ProgressHeader extends StatelessWidget {
                                   // Golden Yellow Knob Thumb Circle with Rich Shade Gradient & Glow
                                   if (activeWidth > 0)
                                     AnimatedPositioned(
-                                      duration: const Duration(milliseconds: 350),
+                                      duration: const Duration(
+                                        milliseconds: 350,
+                                      ),
                                       curve: Curves.easeOutCubic,
-                                      left: (activeWidth - 6.0).clamp(0.0, constraints.maxWidth - 12),
+                                      left: (activeWidth - 6.0).clamp(
+                                        0.0,
+                                        constraints.maxWidth - 12,
+                                      ),
                                       child: Container(
                                         width: 12,
                                         height: 12,
@@ -117,9 +127,15 @@ class ProgressHeader extends StatelessWidget {
                                             begin: Alignment.topLeft,
                                             end: Alignment.bottomRight,
                                             colors: [
-                                              Color(0xFFFCD34D), // Light Gold Highlight
-                                              Color(0xFFF59E0B), // Golden Yellow Core
-                                              Color(0xFFD97706), // Deep Amber Shade
+                                              Color(
+                                                0xFFFCD34D,
+                                              ), // Light Gold Highlight
+                                              Color(
+                                                0xFFF59E0B,
+                                              ), // Golden Yellow Core
+                                              Color(
+                                                0xFFD97706,
+                                              ), // Deep Amber Shade
                                             ],
                                           ),
                                           border: Border.all(
@@ -128,13 +144,16 @@ class ProgressHeader extends StatelessWidget {
                                           ),
                                           boxShadow: [
                                             BoxShadow(
-                                              color: const Color(0xFFF59E0B).withValues(alpha: 0.6),
+                                              color: const Color(0xFFF59E0B)
+                                                  .withValues(alpha: 0.6),
                                               blurRadius: 6,
                                               spreadRadius: 1,
                                               offset: const Offset(0, 1),
                                             ),
                                             BoxShadow(
-                                              color: Colors.black.withValues(alpha: 0.1),
+                                              color: Colors.black.withValues(
+                                                alpha: 0.1,
+                                              ),
                                               blurRadius: 2,
                                               offset: const Offset(0, 1),
                                             ),
@@ -166,7 +185,8 @@ class ProgressHeader extends StatelessWidget {
 
             // Circular Info (i) Button (Figma Style)
             InkWell(
-              onTap: onHelp ??
+              onTap:
+                  onHelp ??
                   () {
                     showDialog(
                       context: context,
@@ -175,7 +195,9 @@ class ProgressHeader extends StatelessWidget {
                           borderRadius: BorderRadius.circular(20),
                         ),
                         title: Text(
-                          isEnglish ? 'Sehat Coach Onboarding' : 'Sehat Coach Onboarding',
+                          isEnglish
+                              ? 'Sehat Coach Onboarding'
+                              : 'Sehat Coach Onboarding',
                           style: const TextStyle(
                             color: AppColors.primaryGreen,
                             fontWeight: FontWeight.bold,

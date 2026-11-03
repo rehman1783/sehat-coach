@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
+
 import '../../../../core/theme/app_colors.dart';
 import '../../domain/models/location_data.dart';
 import '../../domain/models/onboarding_state.dart';
@@ -28,11 +30,13 @@ class Step3LocationStep extends StatefulWidget {
 
 class _Step3LocationStepState extends State<Step3LocationStep> {
   late TextEditingController _customCityController;
+  late FocusNode _cityFocusNode;
 
   @override
   void initState() {
     super.initState();
     _customCityController = TextEditingController(text: widget.selectedCity);
+    _cityFocusNode = FocusNode();
   }
 
   @override
@@ -47,6 +51,7 @@ class _Step3LocationStepState extends State<Step3LocationStep> {
   @override
   void dispose() {
     _customCityController.dispose();
+    _cityFocusNode.dispose();
     super.dispose();
   }
 
@@ -70,7 +75,9 @@ class _Step3LocationStepState extends State<Step3LocationStep> {
         return StatefulBuilder(
           builder: (context, setModalState) {
             final filteredCities = country.cities
-                .where((c) => c.toLowerCase().contains(searchQuery.toLowerCase()))
+                .where(
+                  (c) => c.toLowerCase().contains(searchQuery.toLowerCase()),
+                )
                 .toList();
 
             return Container(
@@ -80,18 +87,22 @@ class _Step3LocationStepState extends State<Step3LocationStep> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        'Cities in ${country.flag} ${country.name}',
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.primaryGreen,
+                      Expanded(
+                        child: Text(
+                          'Cities in ${country.flag} ${country.name}',
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primaryGreen,
+                          ),
                         ),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.close, color: AppColors.textSecondary),
+                        icon: const Icon(
+                          Icons.close,
+                          color: AppColors.textSecondary,
+                        ),
                         onPressed: () => Navigator.pop(context),
                       ),
                     ],
@@ -101,10 +112,16 @@ class _Step3LocationStepState extends State<Step3LocationStep> {
                     autofocus: true,
                     decoration: InputDecoration(
                       hintText: 'Search city...',
-                      prefixIcon: const Icon(Icons.search, color: AppColors.primaryGreen),
+                      prefixIcon: const Icon(
+                        Icons.search,
+                        color: AppColors.primaryGreen,
+                      ),
                       filled: true,
                       fillColor: AppColors.background,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: const BorderSide(color: AppColors.border),
@@ -123,12 +140,17 @@ class _Step3LocationStepState extends State<Step3LocationStep> {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                const Icon(Icons.location_off_outlined,
-                                    size: 48, color: AppColors.textSecondary),
+                                const Icon(
+                                  Icons.location_off_outlined,
+                                  size: 48,
+                                  color: AppColors.textSecondary,
+                                ),
                                 const SizedBox(height: 8),
                                 Text(
                                   'No city found matching "$searchQuery"',
-                                  style: const TextStyle(color: AppColors.textSecondary),
+                                  style: const TextStyle(
+                                    color: AppColors.textSecondary,
+                                  ),
                                 ),
                                 const SizedBox(height: 12),
                                 TextButton(
@@ -136,17 +158,21 @@ class _Step3LocationStepState extends State<Step3LocationStep> {
                                     widget.onSelectCity(searchQuery);
                                     Navigator.pop(context);
                                   },
-                                  child: Text('Use "$searchQuery" as Custom City'),
+                                  child: Text(
+                                    'Use "$searchQuery" as Custom City',
+                                  ),
                                 ),
                               ],
                             ),
                           )
                         : ListView.separated(
                             itemCount: filteredCities.length,
-                            separatorBuilder: (_, _) => const Divider(height: 1),
+                            separatorBuilder: (_, _) =>
+                                const Divider(height: 1),
                             itemBuilder: (context, index) {
                               final city = filteredCities[index];
-                              final isSelected = widget.selectedCity.toLowerCase() ==
+                              final isSelected =
+                                  widget.selectedCity.toLowerCase() ==
                                   city.toLowerCase();
                               return ListTile(
                                 leading: Icon(
@@ -167,8 +193,10 @@ class _Step3LocationStepState extends State<Step3LocationStep> {
                                   ),
                                 ),
                                 trailing: isSelected
-                                    ? const Icon(Icons.check_circle,
-                                        color: AppColors.primaryGreen)
+                                    ? const Icon(
+                                        Icons.check_circle,
+                                        color: AppColors.primaryGreen,
+                                      )
                                     : null,
                                 onTap: () {
                                   widget.onSelectCity(city);
@@ -191,8 +219,6 @@ class _Step3LocationStepState extends State<Step3LocationStep> {
   Widget build(BuildContext context) {
     final currentCountry = _currentCountry;
     final topCities = currentCountry.cities.take(8).toList();
-    final bool isSelectedCityInList = currentCountry.cities.any(
-        (c) => c.toLowerCase() == widget.selectedCity.toLowerCase());
     final bool isEnglish = widget.language == AppLanguage.english;
 
     return Padding(
@@ -206,12 +232,13 @@ class _Step3LocationStepState extends State<Step3LocationStep> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    isEnglish ? "WHERE'S YOUR KITCHEN?" : "AAPKA KITCHEN KAHAN HAI?",
-                    style: const TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w900,
+                    isEnglish
+                        ? "WHERE'S YOUR KITCHEN?"
+                        : "AAPKA KITCHEN KAHAN HAI?",
+                    style: GoogleFonts.delaGothicOne(
+                      fontSize: 24,
                       color: AppColors.primaryGreen,
-                      letterSpacing: 0.8,
+                      height: 1.12,
                     ),
                   ),
                   const SizedBox(height: 6),
@@ -228,7 +255,10 @@ class _Step3LocationStepState extends State<Step3LocationStep> {
 
                   // Auto-Detected Zero-Permission Badge Indicator
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 5,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.primaryGreen.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(8),
@@ -239,17 +269,22 @@ class _Step3LocationStepState extends State<Step3LocationStep> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Text('⚡ ', style: TextStyle(fontSize: 11)),
+                        const Icon(
+                          Icons.location_on_rounded,
+                          size: 14,
+                          color: AppColors.primaryGreen,
+                        ),
+                        const SizedBox(width: 5),
                         Flexible(
                           child: Text(
                             isEnglish
                                 ? (widget.selectedCity.isNotEmpty
-                                    ? 'Auto-Detected Location (${widget.selectedCity}, ${currentCountry.name})'
-                                    : 'Auto-Detected Market (${currentCountry.name})')
+                                      ? 'Auto-Detected Location (${widget.selectedCity}, ${currentCountry.name})'
+                                      : 'Auto-Detected Market (${currentCountry.name})')
                                 : (widget.selectedCity.isNotEmpty
-                                    ? 'Automatic Detect Hua Shehar (${widget.selectedCity}, ${currentCountry.name})'
-                                    : 'Automatic Detect Hua Mulk (${currentCountry.name})'),
-                            overflow: TextOverflow.ellipsis,
+                                      ? 'Automatic Detect Hua Shehar (${widget.selectedCity}, ${currentCountry.name})'
+                                      : 'Automatic Detect Hua Mulk (${currentCountry.name})'),
+                            maxLines: 2,
                             style: const TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.bold,
@@ -264,7 +299,9 @@ class _Step3LocationStepState extends State<Step3LocationStep> {
 
                   // Country Selection Dropdown Header
                   Text(
-                    isEnglish ? 'SELECT YOUR COUNTRY' : 'APNA MULK SELECT KAREIN',
+                    isEnglish
+                        ? 'SELECT YOUR COUNTRY'
+                        : 'APNA MULK SELECT KAREIN',
                     style: const TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
@@ -283,24 +320,34 @@ class _Step3LocationStepState extends State<Step3LocationStep> {
                         color: AppColors.primaryGreen.withValues(alpha: 0.3),
                       ),
                     ),
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 4,
+                    ),
                     child: DropdownButtonHideUnderline(
                       child: DropdownButton<CountryData>(
                         value: currentCountry,
                         isExpanded: true,
-                        icon: const Icon(Icons.arrow_drop_down_circle,
-                            color: AppColors.primaryGreen),
+                        icon: const Icon(
+                          Icons.arrow_drop_down_circle,
+                          color: AppColors.primaryGreen,
+                        ),
                         style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
                           color: AppColors.textPrimary,
                         ),
-                        items: LocationRepository.sortedCountries.map((country) {
+                        items: LocationRepository.sortedCountries.map((
+                          country,
+                        ) {
                           return DropdownMenuItem<CountryData>(
                             value: country,
                             child: Row(
                               children: [
-                                Text(country.flag, style: const TextStyle(fontSize: 20)),
+                                Text(
+                                  country.flag,
+                                  style: const TextStyle(fontSize: 20),
+                                ),
                                 const SizedBox(width: 10),
                                 Expanded(
                                   child: Text(
@@ -333,11 +380,13 @@ class _Step3LocationStepState extends State<Step3LocationStep> {
                     children: [
                       Expanded(
                         child: Text(
-                          isEnglish ? 'SELECT YOUR CITY' : 'APNA SHEHAR SELECT KAREIN',
+                          isEnglish
+                              ? 'SELECT YOUR CITY'
+                              : 'APNA SHEHAR SELECT KAREIN',
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
                             fontSize: 11,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w500,
                             color: AppColors.textSecondary,
                             letterSpacing: 0.5,
                           ),
@@ -346,14 +395,24 @@ class _Step3LocationStepState extends State<Step3LocationStep> {
                       const SizedBox(width: 8),
                       Flexible(
                         child: InkWell(
-                          onTap: () => _showCitySearchBottomSheet(context, currentCountry),
+                          onTap: () => _showCitySearchBottomSheet(
+                            context,
+                            currentCountry,
+                          ),
                           borderRadius: BorderRadius.circular(8),
                           child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Icon(Icons.search, size: 14, color: AppColors.primaryGreen),
+                                const Icon(
+                                  Icons.search,
+                                  size: 14,
+                                  color: AppColors.primaryGreen,
+                                ),
                                 const SizedBox(width: 4),
                                 Flexible(
                                   child: Text(
@@ -363,7 +422,7 @@ class _Step3LocationStepState extends State<Step3LocationStep> {
                                     overflow: TextOverflow.ellipsis,
                                     style: const TextStyle(
                                       fontSize: 11,
-                                      fontWeight: FontWeight.bold,
+                                      fontWeight: FontWeight.w500,
                                       color: AppColors.primaryGreen,
                                     ),
                                   ),
@@ -377,52 +436,77 @@ class _Step3LocationStepState extends State<Step3LocationStep> {
                   ),
                   const SizedBox(height: 10),
 
-                  // Complete Cities Dropdown
-                  Container(
-                    decoration: BoxDecoration(
-                      color: AppColors.background,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppColors.border),
-                    ),
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
-                    child: DropdownButtonHideUnderline(
-                      child: DropdownButton<String>(
-                        value: isSelectedCityInList
-                            ? currentCountry.cities.firstWhere((c) =>
-                                c.toLowerCase() == widget.selectedCity.toLowerCase())
-                            : null,
-                        hint: Text(
-                          widget.selectedCity.isNotEmpty
-                              ? widget.selectedCity
-                              : 'Select from complete cities list...',
-                          style: const TextStyle(
-                            fontSize: 13,
-                            color: AppColors.primaryGreen,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        isExpanded: true,
-                        icon: const Icon(Icons.unfold_more, color: AppColors.medicalBlue),
-                        items: currentCountry.cities.map((city) {
-                          return DropdownMenuItem<String>(
-                            value: city,
-                            child: Text(
-                              city,
-                              style: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.textPrimary,
+                  RawAutocomplete<String>(
+                    textEditingController: _customCityController,
+                    focusNode: _cityFocusNode,
+                    optionsBuilder: (value) {
+                      final query = value.text.trim().toLowerCase();
+                      if (query.isEmpty) return currentCountry.cities;
+                      return currentCountry.cities.where(
+                        (city) => city.toLowerCase().contains(query),
+                      );
+                    },
+                    onSelected: widget.onSelectCity,
+                    fieldViewBuilder:
+                        (context, controller, focusNode, onSubmitted) {
+                          return TextField(
+                            controller: controller,
+                            focusNode: focusNode,
+                            onChanged: widget.onSelectCity,
+                            onSubmitted: (_) => onSubmitted(),
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.textPrimary,
+                            ),
+                            decoration: const InputDecoration(
+                              hintText: 'Type or search for your city',
+                              prefixIcon: Icon(
+                                Icons.search_rounded,
+                                color: AppColors.primaryGreen,
                               ),
                             ),
                           );
-                        }).toList(),
-                        onChanged: (newCity) {
-                          if (newCity != null) {
-                            widget.onSelectCity(newCity);
-                          }
                         },
-                      ),
-                    ),
+                    optionsViewBuilder: (context, onSelected, options) {
+                      final matches = options.toList();
+                      return Align(
+                        alignment: Alignment.topLeft,
+                        child: Material(
+                          elevation: 6,
+                          borderRadius: BorderRadius.circular(14),
+                          clipBehavior: Clip.antiAlias,
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(
+                              maxHeight: 240,
+                              maxWidth: 420,
+                            ),
+                            child: ListView.builder(
+                              padding: EdgeInsets.zero,
+                              shrinkWrap: true,
+                              itemCount: matches.length,
+                              itemBuilder: (context, index) {
+                                final city = matches[index];
+                                return ListTile(
+                                  dense: true,
+                                  leading: const Icon(
+                                    Icons.location_on_outlined,
+                                    color: AppColors.primaryGreen,
+                                  ),
+                                  title: Text(
+                                    city,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  onTap: () => onSelected(city),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                      );
+                    },
                   ),
 
                   const SizedBox(height: 14),
@@ -433,22 +517,29 @@ class _Step3LocationStepState extends State<Step3LocationStep> {
                     runSpacing: 8,
                     children: topCities.map((city) {
                       final bool isSelected =
-                          widget.selectedCity.toLowerCase() == city.toLowerCase();
+                          widget.selectedCity.toLowerCase() ==
+                          city.toLowerCase();
                       return ChoiceChip(
                         label: Text(city),
                         selected: isSelected,
                         onSelected: (selected) {
                           if (selected) widget.onSelectCity(city);
                         },
-                        selectedColor: AppColors.primaryGreen.withValues(alpha: 0.12),
+                        selectedColor: AppColors.primaryGreen.withValues(
+                          alpha: 0.12,
+                        ),
                         backgroundColor: AppColors.background,
                         labelStyle: TextStyle(
                           fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: isSelected ? AppColors.primaryGreen : AppColors.medicalBlue,
+                          fontWeight: FontWeight.w500,
+                          color: isSelected
+                              ? AppColors.primaryGreen
+                              : AppColors.medicalBlue,
                         ),
                         side: BorderSide(
-                          color: isSelected ? AppColors.primaryGreen : AppColors.border,
+                          color: isSelected
+                              ? AppColors.primaryGreen
+                              : AppColors.border,
                           width: isSelected ? 2 : 1,
                         ),
                         shape: RoundedRectangleBorder(
@@ -456,18 +547,6 @@ class _Step3LocationStepState extends State<Step3LocationStep> {
                         ),
                       );
                     }).toList(),
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  // Custom Input fallback
-                  TextField(
-                    controller: _customCityController,
-                    onChanged: widget.onSelectCity,
-                    decoration: const InputDecoration(
-                      hintText: 'Or type custom city...',
-                      prefixIcon: Icon(Icons.location_city, color: AppColors.border),
-                    ),
                   ),
                 ],
               ),
@@ -477,9 +556,8 @@ class _Step3LocationStepState extends State<Step3LocationStep> {
           const SizedBox(height: 16),
 
           // Continue Button (Figma Style)
-          SizedBox(
-            width: double.infinity,
-            height: 54,
+          ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 54),
             child: ElevatedButton(
               onPressed: () {
                 if (widget.selectedCity.trim().isEmpty) {
@@ -489,21 +567,30 @@ class _Step3LocationStepState extends State<Step3LocationStep> {
                     SnackBar(
                       content: Row(
                         children: [
-                          const Icon(Icons.error_outline, color: Colors.white, size: 20),
+                          const Icon(
+                            Icons.error_outline,
+                            color: Colors.white,
+                            size: 20,
+                          ),
                           const SizedBox(width: 10),
                           Expanded(
                             child: Text(
                               isEnglish
                                   ? 'Please select or enter your city to continue'
                                   : 'Aage badhne ke liye apna shehar select ya enter karein!',
-                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13,
+                              ),
                             ),
                           ),
                         ],
                       ),
                       backgroundColor: const Color(0xFFDC2626),
                       behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                       margin: const EdgeInsets.all(16),
                       duration: const Duration(seconds: 2),
                     ),
@@ -525,12 +612,15 @@ class _Step3LocationStepState extends State<Step3LocationStep> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    isEnglish ? 'CONTINUE' : 'AAGE BADHEIN',
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 1.0,
+                  Flexible(
+                    child: Text(
+                      isEnglish ? 'CONTINUE' : 'AAGE BADHEIN',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1.0,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 8),

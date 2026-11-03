@@ -1,0 +1,11 @@
+name: sehat_database_benchmark
+publish_to: none
+environment:
+  sdk: ^3.13.3
+dependencies:
+  drift: ^2.28.0
+  sqlite3: ^2.9.0
+  objectbox: ^5.3.2
+dev_dependencies:
+  build_runner: ^2.4.15
+  objectbox_generator: ^5.3.2

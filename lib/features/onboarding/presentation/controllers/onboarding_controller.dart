@@ -1,16 +1,26 @@
-import 'package:flutter/foundation.dart';
+import 'package:get/get.dart';
+
 import '../../../../core/services/geo_detector.dart';
 import '../../domain/models/location_data.dart';
 import '../../domain/models/onboarding_state.dart';
 
-class OnboardingController extends ChangeNotifier {
+class OnboardingController extends GetxController {
   final OnboardingState _state = OnboardingState();
+  bool _adultAgeConfirmed = false;
 
-  OnboardingController() {
-    initializeGeoLocation();
+  OnboardingController({bool detectLocation = true}) {
+    if (detectLocation) {
+      initializeGeoLocation();
+    }
   }
 
   OnboardingState get state => _state;
+  bool get adultAgeConfirmed => _adultAgeConfirmed && _state.age >= 18;
+
+  // Compatibility bridge for the existing form setters during GetX migration.
+  void notifyListeners() {
+    if (!isClosed) update();
+  }
 
   /// Runs the 3-Tier Zero-Permission Geolocation Detection Cascade
   Future<void> initializeGeoLocation() async {
@@ -26,6 +36,7 @@ class OnboardingController extends ChangeNotifier {
   }
 
   void _applyDetectedLocation(DetectedLocation loc) {
+    if (isClosed || _state.detectedVia == 'user_selected') return;
     _state.countryCode = loc.countryCode;
     _state.country = loc.countryName;
     _state.city = loc.city;
@@ -60,7 +71,13 @@ class OnboardingController extends ChangeNotifier {
   }
 
   void setAge(int age) {
+    if (_state.age != age) _adultAgeConfirmed = false;
     _state.age = age;
+    notifyListeners();
+  }
+
+  void confirmAdultAge(bool confirmed) {
+    _adultAgeConfirmed = confirmed && _state.age >= 18;
     notifyListeners();
   }
 
@@ -74,7 +91,27 @@ class OnboardingController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setCountry(String country, String flag, {String? defaultCity, String? code}) {
+  void setTargetWeight(int weightKg) {
+    _state.targetWeightKg = weightKg;
+    notifyListeners();
+  }
+
+  void setActivityLevel(ActivityLevel level) {
+    _state.activityLevel = level;
+    notifyListeners();
+  }
+
+  void setGoalPace(GoalPace pace) {
+    _state.goalPace = pace;
+    notifyListeners();
+  }
+
+  void setCountry(
+    String country,
+    String flag, {
+    String? defaultCity,
+    String? code,
+  }) {
     _state.country = country;
     _state.countryFlag = flag;
     _state.detectedVia = 'user_selected';
@@ -98,12 +135,26 @@ class OnboardingController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setCondition(HealthCondition cond) {
-    _state.conditions = [cond];
+  void toggleCondition(HealthCondition condition) {
+    if (condition == HealthCondition.standard) {
+      _state.conditions = _state.conditions.contains(condition)
+          ? []
+          : [HealthCondition.standard];
+    } else {
+      _state.conditions.remove(HealthCondition.standard);
+      if (condition == HealthCondition.pregnancy) {
+        _state.conditions.remove(HealthCondition.breastfeeding);
+      } else if (condition == HealthCondition.breastfeeding) {
+        _state.conditions.remove(HealthCondition.pregnancy);
+      }
+      if (_state.conditions.contains(condition)) {
+        _state.conditions.remove(condition);
+      } else {
+        _state.conditions.add(condition);
+      }
+    }
     notifyListeners();
   }
-
-  void toggleCondition(HealthCondition cond) => setCondition(cond);
 
   void setCoach(CoachPersonality coach) {
     _state.coach = coach;
@@ -112,16 +163,23 @@ class OnboardingController extends ChangeNotifier {
 
   /// Calculates final BMR & TDEE using the Mifflin-St Jeor equation
   void computeFinalBlueprint() {
-    double bmr = (10 * _state.weightKg) + (6.25 * _state.heightCm) - (5 * _state.age);
+    if (!adultAgeConfirmed || !_state.allowsGenericCalorieEstimate) {
+      _state.calculatedCalories = 0;
+      notifyListeners();
+      return;
+    }
+
+    double bmr =
+        (10 * _state.weightKg) + (6.25 * _state.heightCm) - (5 * _state.age);
     bmr += (_state.sex == BiologicalSex.male) ? 5 : -161;
 
-    double tdee = bmr * 1.35; // Moderate activity multiplier
-
-    if (_state.goal == GoalType.dropFat) {
-      tdee -= 450;
-    } else if (_state.goal == GoalType.buildMuscle) {
-      tdee += 300;
-    }
+    final activityMultiplier = switch (_state.activityLevel) {
+      ActivityLevel.sedentary => 1.2,
+      ActivityLevel.light => 1.375,
+      ActivityLevel.moderate => 1.55,
+      ActivityLevel.veryActive => 1.725,
+    };
+    final tdee = bmr * activityMultiplier;
 
     _state.calculatedCalories = tdee.round();
     notifyListeners();

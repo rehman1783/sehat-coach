@@ -4,9 +4,21 @@ enum BiologicalSex { male, female }
 
 enum UnitType { metric, imperial }
 
+enum ActivityLevel { sedentary, light, moderate, veryActive }
+
+enum GoalPace { gentle, standard }
+
 enum KitchenRoutine { homeFamily, cookMyself, hostelMess, takeout }
 
-enum HealthCondition { ramadan, diabetes, bp, standard }
+enum HealthCondition {
+  ramadan,
+  diabetes,
+  bp,
+  pregnancy,
+  breastfeeding,
+  clinicianPlan,
+  standard,
+}
 
 enum CoachPersonality { ammi, direct, gentle }
 
@@ -21,6 +33,9 @@ class OnboardingState {
   int age;
   int heightCm;
   int weightKg;
+  int targetWeightKg;
+  ActivityLevel activityLevel;
+  GoalPace goalPace;
   String countryCode;
   String country;
   String countryFlag;
@@ -42,6 +57,9 @@ class OnboardingState {
     this.age = 25,
     this.heightCm = 172,
     this.weightKg = 70,
+    this.targetWeightKg = 65,
+    this.activityLevel = ActivityLevel.moderate,
+    this.goalPace = GoalPace.gentle,
     this.countryCode = 'PK',
     this.country = 'Pakistan',
     this.countryFlag = '🇵🇰',
@@ -54,6 +72,11 @@ class OnboardingState {
     this.coach,
     this.calculatedCalories = 1820,
   }) : conditions = conditions ?? [];
+
+  bool get allowsGenericCalorieEstimate =>
+      !conditions.contains(HealthCondition.pregnancy) &&
+      !conditions.contains(HealthCondition.breastfeeding) &&
+      !conditions.contains(HealthCondition.clinicianPlan);
 
   // Calculated getters
   int get proteinGrams => ((calculatedCalories * 0.30) / 4).round();
@@ -95,7 +118,7 @@ class OnboardingState {
         'detectedVia': detectedVia,
         'currency': currency,
         'isDesiMarket': isDesiMarket,
-      }
+      },
     };
   }
 
@@ -107,6 +130,10 @@ class OnboardingState {
     int? age,
     int? heightCm,
     int? weightKg,
+    int? targetWeightKg,
+    ActivityLevel? activityLevel,
+    GoalPace? goalPace,
+    AppLanguage? language,
     String? countryCode,
     String? country,
     String? countryFlag,
@@ -121,12 +148,16 @@ class OnboardingState {
   }) {
     return OnboardingState(
       currentStep: currentStep ?? this.currentStep,
+      language: language ?? this.language,
       goal: goal ?? this.goal,
       sex: sex ?? this.sex,
       unit: unit ?? this.unit,
       age: age ?? this.age,
       heightCm: heightCm ?? this.heightCm,
       weightKg: weightKg ?? this.weightKg,
+      targetWeightKg: targetWeightKg ?? this.targetWeightKg,
+      activityLevel: activityLevel ?? this.activityLevel,
+      goalPace: goalPace ?? this.goalPace,
       countryCode: countryCode ?? this.countryCode,
       country: country ?? this.country,
       countryFlag: countryFlag ?? this.countryFlag,

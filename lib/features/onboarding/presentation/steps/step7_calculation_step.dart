@@ -1,5 +1,8 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
 import '../../../../core/theme/app_colors.dart';
 import '../../domain/models/onboarding_state.dart';
 
@@ -21,19 +24,17 @@ class _Step7CalculationStepState extends State<Step7CalculationStep>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
+  bool _didComplete = false;
 
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 3600),
+      duration: const Duration(milliseconds: 8500),
     );
 
-    _animation = CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeInOutCubic,
-    );
+    _animation = CurvedAnimation(parent: _controller, curve: Curves.easeInOut);
 
     _controller.addListener(() {
       setState(() {});
@@ -41,13 +42,19 @@ class _Step7CalculationStepState extends State<Step7CalculationStep>
 
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
-        Future.delayed(const Duration(milliseconds: 400), () {
-          if (mounted) widget.onCompleted();
+        Future.delayed(const Duration(milliseconds: 900), () {
+          if (mounted) _completeOnce();
         });
       }
     });
 
     _controller.forward();
+  }
+
+  void _completeOnce() {
+    if (_didComplete) return;
+    _didComplete = true;
+    widget.onCompleted();
   }
 
   @override
@@ -77,13 +84,13 @@ class _Step7CalculationStepState extends State<Step7CalculationStep>
     final List<String> stepsText = isEnglish
         ? [
             'Computing Mifflin-St Jeor baseline...',
-            'Aligning market prices & Bachat index...',
-            'Configuring prayer & coach timers...',
+            'Preparing your food routine summary...',
+            'Applying your coach preference...',
           ]
         : [
             'Biometrics aur goals analyze ho rahe hain...',
-            'Daily calories aur Bachat index set ho rahe hain...',
-            'Timers aur coach notifications set ho rahi hain...',
+            'Aapke food routine ki summary ban rahi hai...',
+            'Aapki coach preference apply ho rahi hai...',
           ];
 
     return Padding(
@@ -97,70 +104,79 @@ class _Step7CalculationStepState extends State<Step7CalculationStep>
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     // Main Percentage Card with Top-Right Badge
-                    SizedBox(
-                      width: 130,
-                      height: 130,
-                      child: Stack(
-                        clipBehavior: Clip.none,
-                        children: [
-                          Container(
-                            width: 130,
-                            height: 130,
-                            decoration: BoxDecoration(
-                              color: AppColors.primaryGreen,
-                              borderRadius: BorderRadius.circular(26),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: AppColors.primaryGreen.withValues(alpha: 0.25),
-                                  blurRadius: 20,
-                                  offset: const Offset(0, 8),
-                                ),
-                              ],
-                            ),
-                            alignment: Alignment.center,
-                            child: Text(
-                              '$percent%',
-                              style: const TextStyle(
-                                fontSize: 40,
-                                fontWeight: FontWeight.w900,
-                                color: Colors.white,
-                                letterSpacing: -1,
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                            top: -6,
-                            right: -6,
-                            child: Container(
-                              width: 36,
-                              height: 36,
+                    Semantics(
+                      key: const ValueKey('blueprint-calculation-progress'),
+                      label: isEnglish
+                          ? 'Blueprint calculation progress'
+                          : 'Blueprint calculation progress',
+                      value: '$percent percent',
+                      liveRegion: true,
+                      child: SizedBox(
+                        width: 130,
+                        height: 130,
+                        child: Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            Container(
+                              width: 130,
+                              height: 130,
                               decoration: BoxDecoration(
-                                color: Colors.white,
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: const Color(0xFF00A3FF),
-                                  width: 3.5,
-                                ),
+                                color: AppColors.primaryGreen,
+                                borderRadius: BorderRadius.circular(26),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.12),
-                                    blurRadius: 6,
-                                    offset: const Offset(0, 2),
+                                    color: AppColors.primaryGreen.withValues(
+                                      alpha: 0.25,
+                                    ),
+                                    blurRadius: 20,
+                                    offset: const Offset(0, 8),
                                   ),
                                 ],
                               ),
                               alignment: Alignment.center,
-                              child: const Text(
-                                'U',
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
+                              child: Text(
+                                '$percent%',
+                                style: const TextStyle(
+                                  fontSize: 40,
+                                  fontWeight: FontWeight.w900,
+                                  color: Colors.white,
+                                  letterSpacing: -1,
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              top: -6,
+                              right: -6,
+                              child: Container(
+                                width: 36,
+                                height: 36,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: const Color(0xFF00A3FF),
+                                    width: 3.5,
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withValues(
+                                        alpha: 0.12,
+                                      ),
+                                      blurRadius: 6,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                alignment: Alignment.center,
+                                child: const Icon(
+                                  Icons.auto_awesome_rounded,
+                                  size: 18,
                                   color: AppColors.primaryGreen,
                                 ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
 
@@ -171,11 +187,10 @@ class _Step7CalculationStepState extends State<Step7CalculationStep>
                       isEnglish
                           ? 'CALIBRATING YOUR BLUEPRINT'
                           : 'METABOLIC BLUEPRINT CALCULATE HO RAHA HAI',
-                      style: const TextStyle(
+                      style: GoogleFonts.delaGothicOne(
                         fontSize: 18,
-                        fontWeight: FontWeight.w900,
                         color: AppColors.primaryGreen,
-                        letterSpacing: 0.5,
+                        height: 1.25,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -203,7 +218,7 @@ class _Step7CalculationStepState extends State<Step7CalculationStep>
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 12.0),
                           child: AnimatedSwitcher(
-                            duration: const Duration(milliseconds: 350),
+                            duration: const Duration(milliseconds: 550),
                             switchInCurve: Curves.easeOutCubic,
                             switchOutCurve: Curves.easeInCubic,
                             child: isActive
@@ -227,14 +242,15 @@ class _Step7CalculationStepState extends State<Step7CalculationStep>
           ),
 
           // Bottom Continue Button (Active on Completion)
-          SizedBox(
-            width: double.infinity,
-            height: 52,
+          ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 52),
             child: ElevatedButton(
-              onPressed: percent >= 100 ? widget.onCompleted : null,
+              onPressed: percent >= 100 ? _completeOnce : null,
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primaryGreen,
-                disabledBackgroundColor: AppColors.primaryGreen.withValues(alpha: 0.4),
+                disabledBackgroundColor: AppColors.primaryGreen.withValues(
+                  alpha: 0.4,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
@@ -243,13 +259,16 @@ class _Step7CalculationStepState extends State<Step7CalculationStep>
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    isEnglish ? 'CONTINUE' : 'AAGE BADHEIN',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w900,
-                      color: Colors.white,
-                      letterSpacing: 1.0,
+                  Flexible(
+                    child: Text(
+                      isEnglish ? 'CONTINUE' : 'AAGE BADHEIN',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w900,
+                        color: Colors.white,
+                        letterSpacing: 1.0,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -272,87 +291,42 @@ class _Step7CalculationStepState extends State<Step7CalculationStep>
 class _ActiveProcessBox extends StatelessWidget {
   final String text;
 
-  const _ActiveProcessBox({
-    super.key,
-    required this.text,
-  });
+  const _ActiveProcessBox({super.key, required this.text});
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          decoration: BoxDecoration(
-            color: const Color(0xFFD8F3E5), // Soft Light Green from Figma
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: const Color(0xFFA7F3D0),
-              width: 1.5,
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        color: const Color(0xFFD8F3E5), // Soft Light Green from Figma
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFA7F3D0), width: 1.5),
+      ),
+      child: Row(
+        children: [
+          const SizedBox(
+            width: 16,
+            height: 16,
+            child: CircularProgressIndicator(
+              strokeWidth: 2.2,
+              valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryGreen),
             ),
           ),
-          child: Row(
-            children: [
-              const SizedBox(
-                width: 16,
-                height: 16,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2.2,
-                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryGreen),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  text,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.primaryGreen,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-
-        // Floating Badge on Right of Active Box
-        Positioned(
-          top: -6,
-          right: 12,
-          child: Container(
-            width: 28,
-            height: 28,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: const Color(0xFF00A3FF),
-                width: 2.5,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.1),
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            alignment: Alignment.center,
-            child: const Text(
-              'U',
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
                 color: AppColors.primaryGreen,
               ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -375,7 +349,9 @@ class _InactiveProcessRow extends StatelessWidget {
       child: Row(
         children: [
           Icon(
-            isDone ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded,
+            isDone
+                ? Icons.check_circle_rounded
+                : Icons.radio_button_unchecked_rounded,
             size: 18,
             color: isDone ? AppColors.primaryGreen : AppColors.border,
           ),
@@ -386,7 +362,9 @@ class _InactiveProcessRow extends StatelessWidget {
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: isDone ? FontWeight.w600 : FontWeight.normal,
-                color: isDone ? AppColors.primaryGreen : AppColors.textSecondary.withValues(alpha: 0.6),
+                color: isDone
+                    ? AppColors.primaryGreen
+                    : AppColors.textSecondary.withValues(alpha: 0.6),
               ),
             ),
           ),
@@ -395,4 +373,3 @@ class _InactiveProcessRow extends StatelessWidget {
     );
   }
 }
-

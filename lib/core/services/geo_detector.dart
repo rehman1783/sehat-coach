@@ -1,7 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+
+import 'privacy_safe_diagnostics.dart';
 
 class DetectedLocation {
   final String countryCode;
@@ -21,31 +24,76 @@ class DetectedLocation {
   });
 
   Map<String, dynamic> toJson() => {
-        'location': {
-          'countryCode': countryCode,
-          'countryName': countryName,
-          'city': city,
-          'detectedVia': detectedVia,
-          'currency': currency,
-          'isDesiMarket': isDesiMarket,
-        }
-      };
+    'location': {
+      'countryCode': countryCode,
+      'countryName': countryName,
+      'city': city,
+      'detectedVia': detectedVia,
+      'currency': currency,
+      'isDesiMarket': isDesiMarket,
+    },
+  };
 }
 
 class GeoDetector {
   static const Map<String, Map<String, String>> _countryMeta = {
-    'PK': {'name': 'Pakistan', 'currency': 'PKR', 'city': 'Lahore', 'desi': 'true'},
-    'GB': {'name': 'United Kingdom', 'currency': 'GBP', 'city': 'London', 'desi': 'false'},
-    'US': {'name': 'United States', 'currency': 'USD', 'city': 'New York', 'desi': 'false'},
-    'AE': {'name': 'United Arab Emirates', 'currency': 'AED', 'city': 'Dubai', 'desi': 'true'},
-    'CA': {'name': 'Canada', 'currency': 'CAD', 'city': 'Toronto', 'desi': 'false'},
-    'SA': {'name': 'Saudi Arabia', 'currency': 'SAR', 'city': 'Riyadh', 'desi': 'true'},
+    'PK': {
+      'name': 'Pakistan',
+      'currency': 'PKR',
+      'city': 'Lahore',
+      'desi': 'true',
+    },
+    'GB': {
+      'name': 'United Kingdom',
+      'currency': 'GBP',
+      'city': 'London',
+      'desi': 'false',
+    },
+    'US': {
+      'name': 'United States',
+      'currency': 'USD',
+      'city': 'New York',
+      'desi': 'false',
+    },
+    'AE': {
+      'name': 'United Arab Emirates',
+      'currency': 'AED',
+      'city': 'Dubai',
+      'desi': 'true',
+    },
+    'CA': {
+      'name': 'Canada',
+      'currency': 'CAD',
+      'city': 'Toronto',
+      'desi': 'false',
+    },
+    'SA': {
+      'name': 'Saudi Arabia',
+      'currency': 'SAR',
+      'city': 'Riyadh',
+      'desi': 'true',
+    },
     'QA': {'name': 'Qatar', 'currency': 'QAR', 'city': 'Doha', 'desi': 'true'},
     'OM': {'name': 'Oman', 'currency': 'OMR', 'city': 'Muscat', 'desi': 'true'},
-    'KW': {'name': 'Kuwait', 'currency': 'KWD', 'city': 'Kuwait City', 'desi': 'true'},
-    'BH': {'name': 'Bahrain', 'currency': 'BHD', 'city': 'Manama', 'desi': 'true'},
+    'KW': {
+      'name': 'Kuwait',
+      'currency': 'KWD',
+      'city': 'Kuwait City',
+      'desi': 'true',
+    },
+    'BH': {
+      'name': 'Bahrain',
+      'currency': 'BHD',
+      'city': 'Manama',
+      'desi': 'true',
+    },
     'IN': {'name': 'India', 'currency': 'INR', 'city': 'Delhi', 'desi': 'true'},
-    'AU': {'name': 'Australia', 'currency': 'AUD', 'city': 'Sydney', 'desi': 'false'},
+    'AU': {
+      'name': 'Australia',
+      'currency': 'AUD',
+      'city': 'Sydney',
+      'desi': 'false',
+    },
   };
 
   /// Tier 1: Zero-Permission Native Signals (Runs <50ms synchronously)
@@ -72,7 +120,10 @@ class GeoDetector {
       final Duration offset = now.timeZoneOffset;
       final String tzName = now.timeZoneName.toUpperCase();
 
-      if (offset.inHours == 5 || tzName.contains('PKT') || tzName.contains('PAKISTAN') || tzName.contains('KARACHI')) {
+      if (offset.inHours == 5 ||
+          tzName.contains('PKT') ||
+          tzName.contains('PAKISTAN') ||
+          tzName.contains('KARACHI')) {
         return _buildResult('PK', 'Lahore', 'locale_timezone');
       } else if (offset.inHours == 0 || offset.inHours == 1) {
         return _buildResult('GB', 'London', 'locale_timezone');
@@ -85,18 +136,21 @@ class GeoDetector {
       }
 
       if (localeCountry.isNotEmpty && _countryMeta.containsKey(localeCountry)) {
-        return _buildResult(localeCountry, _countryMeta[localeCountry]!['city']!, 'locale_timezone');
+        return _buildResult(
+          localeCountry,
+          _countryMeta[localeCountry]!['city']!,
+          'locale_timezone',
+        );
       }
-    } catch (e) {
-      debugPrint('Tier 1 GeoDetection warning: $e');
+    } catch (_) {
+      privacySafeDiagnostics.event('geo.tier1.failed');
     }
     return null;
   }
 
-  /// Tier 2: Network IP Fallback (Lightweight HTTP request with 2.5s timeout)
+  /// Tier 2: Network IP Fallback (HTTPS requests with 2.5s timeout)
   static Future<DetectedLocation?> detectTier2() async {
     final endpoints = [
-      'http://ip-api.com/json',
       'https://ipapi.co/json/',
       'https://get.geojs.io/v1/ip/geo.json',
     ];
@@ -106,25 +160,33 @@ class GeoDetector {
         final response = await http
             .get(
               Uri.parse(url),
-              headers: {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'},
+              headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+              },
             )
             .timeout(const Duration(milliseconds: 2500));
 
         if (response.statusCode == 200) {
           final data = json.decode(response.body);
-          final String code = (data['countryCode'] ?? data['country_code'] ?? data['country'] ?? '')
-              .toString()
-              .toUpperCase();
+          final String code =
+              (data['countryCode'] ??
+                      data['country_code'] ??
+                      data['country'] ??
+                      '')
+                  .toString()
+                  .toUpperCase();
           final String rawCity = (data['city'] ?? '').toString().trim();
 
           if (code.isNotEmpty && _countryMeta.containsKey(code)) {
             final defaultCity = _countryMeta[code]!['city']!;
-            final finalCity = rawCity.isNotEmpty ? _formatCity(rawCity) : defaultCity;
+            final finalCity = rawCity.isNotEmpty
+                ? _formatCity(rawCity)
+                : defaultCity;
             return _buildResult(code, finalCity, 'ip_lookup');
           }
         }
-      } catch (e) {
-        debugPrint('Tier 2 IP GeoDetection endpoint ($url) bypassed: $e');
+      } catch (_) {
+        privacySafeDiagnostics.event('geo.tier2.failed');
       }
     }
     return null;
@@ -158,7 +220,11 @@ class GeoDetector {
         .join(' ');
   }
 
-  static DetectedLocation _buildResult(String code, String city, String source) {
+  static DetectedLocation _buildResult(
+    String code,
+    String city,
+    String source,
+  ) {
     final meta = _countryMeta[code] ?? _countryMeta['PK']!;
     return DetectedLocation(
       countryCode: code,

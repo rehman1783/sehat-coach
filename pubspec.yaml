@@ -37,6 +37,19 @@ dependencies:
   http: ^1.2.0
   device_preview: ^1.2.0
   google_fonts: ^6.2.1
+  get: 4.7.3
+  drift: ^2.35.0
+  sqlite3: ^3.7.1
+  flutter_secure_storage: ^11.2.0
+  crypto: ^3.0.7
+  file_selector: 1.1.0
+  in_app_purchase: ^3.3.1
+  firebase_core: ^5.1.0
+  firebase_auth: ^7.0.1
+  firebase_app_check: ^0.5.1
+  google_sign_in: ^7.2.0
+  connectivity_plus: ^7.3.2
+  path_provider: ^2.1.6
 
 dev_dependencies:
   flutter_test:
@@ -49,12 +62,19 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
   flutter_launcher_icons: ^0.14.3
+  build_runner: ^2.4.15
+  drift_dev: ^2.35.0
+
+hooks:
+  user_defines:
+    sqlite3:
+      source: sqlite3mc
 
 flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
   image_path: "assets/icon/app_icon.png"
-  min_sdk_android: 21
+  min_sdk_android: 29
   web:
     generate: true
     image_path: "assets/icon/app_icon.png"

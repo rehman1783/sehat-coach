@@ -1,0 +1,143 @@
+{
+  "_note1": "KEEP THIS FILE! Check it into a version control system (VCS) like git.",
+  "_note2": "ObjectBox manages crucial IDs for your object model. See docs for details.",
+  "_note3": "If you have VCS merge conflicts, you must resolve them according to ObjectBox docs.",
+  "entities": [
+    {
+      "id": "1:7838262136511295195",
+      "lastPropertyId": "4:4558659420083800041",
+      "name": "Food",
+      "properties": [
+        {
+          "id": "1:8830905028109825955",
+          "name": "id",
+          "type": 6,
+          "flags": 129
+        },
+        {
+          "id": "2:7177980754947542134",
+          "name": "name",
+          "indexId": "1:2470036112803051557",
+          "type": 9,
+          "flags": 2048
+        },
+        {
+          "id": "3:8977625579433523110",
+          "name": "energy",
+          "type": 6
+        },
+        {
+          "id": "4:4558659420083800041",
+          "name": "source",
+          "type": 9
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "2:9202593426022610005",
+      "lastPropertyId": "3:7385100166730528470",
+      "name": "Meal",
+      "properties": [
+        {
+          "id": "1:6324308178998857881",
+          "name": "id",
+          "type": 6,
+          "flags": 129
+        },
+        {
+          "id": "2:7826647710298657570",
+          "name": "servings",
+          "type": 6
+        },
+        {
+          "id": "3:7385100166730528470",
+          "name": "foodId",
+          "indexId": "2:1222502423279117398",
+          "type": 11,
+          "flags": 520,
+          "relationTarget": "Food"
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "3:23113256854699737",
+      "lastPropertyId": "5:775566765719498605",
+      "name": "OutboxEntry",
+      "properties": [
+        {
+          "id": "1:1826859882473964700",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:8932003874828853146",
+          "name": "operationKey",
+          "indexId": "3:2027905723218140380",
+          "type": 9,
+          "flags": 2080
+        },
+        {
+          "id": "3:3605521102056358332",
+          "name": "owner",
+          "type": 9
+        },
+        {
+          "id": "4:567573924713017882",
+          "name": "revision",
+          "type": 6
+        },
+        {
+          "id": "5:775566765719498605",
+          "name": "value",
+          "type": 9
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "4:7465804451041502668",
+      "lastPropertyId": "4:5814231986932171733",
+      "name": "SyncProfile",
+      "properties": [
+        {
+          "id": "1:5377361237344292199",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:5952863846263779431",
+          "name": "owner",
+          "indexId": "4:8954433961211390753",
+          "type": 9,
+          "flags": 2080
+        },
+        {
+          "id": "3:7790941701840026655",
+          "name": "revision",
+          "type": 6
+        },
+        {
+          "id": "4:5814231986932171733",
+          "name": "value",
+          "type": 9
+        }
+      ],
+      "relations": []
+    }
+  ],
+  "lastEntityId": "4:7465804451041502668",
+  "lastIndexId": "4:8954433961211390753",
+  "lastRelationId": "0:0",
+  "lastSequenceId": "0:0",
+  "modelVersion": 5,
+  "modelVersionParserMinimum": 5,
+  "retiredEntityUids": [],
+  "retiredIndexUids": [],
+  "retiredPropertyUids": [],
+  "retiredRelationUids": [],
+  "version": 1
+}

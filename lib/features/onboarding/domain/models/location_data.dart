@@ -1,3 +1,5 @@
+import '../../../location/domain/city_configuration.dart';
+
 class CountryData {
   final String name;
   final String code;
@@ -14,304 +16,53 @@ class CountryData {
   });
 }
 
+/// V1 launches in Pakistan. This repository boundary can later be backed by
+/// the remotely managed city catalogue without changing presentation code.
 class LocationRepository {
-  static const List<CountryData> countries = [
-    CountryData(
-      name: 'Pakistan',
-      code: 'PK',
-      flag: '🇵🇰',
-      marketLabel: 'Pakistan Market',
-      cities: [
-        'Karachi',
-        'Lahore',
-        'Islamabad',
-        'Rawalpindi',
-        'Faisalabad',
-        'Multan',
-        'Peshawar',
-        'Quetta',
-        'Gujranwala',
-        'Sialkot',
-        'Hyderabad',
-        'Sukkur',
-        'Bahawalpur',
-        'Sargodha',
-        'Abbottabad',
-        'Mardan',
-        'Larkana',
-        'Mirpur',
-        'Muzaffarabad',
-        'Gwadar',
-        'Okara',
-        'Rahim Yar Khan',
-        'Jhang',
-        'Sheikhupura',
-        'Dera Ghazi Khan',
-        'Sahiwal',
-        'Kasur',
-        'Mingora',
-        'Chiniot',
-        'Nawabshah',
-        'Kamoke',
-        'Burewala',
-        'Jhelum',
-        'Sadiqabad',
-        'Khanewal',
-        'Hafizabad',
-        'Kohat',
-        'Jacobabad',
-        'Shikarpur',
-        'Muzaffargarh',
-        'Khanpur',
-        'Gojra',
-        'Bahawalnagar',
-        'Muridke',
-        'Pakpattan',
-        'Tando Adam',
-        'Dera Ismail Khan',
-        'Vehari',
-        'Kot Addu',
-        'Nowshera',
-        'Swabi',
-        'Charsadda',
-        'Attock',
-        'Chakwal',
-        'Mansehra',
-        'Bannu',
-        'Turbat',
-        'Khuzdar',
-        'Hub',
-      ],
-    ),
-    CountryData(
-      name: 'United Arab Emirates',
-      code: 'AE',
-      flag: '🇦🇪',
-      marketLabel: 'UAE Market',
-      cities: [
-        'Dubai',
-        'Abu Dhabi',
-        'Sharjah',
-        'Ajman',
-        'Ras Al Khaimah',
-        'Fujairah',
-        'Umm Al Quwain',
-        'Al Ain',
-        'Khor Fakkan',
-        'Dibba Al-Fujairah',
-      ],
-    ),
-    CountryData(
-      name: 'Saudi Arabia',
-      code: 'SA',
-      flag: '🇸🇦',
-      marketLabel: 'Saudi Arabia Market',
-      cities: [
-        'Riyadh',
-        'Jeddah',
-        'Mecca',
-        'Medina',
-        'Dammam',
-        'Khobar',
-        'Tabuk',
-        'Buraidah',
-        'Abha',
-        'Taif',
-        'Jubail',
-        'Khamis Mushait',
-        'Hail',
-        'Najran',
-        'Yanbu',
-      ],
-    ),
-    CountryData(
-      name: 'United Kingdom',
-      code: 'GB',
-      flag: '🇬🇧',
-      marketLabel: 'UK Market',
-      cities: [
-        'London',
-        'Birmingham',
-        'Manchester',
-        'Glasgow',
-        'Leeds',
-        'Liverpool',
-        'Edinburgh',
-        'Bristol',
-        'Sheffield',
-        'Leicester',
-        'Coventry',
-        'Bradford',
-        'Nottingham',
-        'Newcastle upon Tyne',
-      ],
-    ),
-    CountryData(
-      name: 'United States',
-      code: 'US',
-      flag: '🇺🇸',
-      marketLabel: 'USA Market',
-      cities: [
-        'New York',
-        'Los Angeles',
-        'Chicago',
-        'Houston',
-        'Phoenix',
-        'Philadelphia',
-        'San Antonio',
-        'San Diego',
-        'Dallas',
-        'San Jose',
-        'Austin',
-        'Seattle',
-        'San Francisco',
-        'Miami',
-      ],
-    ),
-    CountryData(
-      name: 'Canada',
-      code: 'CA',
-      flag: '🇨🇦',
-      marketLabel: 'Canada Market',
-      cities: [
-        'Toronto',
-        'Montreal',
-        'Vancouver',
-        'Calgary',
-        'Edmonton',
-        'Ottawa',
-        'Winnipeg',
-        'Quebec City',
-        'Hamilton',
-        'Kitchener',
-      ],
-    ),
-    CountryData(
-      name: 'Qatar',
-      code: 'QA',
-      flag: '🇶🇦',
-      marketLabel: 'Qatar Market',
-      cities: [
-        'Doha',
-        'Al Rayyan',
-        'Al Wakrah',
-        'Al Khor',
-        'Umm Salal',
-        'Lusail',
-      ],
-    ),
-    CountryData(
-      name: 'Oman',
-      code: 'OM',
-      flag: '🇴🇲',
-      marketLabel: 'Oman Market',
-      cities: [
-        'Muscat',
-        'Salalah',
-        'Sohar',
-        'Nizwa',
-        'Sur',
-        'Ibri',
-        'Seeb',
-      ],
-    ),
-    CountryData(
-      name: 'Kuwait',
-      code: 'KW',
-      flag: '🇰🇼',
-      marketLabel: 'Kuwait Market',
-      cities: [
-        'Kuwait City',
-        'Al Ahmadi',
-        'Hawalli',
-        'Salmiya',
-        'Sabah Al Salem',
-        'Al Farwaniyah',
-      ],
-    ),
-    CountryData(
-      name: 'Bahrain',
-      code: 'BH',
-      flag: '🇧🇭',
-      marketLabel: 'Bahrain Market',
-      cities: [
-        'Manama',
-        'Riffa',
-        'Muharraq',
-        'Hamad Town',
-        'Isa Town',
-        'Sitra',
-      ],
-    ),
-    CountryData(
-      name: 'India',
-      code: 'IN',
-      flag: '🇮🇳',
-      marketLabel: 'India Market',
-      cities: [
-        'Mumbai',
-        'Delhi',
-        'Bengaluru',
-        'Hyderabad',
-        'Ahmedabad',
-        'Chennai',
-        'Kolkata',
-        'Surat',
-        'Pune',
-        'Jaipur',
-        'Lucknow',
-        'Kanpur',
-        'Nagpur',
-        'Indore',
-      ],
-    ),
-    CountryData(
-      name: 'Australia',
-      code: 'AU',
-      flag: '🇦🇺',
-      marketLabel: 'Australia Market',
-      cities: [
-        'Sydney',
-        'Melbourne',
-        'Brisbane',
-        'Perth',
-        'Adelaide',
-        'Gold Coast',
-        'Canberra',
-        'Newcastle',
-      ],
-    ),
+  static const List<String> launchCities = [
+    'Karachi',
+    'Lahore',
+    'Islamabad',
+    'Rawalpindi',
+    'Faisalabad',
+    'Multan',
+    'Peshawar',
+    'Quetta',
+    'Hyderabad',
+    'Gujranwala',
+    'Other city',
   ];
 
-  static List<CountryData>? _cachedSortedCountries;
+  static const CountryData pakistan = CountryData(
+    name: 'Pakistan',
+    code: 'PK',
+    flag: '🇵🇰',
+    marketLabel: 'Pakistan Market',
+    cities: launchCities,
+  );
 
-  static List<CountryData> get sortedCountries {
-    if (_cachedSortedCountries != null) return _cachedSortedCountries!;
-    final list = countries.map((c) {
-      final sortedCities = List<String>.from(c.cities)..sort((a, b) => a.compareTo(b));
-      return CountryData(
-        name: c.name,
-        code: c.code,
-        flag: c.flag,
-        marketLabel: c.marketLabel,
-        cities: sortedCities,
-      );
-    }).toList();
-    list.sort((a, b) => a.name.compareTo(b.name));
-    _cachedSortedCountries = list;
-    return list;
-  }
+  static const List<CountryData> countries = [pakistan];
 
-  static CountryData get defaultCountry => sortedCountries.firstWhere(
-        (c) => c.code == 'PK',
-        orElse: () => sortedCountries.first,
-      );
+  static List<CountryData> get sortedCountries => countries;
 
-  static CountryData findByCode(String code) {
-    return sortedCountries.firstWhere(
-      (c) => c.code.toUpperCase() == code.toUpperCase(),
-      orElse: () => defaultCountry,
+  static CountryData get defaultCountry => pakistan;
+
+  /// Converts a previously verified published release into runtime UI data.
+  /// A missing release deliberately retains the bundled V1 fallback.
+  static CountryData fromConfiguration(
+    PublishedCityConfiguration? configuration,
+  ) {
+    if (configuration == null) return pakistan;
+    return CountryData(
+      name: pakistan.name,
+      code: configuration.countryCode,
+      flag: pakistan.flag,
+      marketLabel: pakistan.marketLabel,
+      cities: List.unmodifiable(
+        configuration.enabledCities.map((city) => city.displayName),
+      ),
     );
   }
-}
 
+  static CountryData findByCode(String code) => pakistan;
+}

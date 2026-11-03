@@ -32,6 +32,16 @@ migrate_working_dir/
 .pub/
 /build/
 /coverage/
+/.cache/
+
+# Local environment and release configuration must never be committed.
+.env
+.env.*
+!.env.example
+*.production-defines.json
+production-defines*.json
+**/service-account*.json
+**/service_account*.json
 
 # Symbolication related
 app.*.symbols

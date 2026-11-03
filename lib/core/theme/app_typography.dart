@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import 'app_colors.dart';
 
 /// Centralized Typography System for Sehat Coach.
@@ -8,7 +9,7 @@ import 'app_colors.dart';
 /// 2. [Inter] - For body text, subtitles, UI elements, buttons, input fields, labels.
 class AppTypography {
   // --- Dela Gothic One Styles (Headings, Display & Section Titles) ---
-  
+
   static TextStyle delaGothic({
     double fontSize = 20,
     Color color = AppColors.medicalBlue,
@@ -24,43 +25,23 @@ class AppTypography {
   }
 
   static TextStyle displayLarge({Color color = AppColors.medicalBlue}) {
-    return GoogleFonts.delaGothicOne(
-      fontSize: 32,
-      color: color,
-      height: 1.2,
-    );
+    return GoogleFonts.delaGothicOne(fontSize: 32, color: color, height: 1.2);
   }
 
   static TextStyle displayMedium({Color color = AppColors.medicalBlue}) {
-    return GoogleFonts.delaGothicOne(
-      fontSize: 26,
-      color: color,
-      height: 1.25,
-    );
+    return GoogleFonts.delaGothicOne(fontSize: 26, color: color, height: 1.25);
   }
 
   static TextStyle headlineMedium({Color color = AppColors.medicalBlue}) {
-    return GoogleFonts.delaGothicOne(
-      fontSize: 22,
-      color: color,
-      height: 1.3,
-    );
+    return GoogleFonts.delaGothicOne(fontSize: 22, color: color, height: 1.3);
   }
 
   static TextStyle titleLarge({Color color = AppColors.medicalBlue}) {
-    return GoogleFonts.delaGothicOne(
-      fontSize: 18,
-      color: color,
-      height: 1.3,
-    );
+    return GoogleFonts.delaGothicOne(fontSize: 18, color: color, height: 1.3);
   }
 
   static TextStyle titleMedium({Color color = AppColors.medicalBlue}) {
-    return GoogleFonts.delaGothicOne(
-      fontSize: 16,
-      color: color,
-      height: 1.35,
-    );
+    return GoogleFonts.delaGothicOne(fontSize: 16, color: color, height: 1.35);
   }
 
   // --- Inter Styles (Body, Subtitles, Buttons, Labels) ---
@@ -72,7 +53,7 @@ class AppTypography {
     double? letterSpacing,
     double? height,
   }) {
-    return GoogleFonts.inter(
+    return GoogleFonts.poppins(
       fontSize: fontSize,
       fontWeight: fontWeight,
       color: color,
@@ -81,8 +62,11 @@ class AppTypography {
     );
   }
 
-  static TextStyle bodyLarge({Color color = AppColors.textPrimary, FontWeight fontWeight = FontWeight.w400}) {
-    return GoogleFonts.inter(
+  static TextStyle bodyLarge({
+    Color color = AppColors.textPrimary,
+    FontWeight fontWeight = FontWeight.w400,
+  }) {
+    return GoogleFonts.poppins(
       fontSize: 16,
       fontWeight: fontWeight,
       color: color,
@@ -90,8 +74,11 @@ class AppTypography {
     );
   }
 
-  static TextStyle bodyMedium({Color color = AppColors.textSecondary, FontWeight fontWeight = FontWeight.w400}) {
-    return GoogleFonts.inter(
+  static TextStyle bodyMedium({
+    Color color = AppColors.textSecondary,
+    FontWeight fontWeight = FontWeight.w400,
+  }) {
+    return GoogleFonts.poppins(
       fontSize: 14,
       fontWeight: fontWeight,
       color: color,
@@ -99,8 +86,11 @@ class AppTypography {
     );
   }
 
-  static TextStyle bodySmall({Color color = AppColors.textSecondary, FontWeight fontWeight = FontWeight.w400}) {
-    return GoogleFonts.inter(
+  static TextStyle bodySmall({
+    Color color = AppColors.textSecondary,
+    FontWeight fontWeight = FontWeight.w400,
+  }) {
+    return GoogleFonts.poppins(
       fontSize: 12,
       fontWeight: fontWeight,
       color: color,
@@ -108,7 +98,10 @@ class AppTypography {
     );
   }
 
-  static TextStyle button({Color color = AppColors.medicalBlue, double fontSize = 15}) {
+  static TextStyle button({
+    Color color = AppColors.medicalBlue,
+    double fontSize = 15,
+  }) {
     return GoogleFonts.inter(
       fontSize: fontSize,
       fontWeight: FontWeight.w700,
@@ -117,7 +110,11 @@ class AppTypography {
     );
   }
 
-  static TextStyle label({Color color = AppColors.textSecondary, double fontSize = 12, FontWeight fontWeight = FontWeight.w600}) {
+  static TextStyle label({
+    Color color = AppColors.textSecondary,
+    double fontSize = 12,
+    FontWeight fontWeight = FontWeight.w600,
+  }) {
     return GoogleFonts.inter(
       fontSize: fontSize,
       fontWeight: fontWeight,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../../../../core/services/geo_detector.dart';
+import 'package:google_fonts/google_fonts.dart';
+
 import '../../../onboarding/domain/models/onboarding_state.dart';
 import '../../../onboarding/presentation/screens/onboarding_screen.dart';
 
@@ -17,8 +18,6 @@ class _SplashScreenState extends State<SplashScreen>
   late final Animation<double> _scaleAnim;
   late final Animation<double> _fadeAnim;
   AppLanguage _selectedLanguage = AppLanguage.romanUrdu;
-  DetectedLocation? _detectedLocation;
-  bool _isGeoLoading = true;
 
   @override
   void initState() {
@@ -39,37 +38,6 @@ class _SplashScreenState extends State<SplashScreen>
     );
 
     _animController.forward();
-    _initGeoDetection();
-  }
-
-  Future<void> _initGeoDetection() async {
-    // 1. Instant Tier 1 Detection (Locale & Timezone)
-    final tier1 = GeoDetector.detectTier1();
-    if (tier1 != null) {
-      if (mounted) {
-        setState(() {
-          _detectedLocation = tier1;
-          _isGeoLoading = false;
-          if (tier1.countryCode != 'PK') {
-            _selectedLanguage = AppLanguage.english;
-          } else {
-            _selectedLanguage = AppLanguage.romanUrdu;
-          }
-        });
-      }
-    }
-
-    // 2. Async IP Geolocation Detection
-    final location = await GeoDetector.detectLocation();
-    if (mounted) {
-      setState(() {
-        _detectedLocation = location;
-        _isGeoLoading = false;
-        if (location.countryCode != 'PK') {
-          _selectedLanguage = AppLanguage.english;
-        }
-      });
-    }
   }
 
   @override
@@ -83,260 +51,269 @@ class _SplashScreenState extends State<SplashScreen>
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) => OnboardingScreen(initialLanguage: _selectedLanguage),
+        builder: (context) =>
+            OnboardingScreen(initialLanguage: _selectedLanguage),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final bool isPakistan = _detectedLocation?.countryCode == 'PK' || (_detectedLocation == null && !_isGeoLoading);
-    final bool isEnglish = _selectedLanguage == AppLanguage.english;
-
     return Scaffold(
       backgroundColor: const Color(0xFFFAF8F3), // Off-white warm background
       body: Stack(
         children: [
           // Background organic shapes matching reference design
           Positioned.fill(
-            child: CustomPaint(
-              painter: _SplashOrganicBackgroundPainter(),
-            ),
+            child: CustomPaint(painter: _SplashOrganicBackgroundPainter()),
           ),
 
           SafeArea(
-            child: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 440),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 28.0, vertical: 20.0),
-                  child: Column(
-                    children: [
-                      const Spacer(flex: 3),
+            child: LayoutBuilder(
+              builder: (context, viewport) => SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: viewport.maxHeight),
+                  child: IntrinsicHeight(
+                    child: Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 440),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 28.0,
+                            vertical: 20.0,
+                          ),
+                          child: Column(
+                            children: [
+                              const Spacer(flex: 3),
 
-                      // Original Logo Icon with Entry Scale Animation
-                      ScaleTransition(
-                        scale: _scaleAnim,
-                        child: GestureDetector(
-                          onTap: () {
-                            HapticFeedback.selectionClick();
-                          },
-                          child: Image.asset(
-                            'assets/icon/Layer 1 (2) copy.png',
-                            width: 140,
-                            height: 140,
-                            fit: BoxFit.contain,
+                              // Original Logo Icon with Entry Scale Animation
+                              ScaleTransition(
+                                scale: _scaleAnim,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    HapticFeedback.selectionClick();
+                                  },
+                                  child: Image.asset(
+                                    'assets/icon/Layer 1 (2) copy.png',
+                                    width: 140,
+                                    height: 140,
+                                    fit: BoxFit.contain,
+                                  ),
+                                ),
+                              ),
+
+                              const SizedBox(height: 22),
+
+                              Text(
+                                'SEHAT COACH',
+                                textAlign: TextAlign.center,
+                                style: GoogleFonts.delaGothicOne(
+                                  fontSize: 28,
+                                  color: const Color(0xFF14532D),
+                                  letterSpacing: -0.5,
+                                ),
+                              ),
+
+                              const SizedBox(height: 8),
+
+                              // Subtitle & Language Selector Fade In
+                              FadeTransition(
+                                opacity: _fadeAnim,
+                                child: Column(
+                                  children: [
+                                    Text(
+                                      'Your Desi Life & Health Assistant',
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                        color: Color(0xFF526070),
+                                        letterSpacing: 0.2,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 16),
+
+                                    Container(
+                                      height: 44,
+                                      width: 180,
+                                      padding: const EdgeInsets.all(4),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(30),
+                                        border: Border.all(
+                                          color: const Color(0xFFD7E2DA),
+                                        ),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black.withValues(
+                                              alpha: 0.06,
+                                            ),
+                                            blurRadius: 12,
+                                            offset: const Offset(0, 4),
+                                          ),
+                                        ],
+                                      ),
+                                      child: Stack(
+                                        children: [
+                                          AnimatedAlign(
+                                            duration: const Duration(
+                                              milliseconds: 320,
+                                            ),
+                                            curve: Curves.easeOutBack,
+                                            alignment:
+                                                _selectedLanguage ==
+                                                    AppLanguage.romanUrdu
+                                                ? Alignment.centerLeft
+                                                : Alignment.centerRight,
+                                            child: FractionallySizedBox(
+                                              widthFactor: 0.5,
+                                              heightFactor: 1,
+                                              child: DecoratedBox(
+                                                decoration: BoxDecoration(
+                                                  color: const Color(
+                                                    0xFFE5F0E8,
+                                                  ),
+                                                  borderRadius:
+                                                      BorderRadius.circular(24),
+                                                  border: Border.all(
+                                                    color: const Color(
+                                                      0xFFBDD3C4,
+                                                    ),
+                                                  ),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: const Color(
+                                                        0xFF14532D,
+                                                      ).withValues(alpha: 0.12),
+                                                      blurRadius: 7,
+                                                      offset: const Offset(
+                                                        0,
+                                                        2,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                child: _LanguageOptionPill(
+                                                  label: 'URDU',
+                                                  isSelected:
+                                                      _selectedLanguage ==
+                                                      AppLanguage.romanUrdu,
+                                                  onTap: () {
+                                                    HapticFeedback.selectionClick();
+                                                    setState(
+                                                      () => _selectedLanguage =
+                                                          AppLanguage.romanUrdu,
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                              Expanded(
+                                                child: _LanguageOptionPill(
+                                                  label: 'ENGLISH',
+                                                  isSelected:
+                                                      _selectedLanguage ==
+                                                      AppLanguage.english,
+                                                  onTap: () {
+                                                    HapticFeedback.selectionClick();
+                                                    setState(
+                                                      () => _selectedLanguage =
+                                                          AppLanguage.english,
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                              const Spacer(flex: 4),
+
+                              // Bottom Action Button & Footer Text
+                              FadeTransition(
+                                opacity: _fadeAnim,
+                                child: Column(
+                                  children: [
+                                    // Start Onboarding CTA
+                                    SizedBox(
+                                      width: double.infinity,
+                                      child: ConstrainedBox(
+                                        constraints: const BoxConstraints(
+                                          minHeight: 56,
+                                        ),
+                                        child: ElevatedButton(
+                                          onPressed: _startOnboarding,
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: const Color(
+                                              0xFF14532D,
+                                            ),
+                                            foregroundColor: Colors.white,
+                                            elevation: 6,
+                                            shadowColor: const Color(0xFF14532D)
+                                                .withValues(alpha: 0.35),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(30),
+                                            ),
+                                          ),
+                                          child: FittedBox(
+                                            fit: BoxFit.scaleDown,
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Text(
+                                                  'CONTINUE',
+                                                  style: const TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w800,
+                                                    letterSpacing: 1.0,
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 8),
+                                                const Icon(
+                                                  Icons.arrow_forward,
+                                                  color: Color(0xFFEAA918),
+                                                  size: 18,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+
+                                    const SizedBox(height: 20),
+
+                                    // Footer Tagline (Hybrid Health)
+                                    const Text(
+                                      'POWERED BY AI • BUILT FOR PAKISTAN',
+                                      style: TextStyle(
+                                        fontSize: 10.5,
+                                        fontWeight: FontWeight.w800,
+                                        color: Color(0xFF475569),
+                                        letterSpacing: 1.2,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 10),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
-
-                      const SizedBox(height: 28),
-
-                      // Subtitle & Language Selector Fade In
-                      FadeTransition(
-                        opacity: _fadeAnim,
-                        child: Column(
-                          children: [
-                            Text(
-                              isEnglish
-                                  ? 'Your Desi Life & Health Assistant'
-                                  : 'Aapka Desi Life & Health Assistant',
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                color: Color(0xFF526070),
-                                letterSpacing: 0.2,
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-
-                            // Country Location Pill Badge
-                            if (_isGeoLoading)
-                              const Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: SizedBox(
-                                  width: 16,
-                                  height: 16,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: Color(0xFF14532D),
-                                  ),
-                                ),
-                              )
-                            else if (_detectedLocation != null)
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                                margin: const EdgeInsets.only(bottom: 12),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFE2EBE0),
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    const Icon(Icons.location_on_rounded, size: 13, color: Color(0xFF14532D)),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      'Detected: ${_detectedLocation!.countryName} (${_detectedLocation!.city})',
-                                      style: const TextStyle(
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.w700,
-                                        color: Color(0xFF14532D),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-
-                            // Country-dependent Language Options
-                            if (isPakistan)
-                              // Pakistan: Show URDU/ROMAN ENGLISH or ENGLISH toggle option
-                              Container(
-                                height: 44,
-                                width: 260,
-                                padding: const EdgeInsets.all(4),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(30),
-                                  border: Border.all(color: const Color(0xFFE2E8F0)),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withValues(alpha: 0.04),
-                                      blurRadius: 10,
-                                      offset: const Offset(0, 3),
-                                    ),
-                                  ],
-                                ),
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: _LanguageOptionPill(
-                                        label: 'ROMAN URDU',
-                                        isSelected: _selectedLanguage == AppLanguage.romanUrdu,
-                                        onTap: () {
-                                          HapticFeedback.selectionClick();
-                                          setState(() => _selectedLanguage = AppLanguage.romanUrdu);
-                                        },
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: _LanguageOptionPill(
-                                        label: 'ENGLISH',
-                                        isSelected: _selectedLanguage == AppLanguage.english,
-                                        onTap: () {
-                                          HapticFeedback.selectionClick();
-                                          setState(() => _selectedLanguage = AppLanguage.english);
-                                        },
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              )
-                            else
-                              // Non-Pakistan: Show ONLY English option
-                              Container(
-                                height: 44,
-                                width: 260,
-                                alignment: Alignment.center,
-                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(30),
-                                  border: Border.all(color: const Color(0xFFE2E8F0)),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withValues(alpha: 0.04),
-                                      blurRadius: 10,
-                                      offset: const Offset(0, 3),
-                                    ),
-                                  ],
-                                ),
-                                child: const Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(Icons.language_rounded, size: 16, color: Color(0xFF14532D)),
-                                    SizedBox(width: 8),
-                                    Text(
-                                      'LANGUAGE: ENGLISH',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w800,
-                                        color: Color(0xFF14532D),
-                                        letterSpacing: 0.5,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                          ],
-                        ),
-                      ),
-
-                      const Spacer(flex: 4),
-
-                      // Bottom Action Button & Footer Text
-                      FadeTransition(
-                        opacity: _fadeAnim,
-                        child: Column(
-                          children: [
-                            // Start Onboarding CTA
-                            SizedBox(
-                              width: double.infinity,
-                              height: 56,
-                              child: ElevatedButton(
-                                onPressed: _startOnboarding,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF14532D),
-                                  foregroundColor: Colors.white,
-                                  elevation: 6,
-                                  shadowColor: const Color(0xFF14532D).withValues(alpha: 0.35),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(30),
-                                  ),
-                                ),
-                                child: FittedBox(
-                                  fit: BoxFit.scaleDown,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        isEnglish ? 'START ONBOARDING' : 'ONBOARDING SHURU KAREIN',
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w800,
-                                          letterSpacing: 1.0,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      const Icon(
-                                        Icons.arrow_forward,
-                                        color: Color(0xFFEAA918),
-                                        size: 18,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-
-                            const SizedBox(height: 20),
-
-                            // Footer Tagline (Hybrid Health)
-                            const Text(
-                              'POWERED BY AI • HYBRID HEALTH',
-                              style: TextStyle(
-                                fontSize: 10.5,
-                                fontWeight: FontWeight.w800,
-                                color: Color(0xFF475569),
-                                letterSpacing: 1.2,
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-                          ],
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
               ),
@@ -361,37 +338,29 @@ class _LanguageOptionPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeOut,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFFFAF8F3) : Colors.transparent,
-          borderRadius: BorderRadius.circular(24),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.04),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ]
-              : [],
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 6.0),
-          child: FittedBox(
-            fit: BoxFit.scaleDown,
-            child: Text(
-              label,
+    return Semantics(
+      button: true,
+      selected: isSelected,
+      label: '$label language',
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(24),
+        child: Center(
+          child: AnimatedScale(
+            duration: const Duration(milliseconds: 220),
+            curve: Curves.easeOutBack,
+            scale: isSelected ? 1.04 : 0.96,
+            child: AnimatedDefaultTextStyle(
+              duration: const Duration(milliseconds: 220),
               style: TextStyle(
                 fontSize: 11.5,
-                fontWeight: isSelected ? FontWeight.w900 : FontWeight.w600,
-                color: isSelected ? const Color(0xFF0C1E3C) : const Color(0xFF64748B),
+                fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
+                color: isSelected
+                    ? const Color(0xFF14532D)
+                    : const Color(0xFF64748B),
                 letterSpacing: 0.5,
               ),
+              child: Text(label),
             ),
           ),
         ),
@@ -414,11 +383,7 @@ class _SplashOrganicBackgroundPainter extends CustomPainter {
     final Path yellowBlobPath = Path();
     yellowBlobPath.moveTo(0, 0);
     yellowBlobPath.lineTo(w * 0.28, 0);
-    yellowBlobPath.cubicTo(
-      w * 0.28, h * 0.12,
-      w * 0.16, h * 0.18,
-      0, h * 0.16,
-    );
+    yellowBlobPath.cubicTo(w * 0.28, h * 0.12, w * 0.16, h * 0.18, 0, h * 0.16);
     yellowBlobPath.close();
     canvas.drawPath(yellowBlobPath, yellowBlobPaint);
 
@@ -429,11 +394,7 @@ class _SplashOrganicBackgroundPainter extends CustomPainter {
 
     final Path leafBgPath = Path();
     leafBgPath.moveTo(0, h * 0.08);
-    leafBgPath.cubicTo(
-      w * 0.55, h * 0.05,
-      w * 0.65, h * 0.35,
-      0, h * 0.45,
-    );
+    leafBgPath.cubicTo(w * 0.55, h * 0.05, w * 0.65, h * 0.35, 0, h * 0.45);
     leafBgPath.close();
     canvas.drawPath(leafBgPath, leafBgPaint);
 
@@ -445,11 +406,7 @@ class _SplashOrganicBackgroundPainter extends CustomPainter {
     final Path bottomPath = Path();
     final double brTop = h * 0.52;
     bottomPath.moveTo(w, brTop);
-    bottomPath.cubicTo(
-      w * 0.45, brTop,
-      w * 0.42, brTop + 60,
-      w * 0.40, h,
-    );
+    bottomPath.cubicTo(w * 0.45, brTop, w * 0.42, brTop + 60, w * 0.40, h);
     bottomPath.lineTo(w, h);
     bottomPath.close();
     canvas.drawPath(bottomPath, bottomStructPaint);
@@ -465,4 +422,3 @@ class _SplashOrganicBackgroundPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
-
