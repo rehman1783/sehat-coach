@@ -1,6 +1,6 @@
 # Copy this file to android/key.properties. The real file and keystore are
 # ignored by Git. Never commit passwords or the upload key.
-applicationId=com.yourcompany.sehatcoach
+applicationId=com.sehatcoach.app
 storeFile=C:/absolute/private/path/sehat-coach-upload.jks
 storePassword=replace-locally
 keyAlias=upload

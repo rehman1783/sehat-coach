@@ -47,6 +47,7 @@ class DriftPullApplyStore implements PullApplyStore {
       if (await _cursorWithoutOwnerCheck(ownerId) != page.requestCursor) {
         throw StateError('Cursor changed before apply');
       }
+      final seenKeysInPage = <(String, String)>{};
 
       for (final change in page.changes) {
         if (change.ownerId != ownerId) throw StateError('Owner mismatch');
@@ -55,6 +56,10 @@ class DriftPullApplyStore implements PullApplyStore {
         if (change.serverRevision <= 0) {
           throw StateError('Invalid server revision');
         }
+        final seenInBatch = !seenKeysInPage.add((
+          change.entityType,
+          change.entityKey,
+        ));
         final payloadJson = jsonEncode(change.payload);
 
         final pendingQuery = _database.select(_database.syncOutboxEntries)
@@ -76,8 +81,22 @@ class DriftPullApplyStore implements PullApplyStore {
                       row.entityKey.equals(change.entityKey),
                 ))
                 .getSingleOrNull();
-        if (change.serverRevision <= (prior?.revision ?? 0)) {
+        final priorRevision = prior?.revision ?? 0;
+        if (change.serverRevision < priorRevision) {
           throw StateError('Non-increasing server revision');
+        }
+        if (change.serverRevision == priorRevision) {
+          if (seenInBatch ||
+              prior == null ||
+              prior.isDeleted != change.deleted ||
+              !_jsonValuesEqual(
+                jsonDecode(prior.payloadJson),
+                change.payload,
+              )) {
+            throw StateError('Non-increasing server revision');
+          }
+          // Skip exact pre-existing local state echoed by initial null-cursor pull.
+          continue;
         }
 
         final now = DateTime.now().toUtc();
@@ -111,4 +130,26 @@ class DriftPullApplyStore implements PullApplyStore {
           );
     });
   }
+}
+
+bool _jsonValuesEqual(Object? left, Object? right) {
+  if (identical(left, right)) return true;
+  if (left is Map && right is Map) {
+    if (left.length != right.length) return false;
+    for (final entry in left.entries) {
+      if (!right.containsKey(entry.key) ||
+          !_jsonValuesEqual(entry.value, right[entry.key])) {
+        return false;
+      }
+    }
+    return true;
+  }
+  if (left is List && right is List) {
+    if (left.length != right.length) return false;
+    for (var i = 0; i < left.length; i++) {
+      if (!_jsonValuesEqual(left[i], right[i])) return false;
+    }
+    return true;
+  }
+  return left == right;
 }

@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: sehat-coach-backend
+    runtime: node
+    plan: free
+    rootDir: firebase/functions
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /healthz
+    envVars:
+      - key: FIREBASE_PROJECT_ID
+        value: blogging-app-2025
+      - key: FIREBASE_CLIENT_EMAIL
+        sync: false
+      - key: FIREBASE_PRIVATE_KEY
+        sync: false
+

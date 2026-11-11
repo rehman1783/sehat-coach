@@ -25,4 +25,3 @@ class SecureOperationIdGenerator {
     return '$prefix-$timestamp-$entropy';
   }
 }
-

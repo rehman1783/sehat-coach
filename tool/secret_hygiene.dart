@@ -48,6 +48,7 @@ final Set<String> _excludedDirectories = {
   'build',
   'coverage',
   'ephemeral',
+  'node_modules',
 };
 
 final Set<String> _textExtensions = {

@@ -56,3 +56,8 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+# Firebase Functions dependencies & build outputs
+firebase/.firebase/
+firebase/functions/lib/
+**/node_modules/

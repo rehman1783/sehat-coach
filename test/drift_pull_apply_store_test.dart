@@ -116,4 +116,110 @@ void main() {
     );
     expect(await store.cursor('owner-a'), 'cursor-1');
   });
+
+  test('initial pull accepts identical echoed local revision and rejects mismatched same revision', () async {
+    final local = DriftLocalChangeStore(database, 'owner-a');
+    await local.commit(
+      ownerId: 'owner-a',
+      operationId: 'op-echo-1',
+      entityType: 'profile',
+      entityKey: 'main',
+      expectedRevision: 0,
+      payload: const {'b': 2, 'a': 1},
+    );
+    expect(await local.acknowledge('owner-a', 'op-echo-1'), isTrue);
+
+    await store.applyPage(
+      'owner-a',
+      page(
+        nextCursor: '1',
+        changes: [
+          const RemoteChange(
+            ownerId: 'owner-a',
+            entityType: 'profile',
+            entityKey: 'main',
+            serverRevision: 1,
+            deleted: false,
+            payload: {'a': 1, 'b': 2},
+          ),
+        ],
+      ),
+    );
+    expect(await store.cursor('owner-a'), '1');
+
+    await expectLater(
+      store.applyPage(
+        'owner-a',
+        page(
+          requestCursor: '1',
+          nextCursor: '2',
+          changes: [
+            const RemoteChange(
+              ownerId: 'owner-a',
+              entityType: 'profile',
+              entityKey: 'main',
+              serverRevision: 1,
+              deleted: false,
+              payload: {'a': 99, 'b': 2},
+            ),
+          ],
+        ),
+      ),
+      throwsStateError,
+    );
+    expect(await store.cursor('owner-a'), '1');
+  });
+
+  test('initial pull accepts identical echoed local revision and rejects mismatched same revision', () async {
+    final local = DriftLocalChangeStore(database, 'owner-a');
+    await local.commit(
+      ownerId: 'owner-a',
+      operationId: 'op-echo-1',
+      entityType: 'profile',
+      entityKey: 'main',
+      expectedRevision: 0,
+      payload: const {'b': 2, 'a': 1},
+    );
+    expect(await local.acknowledge('owner-a', 'op-echo-1'), isTrue);
+
+    await store.applyPage(
+      'owner-a',
+      page(
+        nextCursor: '1',
+        changes: [
+          const RemoteChange(
+            ownerId: 'owner-a',
+            entityType: 'profile',
+            entityKey: 'main',
+            serverRevision: 1,
+            deleted: false,
+            payload: {'a': 1, 'b': 2},
+          ),
+        ],
+      ),
+    );
+    expect(await store.cursor('owner-a'), '1');
+
+    await expectLater(
+      store.applyPage(
+        'owner-a',
+        page(
+          requestCursor: '1',
+          nextCursor: '2',
+          changes: [
+            const RemoteChange(
+              ownerId: 'owner-a',
+              entityType: 'profile',
+              entityKey: 'main',
+              serverRevision: 1,
+              deleted: false,
+              payload: {'a': 99, 'b': 2},
+            ),
+          ],
+        ),
+      ),
+      throwsStateError,
+    );
+    expect(await store.cursor('owner-a'), '1');
+  });
 }

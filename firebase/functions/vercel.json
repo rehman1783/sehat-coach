@@ -1,0 +1,15 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "version": 2,
+  "buildCommand": "npm run build",
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/api/index?__sehatRoute=healthz"
+    },
+    {
+      "source": "/(adultEligibility|accountDeletion|syncUpload|syncPull|healthz)",
+      "destination": "/api/index?__sehatRoute=$1"
+    }
+  ]
+}

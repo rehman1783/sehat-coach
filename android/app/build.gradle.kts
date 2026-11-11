@@ -37,9 +37,9 @@ android {
     }
 
     defaultConfig {
-        // Debug builds retain the placeholder. Release builds are blocked below
-        // until key.properties supplies the final Play Store application ID.
-        applicationId = releaseApplicationId ?: "com.example.sehat_coach"
+        // Default to the configured application ID for debug builds while release
+        // builds remain blocked until key.properties supplies release signing.
+        applicationId = releaseApplicationId ?: "com.sehatcoach.app"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         // Android 10 (API 29) is the minimum supported release for V1.

@@ -1,0 +1,25 @@
+{
+  "name": "sehat-coach-functions",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Trusted HTTPS backend endpoints for Sehat Coach V1.",
+  "engines": {
+    "node": "22"
+  },
+  "main": "lib/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node lib/server.js",
+    "test": "npm run build && node --test lib/test/*.test.js",
+    "serve": "npm run build && firebase emulators:start --only functions,firestore,auth",
+    "deploy": "firebase deploy --only functions,firestore"
+  },
+  "dependencies": {
+    "firebase-admin": "^13.2.0",
+    "firebase-functions": "^6.3.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.3"
+  }
+}
+
