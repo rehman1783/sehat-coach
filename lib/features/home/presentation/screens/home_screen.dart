@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../ai_logging/application/ai_meal_draft_handoff.dart';
+import '../../../ai_logging/presentation/controllers/ai_meal_assistant_controller.dart';
 import '../../../bachat/presentation/controllers/bachat_planner_controller.dart';
 import '../../../bachat/presentation/screens/bachat_planner_screen.dart';
 import '../../../meals/presentation/controllers/meal_logger_controller.dart';
@@ -21,6 +23,8 @@ import 'daily_dashboard_screen.dart';
 class HomeScreen extends StatelessWidget {
   final OnboardingState profile;
   final Future<MealLoggerController> Function()? createMealLogger;
+  final Future<AiMealAssistantController> Function()? createAiAssistant;
+  final Future<AiMealDraftHandoff> Function()? createAiDraftHandoff;
   final Future<DailyDashboardController> Function()? createDashboard;
   final Future<RecipeMealLoggerController> Function()? createRecipeMealLogger;
   final Future<WaterTrackerController> Function()? createWaterTracker;
@@ -37,6 +41,8 @@ class HomeScreen extends StatelessWidget {
     super.key,
     required this.profile,
     this.createMealLogger,
+    this.createAiAssistant,
+    this.createAiDraftHandoff,
     this.createDashboard,
     this.createRecipeMealLogger,
     this.createWaterTracker,
@@ -56,7 +62,11 @@ class HomeScreen extends StatelessWidget {
       if (!context.mounted) return;
       await Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (_) => MealLoggerScreen(controller: controller),
+          builder: (_) => MealLoggerScreen(
+            controller: controller,
+            createAiAssistant: createAiAssistant,
+            createAiDraftHandoff: createAiDraftHandoff,
+          ),
         ),
       );
     } on Object {
@@ -86,6 +96,8 @@ class HomeScreen extends StatelessWidget {
             controller: controller,
             profile: profile,
             createMealLogger: createLogger,
+            createAiAssistant: createAiAssistant,
+            createAiDraftHandoff: createAiDraftHandoff,
             createRecipeMealLogger: createRecipeMealLogger,
             waterController: water,
             weightController: weight,

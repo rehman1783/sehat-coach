@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../ai_logging/application/ai_meal_draft_handoff.dart';
+import '../../../ai_logging/presentation/controllers/ai_meal_assistant_controller.dart';
 import '../../../meals/domain/meal_event.dart';
 import '../../../meals/domain/meal_history.dart';
 import '../../../meals/presentation/controllers/meal_logger_controller.dart';
@@ -26,6 +28,8 @@ class DailyDashboardScreen extends StatefulWidget {
     required this.controller,
     required this.profile,
     required this.createMealLogger,
+    this.createAiAssistant,
+    this.createAiDraftHandoff,
     this.createRecipeMealLogger,
     this.waterController,
     this.weightController,
@@ -36,6 +40,8 @@ class DailyDashboardScreen extends StatefulWidget {
   final DailyDashboardController controller;
   final OnboardingState profile;
   final Future<MealLoggerController> Function() createMealLogger;
+  final Future<AiMealAssistantController> Function()? createAiAssistant;
+  final Future<AiMealDraftHandoff> Function()? createAiDraftHandoff;
   final Future<RecipeMealLoggerController> Function()? createRecipeMealLogger;
   final WaterTrackerController? waterController;
   final WeightTrackerController? weightController;
@@ -82,7 +88,13 @@ class _DailyDashboardScreenState extends State<DailyDashboardScreen> {
       final logger = await widget.createMealLogger();
       if (!mounted) return;
       await Navigator.of(context).push(
-        MaterialPageRoute(builder: (_) => MealLoggerScreen(controller: logger)),
+        MaterialPageRoute(
+          builder: (_) => MealLoggerScreen(
+            controller: logger,
+            createAiAssistant: widget.createAiAssistant,
+            createAiDraftHandoff: widget.createAiDraftHandoff,
+          ),
+        ),
       );
     } on Object {
       if (!mounted) return;

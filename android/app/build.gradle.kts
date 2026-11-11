@@ -22,6 +22,10 @@ android {
     compileSdk = flutter.compileSdkVersion
     ndkVersion = "30.0.16248370"
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     lint {
         checkReleaseBuilds = false
         abortOnError = false

@@ -51,11 +51,17 @@ void main() {
     final activity = File(
       'android/app/src/main/kotlin/com/example/sehat_coach/MainActivity.kt',
     ).readAsStringSync();
+    final gradle = File('android/app/build.gradle.kts').readAsStringSync();
 
     expect(activity, contains('if (!BuildConfig.DEBUG)'));
     expect(
       activity,
       contains('window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)'),
+    );
+    expect(
+      gradle,
+      contains('buildConfig = true'),
+      reason: 'AGP 9 disables BuildConfig by default; MainActivity needs it.',
     );
   });
 }

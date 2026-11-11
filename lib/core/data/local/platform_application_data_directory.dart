@@ -9,9 +9,8 @@ typedef ApplicationSupportDirectoryLookup = Future<Directory> Function();
 /// Callers receive an app-owned subdirectory rather than the provider root, so
 /// account data never relies on a working directory or a guessed device path.
 class PlatformApplicationDataDirectory {
-  PlatformApplicationDataDirectory({
-    ApplicationSupportDirectoryLookup? lookup,
-  }) : _lookup = lookup ?? getApplicationSupportDirectory;
+  PlatformApplicationDataDirectory({ApplicationSupportDirectoryLookup? lookup})
+    : _lookup = lookup ?? getApplicationSupportDirectory;
 
   final ApplicationSupportDirectoryLookup _lookup;
 
@@ -27,7 +26,10 @@ class PlatformApplicationDataDirectory {
     final root = Directory(
       '${support.path}${Platform.pathSeparator}sehat_coach${Platform.pathSeparator}accounts_v1',
     );
-    final entityType = await FileSystemEntity.type(root.path, followLinks: false);
+    final entityType = await FileSystemEntity.type(
+      root.path,
+      followLinks: false,
+    );
     if (entityType != FileSystemEntityType.notFound &&
         entityType != FileSystemEntityType.directory) {
       throw FileSystemException(

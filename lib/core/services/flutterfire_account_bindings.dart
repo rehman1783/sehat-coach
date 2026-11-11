@@ -8,6 +8,8 @@ import '../../features/account/data/firebase_account_lifecycle.dart';
 import '../../features/account/data/google_firebase_credential_provider.dart';
 import '../../features/account/data/trusted_account_deletion_gateway.dart';
 import '../../features/account/data/trusted_adult_eligibility_gateway.dart';
+import '../../features/ai_logging/data/trusted_ai_backend_gateway.dart';
+import '../../features/ai_logging/domain/ai_assisted_logging.dart';
 import '../../features/sync/data/trusted_sync_http_transport.dart';
 import '../bootstrap/trusted_account_core_composition.dart';
 import '../bootstrap/trusted_consumer_runtime_composition.dart';
@@ -23,12 +25,16 @@ class FlutterFireAccountServices {
     required this.lifecycle,
     required this.deletion,
     required this.syncTransport,
+    this.aiLogging,
+    this.billing,
   });
 
   final TrustedAccountProviderPorts provider;
   final FirebaseAccountLifecycle lifecycle;
   final TrustedAccountDeletionGateway deletion;
   final TrustedSyncHttpTransport syncTransport;
+  final AiLoggingGateway? aiLogging;
+  final TrustedBillingConfiguration? billing;
 
   Future<void> clearOwnerSession(String ownerId) =>
       lifecycle.clearSession(ownerId);
@@ -48,6 +54,8 @@ class FlutterFireAccountServices {
         reauthentication: lifecycle,
         syncUpload: syncTransport,
         syncPull: syncTransport,
+        aiLogging: aiLogging,
+        billing: billing,
       );
 }
 
@@ -128,11 +136,34 @@ createFlutterFireAccountServicesStartup({
             idTokens: idTokens,
             appCheckTokens: appCheckTokens,
           );
+          final aiEndpoint = config.aiBackendEndpoint;
+          final aiLogging = aiEndpoint == null
+              ? null
+              : TrustedAiBackendGateway(
+                  endpoint: aiEndpoint,
+                  client: client,
+                  idTokens: idTokens,
+                  appCheckTokens: appCheckTokens,
+                );
+          final billingEndpoint = config.billingBackendEndpoint;
+          final catalogEndpoint = config.entitlementCatalogEndpoint;
+          final billing = billingEndpoint != null && catalogEndpoint != null
+              ? TrustedBillingConfiguration(
+                  backendEndpoint: billingEndpoint,
+                  catalogEndpoint: catalogEndpoint,
+                  stateEndpoint: config.billingStateEndpoint,
+                  httpClient: client,
+                  idTokens: idTokens,
+                  appCheckTokens: appCheckTokens,
+                )
+              : null;
           return FlutterFireAccountServices(
             provider: provider,
             lifecycle: lifecycle,
             deletion: deletion,
             syncTransport: syncTransport,
+            aiLogging: aiLogging,
+            billing: billing,
           );
         },
   );

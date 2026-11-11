@@ -77,6 +77,7 @@ class _SehatCoachConsumerAppState extends State<SehatCoachConsumerApp> {
       detectLocation: false,
       effects: TrustedConsumerRuntimeEffects(
         clearDecryptedMemory: decryptedMemory.clear,
+        registerDecryptedMemory: decryptedMemory.register,
         onAuthenticated: _returnToRoot,
         createShell: (home) => ActivatedShellComposition(home: home),
         onReadyForAuthentication: _returnToRoot,

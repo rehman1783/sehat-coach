@@ -1,5 +1,9 @@
 # V1-M08 Monetization and entitlements
 
+## Current evidence — 11 November 2026
+
+`TrustedFirebaseServicesStartup`, `FlutterFireAccountServices`, `composeTrustedConsumerRuntime` and `ActivatedShellComposition.withEntitlements` now wire owner-bound `ActivatedBillingFeatures` into the production consumer shell when `BILLING_BACKEND_URL` and `ENTITLEMENT_CATALOG_URL` (plus optional `BILLING_STATE_URL`) are configured. Partial billing endpoint configurations fail closed before Firebase initialization; live `networkLink` events update `EntitlementController` and `PaywallController`; and `DecryptedAccountMemoryRegistry` / auth-loss cleanup disposes the shared `FlutterPlayBillingAdapter` listener deterministically.
+
 ## Current evidence — 25 October 2026
 
 The first platform-neutral entitlement and credit contract is implemented locally. Entitlement snapshots are explicitly server-verified, revisioned and time-bounded. Active access and bounded offline grace are distinguishable, while an online client with an expired snapshot must refresh rather than trusting stale access.

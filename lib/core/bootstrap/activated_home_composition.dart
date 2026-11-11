@@ -33,6 +33,12 @@ class ActivatedHomeComposition {
   Widget build() => HomeScreen(
     profile: profile,
     createMealLogger: features.createMealLogger,
+    createAiAssistant: features.supportsAiMealAssistant
+        ? features.createAiMealAssistant
+        : null,
+    createAiDraftHandoff: features.supportsAiMealAssistant
+        ? features.createAiMealDraftHandoff
+        : null,
     createDashboard: features.createDailyDashboard,
     createRecipeMealLogger: features.createRecipeMealLogger,
     createWaterTracker: features.createWaterTracker,

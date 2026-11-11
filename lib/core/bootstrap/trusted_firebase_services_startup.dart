@@ -39,6 +39,18 @@ class TrustedFirebaseServicesStartup<T> {
           syncPull == null) {
         throw StateError('Trusted account backend endpoints are required.');
       }
+      if ((config.billingBackendEndpoint == null) !=
+          (config.entitlementCatalogEndpoint == null)) {
+        throw StateError(
+          'Billing backend and entitlement catalog endpoints must be supplied together.',
+        );
+      }
+      if (config.billingStateEndpoint != null &&
+          config.billingBackendEndpoint == null) {
+        throw StateError(
+          'Billing state endpoint requires billing backend and catalog endpoints.',
+        );
+      }
       await initializeFirebase();
       final services = buildServices(
         eligibility,

@@ -1,5 +1,9 @@
 # V1-M07 AI coaching and assisted logging
 
+## Current evidence — 11 November 2026
+
+`FlutterFireAccountServices`, `TrustedConsumerRuntimeServices`, `ActivatedAccountFeatures`, `ActivatedHomeComposition`, `HomeScreen`, `DailyDashboardScreen` and `MealLoggerScreen` now wire `TrustedAiBackendGateway` (when `AI_BACKEND_URL` is configured) through `AiMealAssistantScreen` and deterministic `AiMealDraftHandoff` catalog resolution. When `AI_BACKEND_URL` is omitted, the AI surface stays hidden. Focused 200%-text, catalog-handoff and serialized-session composition tests pass.
+
 ## Current evidence — 25 October 2026
 
 The first backend-neutral safety boundary and GetX review flow are implemented locally. AI meal logging requires explicit consent, sends a bounded request carrying locale and owner/request identity, and accepts only versioned proposals with schema, prompt and model provenance. Every successful proposal remains a review step: the user must explicitly choose candidates before anything can become a meal record. The UI provides Roman Urdu/English selection, visible assumptions, per-candidate selection and a permanent manual-search route.

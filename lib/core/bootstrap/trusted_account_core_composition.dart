@@ -17,6 +17,7 @@ import '../../features/account/domain/verified_adult_owner_session.dart';
 import '../../features/account/presentation/controllers/account_access_controller.dart';
 import '../../features/account/presentation/controllers/account_safety_controller.dart';
 import '../../features/account/presentation/controllers/account_switch_controller.dart';
+import '../../features/ai_logging/domain/ai_assisted_logging.dart';
 import '../../features/sync/domain/sync_pull_coordinator.dart';
 import '../../features/sync/domain/sync_upload_coordinator.dart';
 import '../data/local/account_database_service.dart';
@@ -53,6 +54,7 @@ class TrustedAccountCoreComposition {
     required Future<void> Function() onAuthenticated,
     SyncUploadTransport? syncUpload,
     SyncPullTransport? syncPull,
+    AiLoggingGateway? aiLogging,
   }) {
     final identitySession = SerializedIdentitySession();
     final runtime = EncryptedAccountRuntime(databases, clearDecryptedMemory);
@@ -84,6 +86,7 @@ class TrustedAccountCoreComposition {
         ownerSession: VerifiedAdultOwnerSession(identitySession),
         syncUpload: syncUpload,
         syncPull: syncPull,
+        aiLogging: aiLogging,
       ),
     );
   }

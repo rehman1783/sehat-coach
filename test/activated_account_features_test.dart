@@ -5,7 +5,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:sehat_coach/core/bootstrap/activated_account_features.dart';
 import 'package:sehat_coach/core/data/local/account_database_service.dart';
 import 'package:sehat_coach/core/data/local/account_key_resolver.dart';
+import 'package:sehat_coach/features/account/domain/account_identity.dart';
 import 'package:sehat_coach/features/account/domain/authenticated_owner_session.dart';
+import 'package:sehat_coach/features/account/domain/serialized_identity_session.dart';
+import 'package:sehat_coach/features/account/domain/verified_adult_owner_session.dart';
+import 'package:sehat_coach/features/ai_logging/domain/ai_assisted_logging.dart';
 import 'package:sehat_coach/features/bachat/domain/bachat_planner.dart';
 import 'package:sehat_coach/features/bachat/domain/bachat_repository.dart';
 import 'package:sehat_coach/features/catalog/domain/catalog_food.dart';
@@ -207,6 +211,44 @@ void main() {
       }
     },
   );
+
+  test(
+    'health plan and AI assistant compose cleanly with serialized identity',
+    () async {
+      final harness = await _Harness.create('owner-a');
+      addTearDown(harness.dispose);
+      final serialized = SerializedIdentitySession(
+        AccountIdentity(
+          uid: 'owner-a',
+          emailVerified: true,
+          adultEligible: true,
+          linkedProviders: const {AccountProvider.password},
+        ),
+      );
+      final features = ActivatedAccountFeatures(
+        databases: harness.service,
+        ownerSession: VerifiedAdultOwnerSession(serialized),
+        aiLogging: _AiGateway(),
+      );
+
+      final healthPlan = await features.createHealthPlanController();
+      expect(healthPlan.ownerId, 'owner-a');
+      expect(features.supportsAiMealAssistant, isTrue);
+
+      final assistant = await features.createAiMealAssistant();
+      final handoff = await features.createAiMealDraftHandoff();
+      expect(assistant.ownerId, 'owner-a');
+      expect(handoff, isNotNull);
+
+      final disabled = ActivatedAccountFeatures(
+        databases: harness.service,
+        ownerSession: harness.session,
+      );
+      expect(disabled.supportsAiMealAssistant, isFalse);
+      expect(disabled.createAiMealAssistant, throwsStateError);
+      expect(disabled.createAiMealDraftHandoff, throwsStateError);
+    },
+  );
 }
 
 class _SyncTransport implements SyncUploadTransport, SyncPullTransport {
@@ -334,6 +376,12 @@ class _IdsFake implements MealEventIdGenerator {
 class _ClockFake implements MealClock {
   @override
   DateTime nowUtc() => DateTime.utc(2026, 10, 22, 12);
+}
+
+class _AiGateway implements AiLoggingGateway {
+  @override
+  Future<AiLoggingProposal> propose(AiLoggingRequest request) =>
+      throw UnimplementedError();
 }
 
 CatalogFood _food() => CatalogFood(

@@ -13,6 +13,27 @@ void main() {
         deletion: _deletion,
         syncUpload: _syncUpload,
       ),
+      _config(
+        eligibility: _eligibility,
+        deletion: _deletion,
+        syncUpload: _syncUpload,
+        syncPull: _syncPull,
+        billingBackend: _billingBackend,
+      ),
+      _config(
+        eligibility: _eligibility,
+        deletion: _deletion,
+        syncUpload: _syncUpload,
+        syncPull: _syncPull,
+        entitlementCatalog: _entitlementCatalog,
+      ),
+      _config(
+        eligibility: _eligibility,
+        deletion: _deletion,
+        syncUpload: _syncUpload,
+        syncPull: _syncPull,
+        billingState: _billingState,
+      ),
     ]) {
       var initializeCalls = 0;
       final startup = TrustedFirebaseServicesStartup<Object>(
@@ -72,12 +93,18 @@ final _eligibility = Uri.https('api.example.test', '/eligibility');
 final _deletion = Uri.https('api.example.test', '/deletion');
 final _syncUpload = Uri.https('api.example.test', '/sync/upload');
 final _syncPull = Uri.https('api.example.test', '/sync/pull');
+final _billingBackend = Uri.https('api.example.test', '/billing/reconcile');
+final _entitlementCatalog = Uri.https('api.example.test', '/billing/catalog');
+final _billingState = Uri.https('api.example.test', '/billing/state');
 
 AppConfig _config({
   Uri? eligibility,
   Uri? deletion,
   Uri? syncUpload,
   Uri? syncPull,
+  Uri? billingBackend,
+  Uri? entitlementCatalog,
+  Uri? billingState,
 }) => AppConfig(
   environment: AppEnvironment.staging,
   enableDevicePreview: false,
@@ -86,6 +113,9 @@ AppConfig _config({
   accountDeletionEndpoint: deletion,
   syncUploadEndpoint: syncUpload,
   syncPullEndpoint: syncPull,
+  billingBackendEndpoint: billingBackend,
+  entitlementCatalogEndpoint: entitlementCatalog,
+  billingStateEndpoint: billingState,
 );
 
 AppConfig _completeConfig() => _config(

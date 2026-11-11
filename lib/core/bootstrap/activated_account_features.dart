@@ -1,4 +1,7 @@
 import '../../features/account/domain/create_profile_use_case.dart';
+import '../../features/ai_logging/application/ai_meal_draft_handoff.dart';
+import '../../features/ai_logging/domain/ai_assisted_logging.dart';
+import '../../features/ai_logging/presentation/controllers/ai_meal_assistant_controller.dart';
 import '../../features/bachat/domain/bachat_repository.dart';
 import '../../features/bachat/presentation/controllers/bachat_planner_controller.dart';
 import '../../features/catalog/data/drift_offline_food_catalog_repository.dart';
@@ -60,6 +63,9 @@ import '../../features/onboarding/data/repositories/drift_profile_repository.dar
 import '../../features/location/domain/city_configuration.dart';
 import '../data/local/account_database_service.dart';
 import '../data/local/app_database.dart' as db;
+import '../services/secure_operation_id.dart';
+
+DateTime _systemUtcClock() => DateTime.now().toUtc();
 
 /// Application composition root for features that require a verified account.
 ///
@@ -83,6 +89,9 @@ class ActivatedAccountFeatures {
     HealthPlanClock healthPlanClock = const SystemHealthPlanClock(),
     SyncUploadTransport? syncUpload,
     SyncPullTransport? syncPull,
+    AiLoggingGateway? aiLogging,
+    AiRequestIdSource? aiRequestIds,
+    AiClock? aiClock,
   }) => ActivatedAccountFeatures._(
     databases: databases,
     ownerSession: ownerSession,
@@ -100,6 +109,9 @@ class ActivatedAccountFeatures {
     healthPlanClock: healthPlanClock,
     syncUpload: syncUpload,
     syncPull: syncPull,
+    aiLogging: aiLogging,
+    aiRequestIds: aiRequestIds ?? SecureOperationIdGenerator('ai').nextId,
+    aiClock: aiClock ?? _systemUtcClock,
   );
 
   ActivatedAccountFeatures._({
@@ -119,6 +131,9 @@ class ActivatedAccountFeatures {
     required this._healthPlanClock,
     required this._syncUpload,
     required this._syncPull,
+    required this._aiLogging,
+    required this._aiRequestIds,
+    required this._aiClock,
   });
 
   final AccountDatabaseService _databases;
@@ -137,6 +152,12 @@ class ActivatedAccountFeatures {
   final HealthPlanClock _healthPlanClock;
   final SyncUploadTransport? _syncUpload;
   final SyncPullTransport? _syncPull;
+  final AiLoggingGateway? _aiLogging;
+  final AiRequestIdSource _aiRequestIds;
+  final AiClock _aiClock;
+
+  AuthenticatedOwnerSession get ownerSession => _ownerSession;
+  bool get supportsAiMealAssistant => _aiLogging != null;
 
   /// Creates the authenticated onboarding boundary against the currently
   /// verified owner's encrypted database. The returned handoff is one-shot so
@@ -197,6 +218,42 @@ class ActivatedAccountFeatures {
           ids: _mealIds,
           clock: _mealClock,
         ),
+      );
+    });
+  }
+
+  /// Creates an owner-bound AI assisted logging controller when `AI_BACKEND_URL`
+  /// is configured. Candidates remain unpersisted until resolved against the
+  /// offline catalog and explicitly saved by the user.
+  Future<AiMealAssistantController> createAiMealAssistant() {
+    final gateway = _aiLogging;
+    if (gateway == null) {
+      throw StateError('AI meal assistant gateway is unavailable');
+    }
+    return _ownerSession.withOwner(
+      (ownerId) async => AiMealAssistantController(
+        ownerId: ownerId,
+        coordinator: AiLoggingCoordinator(gateway: gateway),
+        requestIds: _aiRequestIds,
+        clock: _aiClock,
+      ),
+    );
+  }
+
+  /// Creates the deterministic catalog handoff used to verify AI suggestions
+  /// against the active owner's approved offline catalog.
+  Future<AiMealDraftHandoff> createAiMealDraftHandoff() {
+    if (_aiLogging == null) {
+      throw StateError('AI meal assistant gateway is unavailable');
+    }
+    return _ownerSession.withOwner((ownerId) async {
+      final database = await _databases.open(ownerId);
+      if (_databases.activeOwnerId != ownerId) {
+        throw StateError('Active database owner changed during composition');
+      }
+      return AiMealDraftHandoff(
+        catalog: DriftOfflineFoodCatalogRepository(database),
+        clock: _aiClock,
       );
     });
   }
@@ -433,16 +490,30 @@ class ActivatedAccountFeatures {
   }
 
   Future<VerifiedEntitlementCache> createVerifiedEntitlementCache() {
+    return _ownerSession.withOwner(_openVerifiedEntitlementCache);
+  }
+
+  /// Opens the owner-bound verified entitlement cache and returns it together
+  /// with the verified owner identity in a single serialized session step.
+  Future<({String ownerId, VerifiedEntitlementCache cache})>
+  createVerifiedEntitlementContext() {
     return _ownerSession.withOwner((ownerId) async {
-      final database = await _databases.open(ownerId);
-      if (_databases.activeOwnerId != ownerId) {
-        throw StateError('Active database owner changed during composition');
-      }
-      return DriftVerifiedEntitlementCache(
-        database: database,
-        expectedOwnerId: ownerId,
-      );
+      final cache = await _openVerifiedEntitlementCache(ownerId);
+      return (ownerId: ownerId, cache: cache);
     });
+  }
+
+  Future<VerifiedEntitlementCache> _openVerifiedEntitlementCache(
+    String ownerId,
+  ) async {
+    final database = await _databases.open(ownerId);
+    if (_databases.activeOwnerId != ownerId) {
+      throw StateError('Active database owner changed during composition');
+    }
+    return DriftVerifiedEntitlementCache(
+      database: database,
+      expectedOwnerId: ownerId,
+    );
   }
 
   Future<FastingPreferencesRepository> createFastingPreferences() {
@@ -510,16 +581,18 @@ class ActivatedAccountFeatures {
   });
 
   Future<HealthPlanRepository> createHealthPlanRepository() {
-    return _ownerSession.withOwner((ownerId) async {
-      final database = await _databases.open(ownerId);
-      if (_databases.activeOwnerId != ownerId) {
-        throw StateError('Active database owner changed during composition');
-      }
-      return LocalChangeHealthPlanRepository(
-        DriftLocalChangeStore(database, ownerId),
-        ownerId,
-      );
-    });
+    return _ownerSession.withOwner(_openHealthPlanRepository);
+  }
+
+  Future<HealthPlanRepository> _openHealthPlanRepository(String ownerId) async {
+    final database = await _databases.open(ownerId);
+    if (_databases.activeOwnerId != ownerId) {
+      throw StateError('Active database owner changed during composition');
+    }
+    return LocalChangeHealthPlanRepository(
+      DriftLocalChangeStore(database, ownerId),
+      ownerId,
+    );
   }
 
   Future<CreateHealthMealPlan> createHealthMealPlanSaver() async =>
@@ -564,7 +637,7 @@ class ActivatedAccountFeatures {
 
   Future<HealthPlanController> createHealthPlanController() {
     return _ownerSession.withOwner((ownerId) async {
-      final repository = await createHealthPlanRepository();
+      final repository = await _openHealthPlanRepository(ownerId);
       return HealthPlanController(
         ownerId: ownerId,
         planCreator: CreateHealthMealPlan(

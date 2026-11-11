@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import '../../features/account/data/encrypted_account_runtime.dart';
+import '../../features/ai_logging/domain/ai_assisted_logging.dart';
 import '../../features/sync/domain/sync_pull_coordinator.dart';
 import '../../features/sync/domain/sync_upload_coordinator.dart';
 import '../data/local/flutter_secure_account_key_vault.dart';
@@ -23,6 +24,7 @@ class TrustedPlatformAccountComposition {
     List<String> legacyStorageScopes = const [],
     SyncUploadTransport? syncUpload,
     SyncPullTransport? syncPull,
+    AiLoggingGateway? aiLogging,
   }) {
     final storage = TrustedLocalStorageComposition(
       directory: applicationDataDirectory,
@@ -39,6 +41,7 @@ class TrustedPlatformAccountComposition {
         onAuthenticated: onAuthenticated,
         syncUpload: syncUpload,
         syncPull: syncPull,
+        aiLogging: aiLogging,
       ),
     );
   }

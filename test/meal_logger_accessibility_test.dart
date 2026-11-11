@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sehat_coach/features/account/domain/authenticated_owner_session.dart';
+import 'package:sehat_coach/features/ai_logging/application/ai_meal_draft_handoff.dart';
+import 'package:sehat_coach/features/ai_logging/domain/ai_assisted_logging.dart';
+import 'package:sehat_coach/features/ai_logging/presentation/controllers/ai_meal_assistant_controller.dart';
 import 'package:sehat_coach/features/catalog/domain/catalog_food.dart';
 import 'package:sehat_coach/features/catalog/domain/offline_food_catalog_repository.dart';
 import 'package:sehat_coach/features/meals/domain/meal_event.dart';
@@ -20,10 +23,25 @@ void main() {
     await tester.pumpWidget(
       MediaQuery(
         data: const MediaQueryData(textScaler: TextScaler.linear(2)),
-        child: MaterialApp(home: MealLoggerScreen(controller: controller)),
+        child: MaterialApp(
+          home: MealLoggerScreen(
+            controller: controller,
+            createAiAssistant: () async =>
+                throw StateError('not opened in layout check'),
+            createAiDraftHandoff: () async =>
+                throw StateError('not opened in layout check'),
+          ),
+        ),
       ),
     );
     await tester.pumpAndSettle();
+
+    await tester.scrollUntilVisible(
+      find.text('ASSIST WITH AI'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    expect(find.text('ASSIST WITH AI'), findsOneWidget);
 
     await tester.scrollUntilVisible(
       find.text('Fixture food'),
@@ -93,6 +111,50 @@ void main() {
       findsOneWidget,
     );
   });
+
+  testWidgets('AI assistant resolves confirmed food into meal draft', (
+    tester,
+  ) async {
+    final catalog = _Catalog(approvedFood: _food());
+    final controller = _controller(catalog: catalog);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: MealLoggerScreen(
+          controller: controller,
+          createAiAssistant: () async => AiMealAssistantController(
+            ownerId: 'owner-a',
+            coordinator: AiLoggingCoordinator(gateway: _AiGateway()),
+            requestIds: () => 'ai-req-1',
+            clock: () => DateTime.utc(2026, 10, 25, 10),
+          ),
+          createAiDraftHandoff: () async => AiMealDraftHandoff(
+            catalog: catalog,
+            clock: () => DateTime.utc(2026, 10, 25, 10, 1),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('ASSIST WITH AI'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField), 'aik katori daal');
+    await tester.tap(find.byType(Switch));
+    await tester.pump();
+    await tester.tap(find.text('SUGGEST MATCHES'));
+    await tester.pumpAndSettle();
+    await tester.drag(find.byType(ListView), const Offset(0, -400));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('CONFIRM SELECTED ITEMS'));
+    await tester.pumpAndSettle();
+
+    expect(controller.selected, hasLength(1));
+    expect(controller.selected.single.food.id, 'food-1');
+    expect(controller.aiProvenance.value?.requestId, 'ai-req-1');
+    expect(find.text('Fixture food'), findsOneWidget);
+    expect(find.text('SAVE MEAL'), findsOneWidget);
+  });
 }
 
 class _Host extends StatelessWidget {
@@ -129,18 +191,43 @@ MealLoggerController _controller({OfflineFoodCatalogRepository? catalog}) =>
     );
 
 class _Catalog implements OfflineFoodCatalogRepository {
-  _Catalog({this.fails = false});
+  _Catalog({this.fails = false, this.approvedFood});
 
   final bool fails;
+  final CatalogFood? approvedFood;
 
   @override
-  Future<CatalogFood?> findApprovedById(String foodId) async => null;
+  Future<CatalogFood?> findApprovedById(String foodId) async =>
+      approvedFood?.id == foodId ? approvedFood : null;
 
   @override
   Future<List<CatalogFood>> search(FoodSearchQuery query) async {
     if (fails) throw StateError('offline');
     return [];
   }
+}
+
+class _AiGateway implements AiLoggingGateway {
+  @override
+  Future<AiLoggingProposal> propose(AiLoggingRequest request) async =>
+      AiLoggingProposal(
+        requestId: request.requestId,
+        schemaVersion: 'ai-log-v1',
+        promptVersion: 'prompt-v1',
+        modelId: 'backend-model',
+        createdAtUtc: DateTime.utc(2026, 10, 25, 10),
+        expiresAtUtc: DateTime.utc(2026, 10, 25, 10, 10),
+        candidates: [
+          AiFoodCandidate(
+            catalogFoodId: 'food-1',
+            servingId: 'katori',
+            quantity: 1,
+            confidence: 0.9,
+            explanation: 'Fixture food from reviewed catalog',
+            assumptions: const ['1 katori serving'],
+          ),
+        ],
+      );
 }
 
 class _MealRepository implements MealEventRepository {

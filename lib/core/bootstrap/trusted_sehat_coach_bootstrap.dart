@@ -6,6 +6,7 @@ import '../../features/account/data/encrypted_account_runtime.dart';
 import '../../features/account/data/secure_account_lifecycle_port.dart';
 import '../../features/account/presentation/controllers/account_safety_controller.dart';
 import '../../features/account/presentation/controllers/account_switch_controller.dart';
+import '../../features/ai_logging/domain/ai_assisted_logging.dart';
 import '../../features/bachat/domain/bachat_repository.dart';
 import '../../features/location/domain/city_configuration.dart';
 import '../../features/onboarding/domain/models/onboarding_state.dart';
@@ -49,6 +50,7 @@ class TrustedSehatCoachBootstrap {
     BachatRepository? bachatRepository,
     SyncUploadTransport? syncUpload,
     SyncPullTransport? syncPull,
+    AiLoggingGateway? aiLogging,
     Stream<bool>? networkLink,
     Listenable? profileRefresh,
     Widget? loading,
@@ -64,6 +66,7 @@ class TrustedSehatCoachBootstrap {
       onAuthenticated: onAuthenticated,
       syncUpload: syncUpload,
       syncPull: syncPull,
+      aiLogging: aiLogging,
     );
     final application =
         TrustedAccountApplicationComposition.withAccountLifecycle(

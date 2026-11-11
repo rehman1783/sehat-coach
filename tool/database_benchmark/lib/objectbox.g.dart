@@ -248,9 +248,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
           4,
           0,
         );
-        final nameParam = const fb.StringReader(
-          asciiOptimization: true,
-        ).vTableGet(buffer, rootOffset, 6, '');
+        final nameParam = const fb.StringReader(asciiOptimization: true)
+            .vTableGet(buffer, rootOffset, 6, '');
         final energyParam = const fb.Int64Reader().vTableGet(
           buffer,
           rootOffset,
@@ -258,9 +257,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
           0,
         );
         final object = Food(id: idParam, name: nameParam, energy: energyParam)
-          ..source = const fb.StringReader(
-            asciiOptimization: true,
-          ).vTableGetNullable(buffer, rootOffset, 10);
+          ..source = const fb.StringReader(asciiOptimization: true)
+              .vTableGetNullable(buffer, rootOffset, 10);
 
         return object;
       },
@@ -337,21 +335,18 @@ obx_int.ModelDefinition getObjectBoxModel() {
           4,
           0,
         );
-        final operationKeyParam = const fb.StringReader(
-          asciiOptimization: true,
-        ).vTableGet(buffer, rootOffset, 6, '');
-        final ownerParam = const fb.StringReader(
-          asciiOptimization: true,
-        ).vTableGet(buffer, rootOffset, 8, '');
+        final operationKeyParam = const fb.StringReader(asciiOptimization: true)
+            .vTableGet(buffer, rootOffset, 6, '');
+        final ownerParam = const fb.StringReader(asciiOptimization: true)
+            .vTableGet(buffer, rootOffset, 8, '');
         final revisionParam = const fb.Int64Reader().vTableGet(
           buffer,
           rootOffset,
           10,
           0,
         );
-        final valueParam = const fb.StringReader(
-          asciiOptimization: true,
-        ).vTableGet(buffer, rootOffset, 12, '');
+        final valueParam = const fb.StringReader(asciiOptimization: true)
+            .vTableGet(buffer, rootOffset, 12, '');
         final object = OutboxEntry(
           id: idParam,
           operationKey: operationKeyParam,
@@ -391,18 +386,16 @@ obx_int.ModelDefinition getObjectBoxModel() {
           4,
           0,
         );
-        final ownerParam = const fb.StringReader(
-          asciiOptimization: true,
-        ).vTableGet(buffer, rootOffset, 6, '');
+        final ownerParam = const fb.StringReader(asciiOptimization: true)
+            .vTableGet(buffer, rootOffset, 6, '');
         final revisionParam = const fb.Int64Reader().vTableGet(
           buffer,
           rootOffset,
           8,
           0,
         );
-        final valueParam = const fb.StringReader(
-          asciiOptimization: true,
-        ).vTableGet(buffer, rootOffset, 10, '');
+        final valueParam = const fb.StringReader(asciiOptimization: true)
+            .vTableGet(buffer, rootOffset, 10, '');
         final object = SyncProfile(
           id: idParam,
           owner: ownerParam,

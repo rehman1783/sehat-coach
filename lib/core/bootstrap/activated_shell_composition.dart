@@ -51,15 +51,23 @@ class ActivatedShellComposition {
     if (createAccountSafety != null || createAccountSwitch != null) {
       throw StateError('Account lifecycle destinations are already configured');
     }
-    return ActivatedShellComposition(
-      home: home,
-      createFeed: createFeed,
-      createEntitlements: createEntitlements,
-      createPaywall: createPaywall,
+    return _copyWith(
       createAccountSafety: createSafety,
       createAccountSwitch: createSwitch,
-      syncTriggers: syncTriggers,
-      onSyncLifecycleError: onSyncLifecycleError,
+    );
+  }
+
+  ActivatedShellComposition withEntitlements({
+    required Future<EntitlementController> Function() createEntitlements,
+    Future<PaywallController> Function(EntitlementController controller)?
+    createPaywall,
+  }) {
+    if (this.createEntitlements != null || this.createPaywall != null) {
+      throw StateError('Entitlement destinations are already configured');
+    }
+    return _copyWith(
+      createEntitlements: createEntitlements,
+      createPaywall: createPaywall,
     );
   }
 
@@ -69,17 +77,26 @@ class ActivatedShellComposition {
     if (syncTriggers != null) {
       throw StateError('Sync lifecycle is already configured');
     }
-    return ActivatedShellComposition(
-      home: home,
-      createFeed: createFeed,
-      createEntitlements: createEntitlements,
-      createPaywall: createPaywall,
-      createAccountSafety: createAccountSafety,
-      createAccountSwitch: createAccountSwitch,
-      syncTriggers: coordinator,
-      onSyncLifecycleError: onSyncLifecycleError,
-    );
+    return _copyWith(syncTriggers: coordinator);
   }
+
+  ActivatedShellComposition _copyWith({
+    Future<EntitlementController> Function()? createEntitlements,
+    Future<PaywallController> Function(EntitlementController controller)?
+    createPaywall,
+    Future<AccountSafetyController> Function()? createAccountSafety,
+    Future<AccountSwitchController> Function()? createAccountSwitch,
+    SyncLifecycleCoordinator? syncTriggers,
+  }) => ActivatedShellComposition(
+    home: home,
+    createFeed: createFeed,
+    createEntitlements: createEntitlements ?? this.createEntitlements,
+    createPaywall: createPaywall ?? this.createPaywall,
+    createAccountSafety: createAccountSafety ?? this.createAccountSafety,
+    createAccountSwitch: createAccountSwitch ?? this.createAccountSwitch,
+    syncTriggers: syncTriggers ?? this.syncTriggers,
+    onSyncLifecycleError: onSyncLifecycleError,
+  );
 
   Widget build() => AuthenticatedShellScreen(
     home: home.build(),

@@ -48,6 +48,32 @@ void main() {
       throwsArgumentError,
     );
   });
+
+  test('attaches entitlement factories once without overwriting', () async {
+    final harness = await _Harness.create();
+    addTearDown(harness.dispose);
+    final composition =
+        ActivatedShellComposition(
+          home: ActivatedHomeComposition(
+            features: harness.features,
+            profile: OnboardingState(city: 'Islamabad'),
+          ),
+        ).withEntitlements(
+          createEntitlements: () => throw UnimplementedError(),
+          createPaywall: (EntitlementController _) =>
+              throw UnimplementedError(),
+        );
+
+    final shell = composition.build() as AuthenticatedShellScreen;
+    expect(shell.createEntitlements, isNotNull);
+    expect(shell.createPaywall, isNotNull);
+    expect(
+      () => composition.withEntitlements(
+        createEntitlements: () => throw UnimplementedError(),
+      ),
+      throwsStateError,
+    );
+  });
 }
 
 class _Harness {

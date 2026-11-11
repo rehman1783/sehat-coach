@@ -4,14 +4,25 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../ai_logging/application/ai_meal_draft_handoff.dart';
+import '../../../ai_logging/domain/ai_assisted_logging.dart';
+import '../../../ai_logging/presentation/controllers/ai_meal_assistant_controller.dart';
+import '../../../ai_logging/presentation/screens/ai_meal_assistant_screen.dart';
 import '../../../custom_foods/presentation/screens/user_food_entry_screen.dart';
 import '../../../custom_foods/domain/user_food_records.dart';
 import '../controllers/meal_logger_controller.dart';
 
 class MealLoggerScreen extends StatefulWidget {
-  const MealLoggerScreen({super.key, required this.controller});
+  const MealLoggerScreen({
+    super.key,
+    required this.controller,
+    this.createAiAssistant,
+    this.createAiDraftHandoff,
+  });
 
   final MealLoggerController controller;
+  final Future<AiMealAssistantController> Function()? createAiAssistant;
+  final Future<AiMealDraftHandoff> Function()? createAiDraftHandoff;
 
   @override
   State<MealLoggerScreen> createState() => _MealLoggerScreenState();
@@ -21,6 +32,7 @@ class _MealLoggerScreenState extends State<MealLoggerScreen> {
   final _search = TextEditingController();
   Timer? _debounce;
   bool _allowExit = false;
+  bool _openingAi = false;
 
   @override
   void dispose() {
@@ -52,6 +64,54 @@ class _MealLoggerScreenState extends State<MealLoggerScreen> {
     );
     if (result is CustomFoodRecord) {
       widget.controller.addCustomFood(result);
+    }
+  }
+
+  Future<void> _openAiAssistant() async {
+    final createAssistant = widget.createAiAssistant;
+    final createHandoff = widget.createAiDraftHandoff;
+    if (createAssistant == null || createHandoff == null || _openingAi) return;
+    setState(() => _openingAi = true);
+    AiMealAssistantController? assistant;
+    try {
+      assistant = await createAssistant();
+      final handoff = await createHandoff();
+      if (!mounted) return;
+      final confirmation = await Navigator.of(context).push<Object?>(
+        MaterialPageRoute<Object?>(
+          builder: (_) => AiMealAssistantScreen(
+            controller: assistant!,
+            onManualSearch: () => Navigator.of(context).pop(),
+          ),
+        ),
+      );
+      if (!mounted || confirmation is! AiProposalConfirmation) return;
+      final result = await handoff.apply(
+        confirmation: confirmation,
+        mealDraft: widget.controller,
+      );
+      if (!mounted) return;
+      switch (result) {
+        case AiMealDraftApplied(:final itemCount):
+          widget.controller.errorMessage.value = null;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                '$itemCount suggested item${itemCount == 1 ? '' : 's'} added for review.',
+              ),
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        case AiMealDraftNeedsManualReview(:final message):
+          widget.controller.errorMessage.value = message;
+      }
+    } on Object {
+      if (!mounted) return;
+      widget.controller.errorMessage.value =
+          'AI meal assistant is unavailable. Continue with manual search.';
+    } finally {
+      assistant?.onDelete();
+      if (mounted) setState(() => _openingAi = false);
     }
   }
 
@@ -158,6 +218,18 @@ class _MealLoggerScreenState extends State<MealLoggerScreen> {
                                   : null,
                             ),
                           ),
+                          if (widget.createAiAssistant != null &&
+                              widget.createAiDraftHandoff != null) ...[
+                            const SizedBox(height: 12),
+                            ConstrainedBox(
+                              constraints: const BoxConstraints(minHeight: 48),
+                              child: OutlinedButton.icon(
+                                onPressed: _openingAi ? null : _openAiAssistant,
+                                icon: const Icon(Icons.auto_awesome_outlined),
+                                label: const Text('ASSIST WITH AI'),
+                              ),
+                            ),
+                          ],
                           if (controller.errorMessage.value
                               case final error?) ...[
                             const SizedBox(height: 10),
