@@ -20,6 +20,7 @@ class AccountSafetyScreen extends StatelessWidget {
       await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
+          scrollable: true,
           title: Text(title),
           content: Text(body),
           actions: [
@@ -74,14 +75,19 @@ class AccountSafetyScreen extends StatelessWidget {
                         if (confirmed) await controller.signOut();
                       },
               ),
-              if (controller.canSyncAndSignOut.value)
+              if (controller.canSyncAndSignOut.value) ...[
+                const SizedBox(height: 10),
                 FilledButton.icon(
                   onPressed: controller.isBusy.value
                       ? null
                       : () => controller.signOut(syncFirst: true),
                   icon: const Icon(Icons.sync_rounded),
-                  label: const Text('SYNC AND SIGN OUT'),
+                  label: const Text(
+                    'SYNC AND SIGN OUT',
+                    textAlign: TextAlign.center,
+                  ),
                 ),
+              ],
               const SizedBox(height: 12),
               _ActionCard(
                 icon: Icons.phonelink_erase_outlined,
@@ -121,13 +127,18 @@ class AccountSafetyScreen extends StatelessWidget {
                         await controller.deleteAccount(confirmed: confirmed);
                       },
               ),
-              if (controller.canReauthenticateForDelete.value)
+              if (controller.canReauthenticateForDelete.value) ...[
+                const SizedBox(height: 10),
                 OutlinedButton(
                   onPressed: controller.isBusy.value
                       ? null
                       : controller.reauthenticateAndDelete,
-                  child: const Text('SIGN IN AGAIN AND RETRY DELETION'),
+                  child: const Text(
+                    'SIGN IN AGAIN AND RETRY DELETION',
+                    textAlign: TextAlign.center,
+                  ),
                 ),
+              ],
               if (controller.message.value case final message?) ...[
                 const SizedBox(height: 14),
                 _StatusMessage(message: message, error: false),

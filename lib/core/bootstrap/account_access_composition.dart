@@ -1,4 +1,5 @@
 import '../../features/account/domain/account_access_coordinator.dart';
+import '../../features/account/domain/confirm_adult_eligibility_use_case.dart';
 import '../../features/account/domain/create_password_account_use_case.dart';
 import '../../features/account/domain/email_verification_use_cases.dart';
 import '../../features/account/domain/request_password_reset_use_case.dart';
@@ -24,6 +25,8 @@ class AccountAccessComposition {
     required AccountRuntimePort runtime,
     required AccountSuspensionPort suspension,
     required Future<void> Function() onAuthenticated,
+    AdultEligibilityConfirmationPort? adultEligibilityConfirmation,
+    Future<void> Function()? signOutPending,
   }) {
     final trustedAuth = TrustedAuthStateCoordinator(
       identitySession,
@@ -40,6 +43,8 @@ class AccountAccessComposition {
       identitySession: identitySession,
       trustedAuth: trustedAuth,
       onAuthenticated: onAuthenticated,
+      adultEligibilityConfirmation: adultEligibilityConfirmation,
+      signOutPending: signOutPending,
     );
   }
 
@@ -51,6 +56,8 @@ class AccountAccessComposition {
     required this.identitySession,
     required this.trustedAuth,
     required this.onAuthenticated,
+    this.adultEligibilityConfirmation,
+    this.signOutPending,
   });
 
   final SignInPort signIn;
@@ -60,21 +67,30 @@ class AccountAccessComposition {
   final SerializedIdentitySession identitySession;
   final TrustedAuthStateCoordinator trustedAuth;
   final Future<void> Function() onAuthenticated;
+  final AdultEligibilityConfirmationPort? adultEligibilityConfirmation;
+  final Future<void> Function()? signOutPending;
 
-  AccountAccessController createController() => AccountAccessController(
-    loginWithPassword: SignInWithPasswordUseCase(signIn),
-    loginWithGoogle: SignInWithGoogleUseCase(signIn),
-    registration: CreatePasswordAccountUseCase(registration),
-    recovery: RequestPasswordResetUseCase(passwordReset),
-    activation: TrustedAccountAccessActivation(trustedAuth),
-    authenticatedCallback: onAuthenticated,
-    requestVerification: RequestEmailVerificationUseCase(
-      identitySession,
-      emailVerification,
-    ),
-    refreshVerification: RefreshEmailVerificationUseCase(
-      identitySession,
-      emailVerification,
-    ),
-  );
+  AccountAccessController createController() {
+    final eligibilityPort = adultEligibilityConfirmation;
+    return AccountAccessController(
+      loginWithPassword: SignInWithPasswordUseCase(signIn),
+      loginWithGoogle: SignInWithGoogleUseCase(signIn),
+      registration: CreatePasswordAccountUseCase(registration),
+      recovery: RequestPasswordResetUseCase(passwordReset),
+      activation: TrustedAccountAccessActivation(trustedAuth),
+      authenticatedCallback: onAuthenticated,
+      requestVerification: RequestEmailVerificationUseCase(
+        identitySession,
+        emailVerification,
+      ),
+      refreshVerification: RefreshEmailVerificationUseCase(
+        identitySession,
+        emailVerification,
+      ),
+      confirmAdultEligibility: eligibilityPort == null
+          ? null
+          : ConfirmAdultEligibilityUseCase(identitySession, eligibilityPort),
+      signOutPending: signOutPending,
+    );
+  }
 }

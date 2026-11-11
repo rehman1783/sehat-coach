@@ -117,6 +117,8 @@ createFlutterFireAccountServicesStartup({
             registration: accountProvider,
             passwordReset: accountProvider,
             emailVerification: accountProvider,
+            adultEligibilityConfirmation: accountProvider,
+            signOutPending: accountProvider.signOutPendingSession,
           );
           final lifecycle = FirebaseAccountLifecycle(
             auth: FlutterFireLifecycleAuthPort(auth),
@@ -217,6 +219,8 @@ TrustedFirebaseAccountStartup createFlutterFireAccountStartup({
         registration: provider,
         passwordReset: provider,
         emailVerification: provider,
+        adultEligibilityConfirmation: provider,
+        signOutPending: provider.signOutPendingSession,
       );
     },
   );

@@ -64,6 +64,11 @@ class _SehatCoachConsumerAppState extends State<SehatCoachConsumerApp> {
     final webSiteKey = const String.fromEnvironment(
       'CONSUMER_RECAPTCHA_ENTERPRISE_SITE_KEY',
     ).trim();
+    const useDebugAppCheck =
+        !kReleaseMode && bool.fromEnvironment('ENABLE_DEBUG_APP_CHECK');
+    final debugAppCheckToken = const String.fromEnvironment(
+      'ANDROID_APP_CHECK_DEBUG_TOKEN',
+    ).trim();
     final startup = createTrustedFlutterFireConsumerStartup(
       config: config,
       firebaseOptions: AdminFirebaseOptions.fromEnvironment(),
@@ -74,6 +79,13 @@ class _SehatCoachConsumerAppState extends State<SehatCoachConsumerApp> {
       providerWeb: kIsWeb && webSiteKey.isNotEmpty
           ? ReCaptchaEnterpriseProvider(webSiteKey)
           : null,
+      providerAndroid: useDebugAppCheck
+          ? AndroidDebugProvider(
+              debugToken: debugAppCheckToken.isEmpty
+                  ? null
+                  : debugAppCheckToken,
+            )
+          : const AndroidPlayIntegrityProvider(),
       detectLocation: false,
       effects: TrustedConsumerRuntimeEffects(
         clearDecryptedMemory: decryptedMemory.clear,

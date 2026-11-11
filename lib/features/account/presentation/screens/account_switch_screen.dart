@@ -14,6 +14,7 @@ class AccountSwitchScreen extends StatelessWidget {
       await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
+          scrollable: true,
           title: const Text('Switch account?'),
           content: const Text(
             'The current account will be safely suspended before another account can sign in. Unsynchronized records will not be deleted.',

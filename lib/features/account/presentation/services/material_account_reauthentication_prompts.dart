@@ -24,6 +24,7 @@ class MaterialAccountReauthenticationPrompts {
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
+        scrollable: true,
         title: const Text('Confirm it’s you'),
         content: const Text(
           'Choose a linked sign-in method before permanently deleting your account.',
@@ -101,43 +102,42 @@ class _PasswordReauthenticationDialogState
 
   @override
   Widget build(BuildContext context) => AlertDialog(
+    scrollable: true,
     title: const Text('Enter your password'),
-    content: SingleChildScrollView(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const Text(
-            'Your password is used only to confirm this action and is not saved.',
-          ),
-          const SizedBox(height: 16),
-          TextField(
-            controller: controller,
-            autofocus: true,
-            obscureText: obscure,
-            autocorrect: false,
-            enableSuggestions: false,
-            enableIMEPersonalizedLearning: false,
-            smartDashesType: SmartDashesType.disabled,
-            smartQuotesType: SmartQuotesType.disabled,
-            textInputAction: TextInputAction.done,
-            onSubmitted: (_) => _submit(),
-            decoration: InputDecoration(
-              labelText: 'Password',
-              errorText: error,
-              suffixIcon: IconButton(
-                tooltip: obscure ? 'Show password' : 'Hide password',
-                onPressed: () => setState(() => obscure = !obscure),
-                icon: Icon(
-                  obscure
-                      ? Icons.visibility_outlined
-                      : Icons.visibility_off_outlined,
-                ),
+    content: Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const Text(
+          'Your password is used only to confirm this action and is not saved.',
+        ),
+        const SizedBox(height: 16),
+        TextField(
+          controller: controller,
+          autofocus: true,
+          obscureText: obscure,
+          autocorrect: false,
+          enableSuggestions: false,
+          enableIMEPersonalizedLearning: false,
+          smartDashesType: SmartDashesType.disabled,
+          smartQuotesType: SmartQuotesType.disabled,
+          textInputAction: TextInputAction.done,
+          onSubmitted: (_) => _submit(),
+          decoration: InputDecoration(
+            labelText: 'Password',
+            errorText: error,
+            suffixIcon: IconButton(
+              tooltip: obscure ? 'Show password' : 'Hide password',
+              onPressed: () => setState(() => obscure = !obscure),
+              icon: Icon(
+                obscure
+                    ? Icons.visibility_outlined
+                    : Icons.visibility_off_outlined,
               ),
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     ),
     actions: [
       TextButton(

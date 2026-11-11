@@ -4,10 +4,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import '../domain/account_identity.dart';
 import '../domain/auth_state_stream_binding.dart';
+import '../domain/authentication_failures.dart';
+import '../domain/confirm_adult_eligibility_use_case.dart';
 import '../domain/create_password_account_use_case.dart';
 import '../domain/email_verification_use_cases.dart';
 import '../domain/request_password_reset_use_case.dart';
 import '../domain/sign_in_use_cases.dart';
+import 'firebase_auth_error_mapper.dart';
 
 typedef AdultEligibilityRegistrar = Future<void> Function(
   String ownerId,
@@ -64,6 +67,7 @@ class FirebaseAccountProvider
         AuthStateStreamPort,
         SignInPort,
         PasswordAccountRegistrationPort,
+        AdultEligibilityConfirmationPort,
         PasswordResetPort,
         EmailVerificationPort {
   FirebaseAccountProvider({
@@ -102,19 +106,29 @@ class FirebaseAccountProvider
     required String emailAddress,
     required String password,
   }) async {
-    final result = await _auth.signInWithEmailAndPassword(
-      email: emailAddress,
-      password: password,
-    );
-    return _identity(_requireUser(result.user), forceRefresh: true);
+    try {
+      final result = await _auth.signInWithEmailAndPassword(
+        email: emailAddress,
+        password: password,
+      );
+      return await _identity(_requireUser(result.user), forceRefresh: true);
+    } on Object catch (error, stackTrace) {
+      throwMappedFirebaseAccountError(error, stackTrace);
+    }
   }
 
   @override
   Future<AccountIdentity> signInWithGoogle() async {
-    final credential = await _googleCredential();
-    if (credential == null) throw const GoogleSignInCancelled();
-    final result = await _auth.signInWithCredential(credential);
-    return _identity(_requireUser(result.user), forceRefresh: true);
+    try {
+      final credential = await _googleCredential();
+      if (credential == null) {
+        throw const AuthenticationFailure(AuthenticationFailureCode.cancelled);
+      }
+      final result = await _auth.signInWithCredential(credential);
+      return await _identity(_requireUser(result.user), forceRefresh: true);
+    } on Object catch (error, stackTrace) {
+      throwMappedFirebaseAccountError(error, stackTrace);
+    }
   }
 
   @override
@@ -123,30 +137,57 @@ class FirebaseAccountProvider
     required String password,
     required AdultEligibilityAttestation eligibility,
   }) async {
-    final result = await _auth.createUserWithEmailAndPassword(
-      email: emailAddress,
-      password: password,
-    );
+    final UserCredential result;
+    try {
+      result = await _auth.createUserWithEmailAndPassword(
+        email: emailAddress,
+        password: password,
+      );
+    } on Object catch (error, stackTrace) {
+      throwMappedFirebaseAccountError(error, stackTrace);
+    }
     final user = _requireUser(result.user);
     try {
       await _registerAdultEligibility(user.uid, eligibility);
       await user.reload();
       final refreshed = _requireCurrentOwner(user.uid);
       return await _identity(refreshed, forceRefresh: true);
-    } catch (_) {
+    } on Object catch (error, stackTrace) {
       await _rollbackIncompleteRegistration(user);
-      rethrow;
+      throwMappedFirebaseAccountError(error, stackTrace);
     }
   }
+
+  @override
+  Future<AccountIdentity> confirmAdultEligibility({
+    required String ownerId,
+    required AdultEligibilityAttestation eligibility,
+  }) async {
+    try {
+      final user = _requireCurrentOwner(ownerId);
+      await _registerAdultEligibility(user.uid, eligibility);
+      await user.reload();
+      final refreshed = _requireCurrentOwner(ownerId);
+      return await _identity(refreshed, forceRefresh: true);
+    } on Object catch (error, stackTrace) {
+      throwMappedFirebaseAccountError(error, stackTrace);
+    }
+  }
+
+  Future<void> signOutPendingSession() => _auth.signOut();
 
   @override
   Future<void> requestPasswordReset(String emailAddress) async {
     try {
       await _auth.sendPasswordResetEmail(email: emailAddress);
-    } on FirebaseAuthException catch (error) {
+    } on FirebaseAuthException catch (error, stackTrace) {
       // Preserve the domain's non-enumerating response when Identity Platform
       // is configured to report an unknown address.
-      if (error.code != 'user-not-found') rethrow;
+      if (error.code != 'user-not-found') {
+        throwMappedFirebaseAccountError(error, stackTrace);
+      }
+    } on Object catch (error, stackTrace) {
+      throwMappedFirebaseAccountError(error, stackTrace);
     }
   }
 
@@ -156,19 +197,25 @@ class FirebaseAccountProvider
     try {
       await user.sendEmailVerification();
       return VerificationDispatch.sent;
-    } on FirebaseAuthException catch (error) {
+    } on FirebaseAuthException catch (error, stackTrace) {
       if (error.code == 'too-many-requests') {
         return VerificationDispatch.throttled;
       }
-      rethrow;
+      throwMappedFirebaseAccountError(error, stackTrace);
+    } on Object catch (error, stackTrace) {
+      throwMappedFirebaseAccountError(error, stackTrace);
     }
   }
 
   @override
   Future<AccountIdentity> refreshIdentity(String ownerId) async {
-    final user = _requireCurrentOwner(ownerId);
-    await user.reload();
-    return _identity(_requireCurrentOwner(ownerId), forceRefresh: true);
+    try {
+      final user = _requireCurrentOwner(ownerId);
+      await user.reload();
+      return await _identity(_requireCurrentOwner(ownerId), forceRefresh: true);
+    } on Object catch (error, stackTrace) {
+      throwMappedFirebaseAccountError(error, stackTrace);
+    }
   }
 
   Future<AccountIdentity> _identity(

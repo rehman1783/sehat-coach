@@ -3,8 +3,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:sehat_coach/core/theme/app_theme.dart';
 import 'package:sehat_coach/features/account/domain/account_access_coordinator.dart';
 import 'package:sehat_coach/features/account/domain/account_identity.dart';
+import 'package:sehat_coach/features/account/domain/confirm_adult_eligibility_use_case.dart';
 import 'package:sehat_coach/features/account/domain/create_password_account_use_case.dart';
 import 'package:sehat_coach/features/account/domain/request_password_reset_use_case.dart';
+import 'package:sehat_coach/features/account/domain/serialized_identity_session.dart';
 import 'package:sehat_coach/features/account/domain/sign_in_use_cases.dart';
 import 'package:sehat_coach/features/account/presentation/controllers/account_access_controller.dart';
 import 'package:sehat_coach/features/account/presentation/screens/account_access_screen.dart';
@@ -160,6 +162,120 @@ void main() {
       expect(tester.takeException(), isNull);
     }
   });
+
+  test('invalid email formats report actionable validation feedback', () async {
+    final controller = _controller(_Runtime());
+    controller.emailAddress.value = 'not-an-email';
+    controller.password.value = 'secret-pass';
+    await controller.submitPassword();
+    expect(controller.errorMessage.value, 'Enter a valid email address.');
+
+    controller.emailAddress.value = ' ';
+    await controller.requestPasswordReset();
+    expect(controller.errorMessage.value, 'Enter a valid email address.');
+  });
+
+  testWidgets(
+    'clearing age field resets declared age so blank age never passes',
+    (tester) async {
+      final runtime = _Runtime();
+      final port = _AuthPort();
+      final controller = _controller(runtime, port: port)..showCreateAccount();
+      await _pumpAccountScreen(tester, controller);
+
+      Future<void> enterVisibleField(String label, String value) async {
+        final field = find.widgetWithText(TextFormField, label);
+        await tester.scrollUntilVisible(
+          field,
+          150,
+          scrollable: find.byType(Scrollable).first,
+        );
+        await tester.ensureVisible(field);
+        await tester.enterText(field, value);
+        await tester.pump();
+      }
+
+      await enterVisibleField('Email address', 'person@example.com');
+      await enterVisibleField('Password', 'temporary-secret');
+      await enterVisibleField('Age', '');
+      expect(controller.declaredAge.value, 0);
+
+      await controller.submitPassword();
+      expect(port.registrationCalls, 0);
+      expect(controller.mode.value, AccountAccessMode.ineligible);
+    },
+  );
+
+  testWidgets(
+    'first-time Google user can confirm 18+ age at 200 percent text and activate runtime',
+    (tester) async {
+      final runtime = _Runtime();
+      final session = SerializedIdentitySession(
+        AccountIdentity(
+          uid: 'google-uid',
+          emailVerified: true,
+          adultEligible: false,
+          linkedProviders: const {AccountProvider.google},
+        ),
+      );
+      final auth = _AuthPort(adult: false);
+      var ready = false;
+      final controller = AccountAccessController(
+        loginWithPassword: SignInWithPasswordUseCase(auth),
+        loginWithGoogle: SignInWithGoogleUseCase(auth),
+        registration: CreatePasswordAccountUseCase(auth),
+        recovery: RequestPasswordResetUseCase(auth),
+        activation: AccountAccessCoordinator(runtime),
+        authenticatedCallback: () async => ready = true,
+        confirmAdultEligibility: ConfirmAdultEligibilityUseCase(session, auth),
+        signOutPending: () async => auth.signedOutCount++,
+      );
+
+      await controller.submitGoogle();
+      expect(controller.mode.value, AccountAccessMode.ineligible);
+      expect(controller.canConfirmAdultEligibility.value, isTrue);
+      expect(runtime.activeOwnerId, isNull);
+
+      await _pumpAccountScreen(tester, controller);
+      final confirmButton = find.text('CONFIRM AND CONTINUE');
+      await tester.scrollUntilVisible(
+        confirmButton,
+        150,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.ensureVisible(confirmButton);
+      expect(confirmButton, findsOneWidget);
+      expect(find.text('Use a different account'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+
+      final ageCheckbox = find.widgetWithText(
+        CheckboxListTile,
+        'I confirm that I am 18 or older',
+      );
+      await tester.scrollUntilVisible(
+        ageCheckbox,
+        150,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.ensureVisible(ageCheckbox);
+      await tester.pumpAndSettle();
+      await tester.tap(ageCheckbox);
+      await tester.pump();
+      await tester.scrollUntilVisible(
+        confirmButton,
+        150,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.ensureVisible(confirmButton);
+      await tester.pumpAndSettle();
+      await tester.tap(confirmButton);
+      await tester.pumpAndSettle();
+
+      expect(auth.eligibilityConfirmCalls, 1);
+      expect(runtime.activeOwnerId, 'google-uid');
+      expect(ready, isTrue);
+    },
+  );
 }
 
 Future<void> _pumpAccountScreen(
@@ -203,18 +319,29 @@ AccountAccessController _controller(
 }
 
 class _AuthPort
-    implements SignInPort, PasswordAccountRegistrationPort, PasswordResetPort {
-  _AuthPort({this.verified = true});
+    implements
+        SignInPort,
+        PasswordAccountRegistrationPort,
+        AdultEligibilityConfirmationPort,
+        PasswordResetPort {
+  _AuthPort({this.verified = true, this.adult = true});
   final bool verified;
+  final bool adult;
   int registrationCalls = 0;
+  int eligibilityConfirmCalls = 0;
+  int signedOutCount = 0;
 
-  AccountIdentity _identity(AccountProvider provider, {bool? emailVerified}) =>
-      AccountIdentity(
-        uid: 'owner-a',
-        emailVerified: emailVerified ?? verified,
-        adultEligible: true,
-        linkedProviders: {provider},
-      );
+  AccountIdentity _identity(
+    AccountProvider provider, {
+    bool? emailVerified,
+    bool? adultEligible,
+    String uid = 'owner-a',
+  }) => AccountIdentity(
+    uid: uid,
+    emailVerified: emailVerified ?? verified,
+    adultEligible: adultEligible ?? adult,
+    linkedProviders: {provider},
+  );
 
   @override
   Future<AccountIdentity> signInWithPassword({
@@ -223,8 +350,11 @@ class _AuthPort
   }) async => _identity(AccountProvider.password);
 
   @override
-  Future<AccountIdentity> signInWithGoogle() async =>
-      _identity(AccountProvider.google);
+  Future<AccountIdentity> signInWithGoogle() async => _identity(
+    AccountProvider.google,
+    emailVerified: true,
+    uid: adult ? 'owner-a' : 'google-uid',
+  );
 
   @override
   Future<AccountIdentity> createPasswordAccount({
@@ -234,6 +364,20 @@ class _AuthPort
   }) async {
     registrationCalls++;
     return _identity(AccountProvider.password, emailVerified: false);
+  }
+
+  @override
+  Future<AccountIdentity> confirmAdultEligibility({
+    required String ownerId,
+    required AdultEligibilityAttestation eligibility,
+  }) async {
+    eligibilityConfirmCalls++;
+    return _identity(
+      AccountProvider.google,
+      uid: ownerId,
+      emailVerified: true,
+      adultEligible: true,
+    );
   }
 
   @override

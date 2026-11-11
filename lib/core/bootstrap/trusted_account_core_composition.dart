@@ -4,6 +4,7 @@ import '../../features/account/data/secure_account_switch_preparation_port.dart'
 import '../../features/account/domain/auth_state_reconciliation_coordinator.dart';
 import '../../features/account/domain/account_data_operations.dart';
 import '../../features/account/domain/auth_state_stream_binding.dart';
+import '../../features/account/domain/confirm_adult_eligibility_use_case.dart';
 import '../../features/account/domain/create_password_account_use_case.dart';
 import '../../features/account/domain/email_verification_use_cases.dart';
 import '../../features/account/domain/prepare_account_switch_use_case.dart';
@@ -35,6 +36,8 @@ class TrustedAccountProviderPorts {
     required this.registration,
     required this.passwordReset,
     required this.emailVerification,
+    this.adultEligibilityConfirmation,
+    this.signOutPending,
   });
 
   final AuthStateStreamPort authState;
@@ -42,6 +45,8 @@ class TrustedAccountProviderPorts {
   final PasswordAccountRegistrationPort registration;
   final PasswordResetPort passwordReset;
   final EmailVerificationPort emailVerification;
+  final AdultEligibilityConfirmationPort? adultEligibilityConfirmation;
+  final Future<void> Function()? signOutPending;
 }
 
 /// Shares one identity serialization boundary across startup events,
@@ -75,6 +80,8 @@ class TrustedAccountCoreComposition {
       runtime: runtime,
       suspension: runtime,
       onAuthenticated: onAuthenticated,
+      adultEligibilityConfirmation: provider.adultEligibilityConfirmation,
+      signOutPending: provider.signOutPending,
     );
     return TrustedAccountCoreComposition._(
       identitySession: identitySession,

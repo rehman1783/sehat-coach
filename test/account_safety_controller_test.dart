@@ -112,6 +112,59 @@ void main() {
     expect(tester.takeException(), isNull);
     semantics.dispose();
   });
+
+  testWidgets(
+    'delete confirmation dialog and reauth retry button stay readable at 200 percent text',
+    (tester) async {
+      tester.view.physicalSize = const Size(320, 568);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      final fixture = _Fixture(
+        recent: false,
+        reauthenticate: () async => false,
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          builder: (context, child) => MediaQuery(
+            data: MediaQuery.of(context)
+                .copyWith(textScaler: const TextScaler.linear(2)),
+            child: child!,
+          ),
+          home: AccountSafetyScreen(controller: fixture.controller),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final deleteButton = find.widgetWithText(TextButton, 'DELETE ACCOUNT');
+      await tester.scrollUntilVisible(
+        deleteButton,
+        220,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.ensureVisible(deleteButton);
+      await tester.pumpAndSettle();
+      await tester.tap(deleteButton);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Permanently delete account?'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+
+      final confirmButton = find.widgetWithText(FilledButton, 'DELETE ACCOUNT');
+      await tester.tap(confirmButton);
+      await tester.pumpAndSettle();
+
+      final retryButton = find.text('SIGN IN AGAIN AND RETRY DELETION');
+      await tester.scrollUntilVisible(
+        retryButton,
+        180,
+        scrollable: find.byType(Scrollable).first,
+      );
+      expect(retryButton, findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
 }
 
 class _Fixture {

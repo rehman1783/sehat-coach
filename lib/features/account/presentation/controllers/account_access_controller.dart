@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../../domain/account_access_coordinator.dart';
 import '../../domain/account_identity.dart';
 import '../../domain/authentication_failures.dart';
+import '../../domain/confirm_adult_eligibility_use_case.dart';
 import '../../domain/create_password_account_use_case.dart';
 import '../../domain/email_verification_use_cases.dart';
 import '../../domain/request_password_reset_use_case.dart';
@@ -20,6 +21,8 @@ class AccountAccessController extends GetxController {
     required Future<void> Function() authenticatedCallback,
     this.requestVerification,
     this.refreshVerification,
+    this.confirmAdultEligibility,
+    this.signOutPending,
   }) : _passwordSignIn = loginWithPassword,
        _googleSignIn = loginWithGoogle,
        _createAccount = registration,
@@ -35,6 +38,8 @@ class AccountAccessController extends GetxController {
   final Future<void> Function() _onAuthenticated;
   final RequestEmailVerificationUseCase? requestVerification;
   final RefreshEmailVerificationUseCase? refreshVerification;
+  final ConfirmAdultEligibilityUseCase? confirmAdultEligibility;
+  final Future<void> Function()? signOutPending;
 
   final mode = AccountAccessMode.signIn.obs;
   final emailAddress = ''.obs;
@@ -42,6 +47,7 @@ class AccountAccessController extends GetxController {
   final declaredAge = 18.obs;
   final adultConfirmed = false.obs;
   final obscurePassword = true.obs;
+  final canConfirmAdultEligibility = false.obs;
   final isBusy = false.obs;
   final message = RxnString();
   final errorMessage = RxnString();
@@ -49,6 +55,7 @@ class AccountAccessController extends GetxController {
   void showSignIn() {
     password.value = '';
     obscurePassword.value = true;
+    canConfirmAdultEligibility.value = false;
     mode.value = AccountAccessMode.signIn;
     _clearFeedback();
   }
@@ -56,16 +63,21 @@ class AccountAccessController extends GetxController {
   void showCreateAccount() {
     password.value = '';
     obscurePassword.value = true;
+    canConfirmAdultEligibility.value = false;
+    if (declaredAge.value <= 0) declaredAge.value = 18;
     mode.value = AccountAccessMode.createAccount;
     _clearFeedback();
   }
 
   void showVerificationRequired() {
+    canConfirmAdultEligibility.value = false;
     mode.value = AccountAccessMode.verifyEmail;
     _clearFeedback();
   }
 
   void showAdultEligibilityRequired() {
+    if (declaredAge.value <= 0) declaredAge.value = 18;
+    canConfirmAdultEligibility.value = confirmAdultEligibility != null;
     mode.value = AccountAccessMode.ineligible;
     _clearFeedback();
   }
@@ -106,6 +118,33 @@ class AccountAccessController extends GetxController {
   Future<void> submitGoogle() async {
     if (isBusy.value) return;
     await _run(() async => _handleSignIn(await _googleSignIn.execute()));
+  }
+
+  Future<void> submitAdultEligibility() async {
+    final confirm = confirmAdultEligibility;
+    if (isBusy.value || confirm == null) return;
+    await _run(() async {
+      final identity = await confirm.execute(
+        declaredAge: declaredAge.value,
+        adultConfirmed: adultConfirmed.value,
+      );
+      await _handleSignIn(
+        SignInResult(identity, accountAccessStatusFor(identity)),
+      );
+    });
+  }
+
+  Future<void> leavePendingAccount() async {
+    if (isBusy.value) return;
+    final signOut = signOutPending;
+    if (signOut == null) {
+      showSignIn();
+      return;
+    }
+    await _run(() async {
+      await signOut();
+      showSignIn();
+    });
   }
 
   Future<void> requestPasswordReset() async {
@@ -155,9 +194,11 @@ class AccountAccessController extends GetxController {
         mode.value = AccountAccessMode.verifyEmail;
         message.value = 'Verify your email before continuing.';
       case AccountAccessStatus.adultEligibilityRequired:
+        canConfirmAdultEligibility.value = confirmAdultEligibility != null;
         mode.value = AccountAccessMode.ineligible;
-        message.value =
-            'Sehat Coach V1 is available only to adults aged 18 or older.';
+        message.value = canConfirmAdultEligibility.value
+            ? 'Confirm that you are 18 or older to complete account setup.'
+            : 'Sehat Coach V1 is available only to adults aged 18 or older.';
     }
   }
 
@@ -177,12 +218,15 @@ class AccountAccessController extends GetxController {
     } on AuthenticationFailure catch (error) {
       errorMessage.value = _safeFailureMessage(error.code);
     } on AdultEligibilityRequired {
+      canConfirmAdultEligibility.value = false;
       mode.value = AccountAccessMode.ineligible;
       errorMessage.value = 'You must be 18 or older to create an account.';
     } on AccountDataRecoveryRequired {
       errorMessage.value =
           'Local health data could not be opened safely. It has not been deleted. '
           'Please retry or contact support before clearing local data.';
+    } on FormatException {
+      errorMessage.value = 'Enter a valid email address.';
     } on ArgumentError {
       errorMessage.value = 'Check the email, password and age information.';
     } on Object {

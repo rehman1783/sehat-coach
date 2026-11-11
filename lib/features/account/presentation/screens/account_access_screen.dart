@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 import '../../../../core/theme/app_colors.dart';
@@ -16,6 +17,9 @@ class AccountAccessScreen extends StatelessWidget {
     body: SafeArea(
       child: Obx(() {
         final mode = controller.mode.value;
+        final confirmingGoogleAge =
+            mode == AccountAccessMode.ineligible &&
+            controller.canConfirmAdultEligibility.value;
         return ResponsiveContent(
           child: ListView(
             children: [
@@ -31,7 +35,10 @@ class AccountAccessScreen extends StatelessWidget {
                 AccountAccessMode.signIn => 'Sign in to restore your synchronized health history securely.',
                 AccountAccessMode.createAccount => 'V1 is for adults aged 18 and above. No identity document is required.',
                 AccountAccessMode.verifyEmail => 'Open the verification link sent to your account email, then return here.',
-                AccountAccessMode.ineligible => 'Adult calorie and weight-management calculations are not suitable for minors.',
+                AccountAccessMode.ineligible =>
+                  confirmingGoogleAge
+                      ? 'V1 is for adults aged 18 and above. Confirm your age below to finish setting up your account.'
+                      : 'Adult calorie and weight-management calculations are not suitable for minors.',
               }, style: Theme.of(context).textTheme.bodyMedium),
               const SizedBox(height: 24),
               if (mode == AccountAccessMode.signIn ||
@@ -74,12 +81,22 @@ class _CredentialsForm extends StatefulWidget {
 }
 
 class _CredentialsFormState extends State<_CredentialsForm> {
+  late final TextEditingController _emailController;
   final TextEditingController _passwordController = TextEditingController();
 
   AccountAccessController get controller => widget.controller;
 
   @override
+  void initState() {
+    super.initState();
+    _emailController = TextEditingController(
+      text: controller.emailAddress.value,
+    );
+  }
+
+  @override
   void dispose() {
+    _emailController.dispose();
     _passwordController.clear();
     _passwordController.dispose();
     super.dispose();
@@ -102,11 +119,16 @@ class _CredentialsFormState extends State<_CredentialsForm> {
   @override
   Widget build(BuildContext context) {
     final creating = controller.mode.value == AccountAccessMode.createAccount;
+    final busy = controller.isBusy.value;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         TextFormField(
+          controller: _emailController,
           keyboardType: TextInputType.emailAddress,
+          textInputAction: TextInputAction.next,
+          autocorrect: false,
+          enableSuggestions: false,
           autofillHints: const [AutofillHints.email],
           decoration: const InputDecoration(labelText: 'Email address'),
           onChanged: (value) => controller.emailAddress.value = value,
@@ -120,6 +142,10 @@ class _CredentialsFormState extends State<_CredentialsForm> {
           enableIMEPersonalizedLearning: false,
           smartDashesType: SmartDashesType.disabled,
           smartQuotesType: SmartQuotesType.disabled,
+          textInputAction: creating
+              ? TextInputAction.next
+              : TextInputAction.done,
+          onFieldSubmitted: creating || busy ? null : (_) => _submitPassword(),
           autofillHints: [
             creating ? AutofillHints.newPassword : AutofillHints.password,
           ],
@@ -141,34 +167,19 @@ class _CredentialsFormState extends State<_CredentialsForm> {
         ),
         if (creating) ...[
           const SizedBox(height: 12),
-          TextFormField(
-            initialValue: '${controller.declaredAge.value}',
-            keyboardType: TextInputType.number,
-            decoration: const InputDecoration(labelText: 'Age'),
-            onChanged: (value) {
-              final age = int.tryParse(value);
-              if (age != null) controller.declaredAge.value = age;
-            },
-          ),
-          CheckboxListTile(
-            contentPadding: EdgeInsets.zero,
-            value: controller.adultConfirmed.value,
-            onChanged: (value) =>
-                controller.adultConfirmed.value = value ?? false,
-            title: const Text('I confirm that I am 18 or older'),
-            subtitle: const Text('No identity document is requested.'),
+          _AdultAttestationFields(
+            controller: controller,
+            onSubmitted: busy ? null : _submitPassword,
           ),
         ],
         const SizedBox(height: 14),
         FilledButton(
-          onPressed: controller.isBusy.value ? null : _submitPassword,
+          onPressed: busy ? null : _submitPassword,
           child: Text(creating ? 'CREATE ACCOUNT' : 'SIGN IN'),
         ),
         if (!creating)
           TextButton(
-            onPressed: controller.isBusy.value
-                ? null
-                : controller.requestPasswordReset,
+            onPressed: busy ? null : controller.requestPasswordReset,
             child: const Text('Forgot password?'),
           ),
         const Padding(
@@ -185,13 +196,13 @@ class _CredentialsFormState extends State<_CredentialsForm> {
           ),
         ),
         OutlinedButton.icon(
-          onPressed: controller.isBusy.value ? null : controller.submitGoogle,
+          onPressed: busy ? null : controller.submitGoogle,
           icon: const Icon(Icons.account_circle_outlined),
           label: const Text('CONTINUE WITH GOOGLE'),
         ),
         const SizedBox(height: 8),
         TextButton(
-          onPressed: () => _switchMode(creating),
+          onPressed: busy ? null : () => _switchMode(creating),
           child: Text(
             creating
                 ? 'Already have an account? Sign in'
@@ -203,44 +214,104 @@ class _CredentialsFormState extends State<_CredentialsForm> {
   }
 }
 
+class _AdultAttestationFields extends StatefulWidget {
+  const _AdultAttestationFields({required this.controller, this.onSubmitted});
+
+  final AccountAccessController controller;
+  final VoidCallback? onSubmitted;
+
+  @override
+  State<_AdultAttestationFields> createState() =>
+      _AdultAttestationFieldsState();
+}
+
+class _AdultAttestationFieldsState extends State<_AdultAttestationFields> {
+  late final TextEditingController _ageController;
+
+  @override
+  void initState() {
+    super.initState();
+    final initialAge = widget.controller.declaredAge.value;
+    _ageController = TextEditingController(
+      text: initialAge > 0 ? '$initialAge' : '',
+    );
+  }
+
+  @override
+  void dispose() {
+    _ageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      TextFormField(
+        controller: _ageController,
+        keyboardType: TextInputType.number,
+        textInputAction: TextInputAction.done,
+        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+        decoration: const InputDecoration(labelText: 'Age'),
+        onFieldSubmitted: (_) => widget.onSubmitted?.call(),
+        onChanged: (value) {
+          final trimmed = value.trim();
+          widget.controller.declaredAge.value = trimmed.isEmpty
+              ? 0
+              : (int.tryParse(trimmed) ?? 0);
+        },
+      ),
+      CheckboxListTile(
+        contentPadding: EdgeInsets.zero,
+        value: widget.controller.adultConfirmed.value,
+        onChanged: (value) =>
+            widget.controller.adultConfirmed.value = value ?? false,
+        title: const Text('I confirm that I am 18 or older'),
+        subtitle: const Text('No identity document is requested.'),
+      ),
+    ],
+  );
+}
+
 class _VerificationActions extends StatelessWidget {
   const _VerificationActions({required this.controller});
   final AccountAccessController controller;
 
   @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.all(18),
-    decoration: BoxDecoration(
-      color: const Color(0xFFF0F7F2),
-      borderRadius: BorderRadius.circular(18),
-      border: Border.all(color: AppColors.border),
-    ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        const Icon(Icons.mark_email_unread_outlined, size: 42),
-        const SizedBox(height: 14),
-        FilledButton(
-          onPressed:
-              controller.refreshVerification == null || controller.isBusy.value
-              ? null
-              : controller.checkVerification,
-          child: const Text('I HAVE VERIFIED MY EMAIL'),
-        ),
-        TextButton(
-          onPressed:
-              controller.requestVerification == null || controller.isBusy.value
-              ? null
-              : controller.resendVerification,
-          child: const Text('Resend verification email'),
-        ),
-        TextButton(
-          onPressed: controller.showSignIn,
-          child: const Text('Back to sign in'),
-        ),
-      ],
-    ),
-  );
+  Widget build(BuildContext context) {
+    final busy = controller.isBusy.value;
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF0F7F2),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const Icon(Icons.mark_email_unread_outlined, size: 42),
+          const SizedBox(height: 14),
+          FilledButton(
+            onPressed: controller.refreshVerification == null || busy
+                ? null
+                : controller.checkVerification,
+            child: const Text('I HAVE VERIFIED MY EMAIL'),
+          ),
+          TextButton(
+            onPressed: controller.requestVerification == null || busy
+                ? null
+                : controller.resendVerification,
+            child: const Text('Resend verification email'),
+          ),
+          TextButton(
+            onPressed: busy ? null : controller.leavePendingAccount,
+            child: const Text('Back to sign in'),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _IneligibleCard extends StatelessWidget {
@@ -248,28 +319,66 @@ class _IneligibleCard extends StatelessWidget {
   final AccountAccessController controller;
 
   @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.all(18),
-    decoration: BoxDecoration(
-      color: const Color(0xFFFFF1EE),
-      borderRadius: BorderRadius.circular(18),
-      border: Border.all(color: AppColors.errorRed.withValues(alpha: 0.3)),
-    ),
-    child: Column(
-      children: [
-        const Icon(Icons.health_and_safety_outlined, size: 42),
-        const SizedBox(height: 12),
-        const Text(
-          'We cannot complete account setup for users under 18 in V1. Your age response does not require an identity document.',
-          textAlign: TextAlign.center,
+  Widget build(BuildContext context) {
+    final busy = controller.isBusy.value;
+    if (controller.canConfirmAdultEligibility.value) {
+      return Material(
+        color: const Color(0xFFF0F7F2),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(18),
+          side: const BorderSide(color: AppColors.border),
         ),
-        TextButton(
-          onPressed: controller.showCreateAccount,
-          child: const Text('Review age information'),
+        child: Padding(
+          padding: const EdgeInsets.all(18),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _AdultAttestationFields(
+                controller: controller,
+                onSubmitted: busy ? null : controller.submitAdultEligibility,
+              ),
+              const SizedBox(height: 14),
+              FilledButton(
+                onPressed: busy ? null : controller.submitAdultEligibility,
+                child: const Text('CONFIRM AND CONTINUE'),
+              ),
+              TextButton(
+                onPressed: busy ? null : controller.leavePendingAccount,
+                child: const Text('Use a different account'),
+              ),
+            ],
+          ),
         ),
-      ],
-    ),
-  );
+      );
+    }
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFF1EE),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppColors.errorRed.withValues(alpha: 0.3)),
+      ),
+      child: Column(
+        children: [
+          const Icon(Icons.health_and_safety_outlined, size: 42),
+          const SizedBox(height: 12),
+          const Text(
+            'We cannot complete account setup for users under 18 in V1. Your age response does not require an identity document.',
+            textAlign: TextAlign.center,
+          ),
+          TextButton(
+            onPressed: busy ? null : controller.showCreateAccount,
+            child: const Text('Review age information'),
+          ),
+          if (controller.signOutPending != null)
+            TextButton(
+              onPressed: busy ? null : controller.leavePendingAccount,
+              child: const Text('Use a different account'),
+            ),
+        ],
+      ),
+    );
+  }
 }
 
 class _FeedbackCard extends StatelessWidget {

@@ -4,6 +4,7 @@ import '../domain/account_identity.dart';
 import '../domain/link_account_provider_use_case.dart';
 import '../domain/reauthenticate_account_use_cases.dart';
 import 'firebase_account_provider.dart';
+import 'firebase_auth_error_mapper.dart';
 
 abstract interface class FirebaseLifecycleUserPort {
   String get uid;
@@ -109,26 +110,34 @@ class FirebaseAccountLifecycle
     required String ownerId,
     required String password,
   }) async {
-    final user = _requireOwner(ownerId);
-    final email = user.email?.trim();
-    if (email == null || email.isEmpty) {
-      throw const ReauthenticationProviderNotLinked(AccountProvider.password);
+    try {
+      final user = _requireOwner(ownerId);
+      final email = user.email?.trim();
+      if (email == null || email.isEmpty) {
+        throw const ReauthenticationProviderNotLinked(AccountProvider.password);
+      }
+      await user.reauthenticate(
+        EmailAuthProvider.credential(email: email, password: password),
+      );
+      return await _refreshOwner(ownerId);
+    } on Object catch (error, stackTrace) {
+      throwMappedFirebaseAccountError(error, stackTrace);
     }
-    await user.reauthenticate(
-      EmailAuthProvider.credential(email: email, password: password),
-    );
-    return _refreshOwner(ownerId);
   }
 
   @override
   Future<AccountIdentity?> reauthenticateWithGoogle({
     required String ownerId,
   }) async {
-    final user = _requireOwner(ownerId);
-    final credential = await googleCredential();
-    if (credential == null) return null;
-    await user.reauthenticate(credential);
-    return _refreshOwner(ownerId);
+    try {
+      final user = _requireOwner(ownerId);
+      final credential = await googleCredential();
+      if (credential == null) return null;
+      await user.reauthenticate(credential);
+      return await _refreshOwner(ownerId);
+    } on Object catch (error, stackTrace) {
+      throwMappedFirebaseAccountError(error, stackTrace);
+    }
   }
 
   @override
@@ -139,11 +148,15 @@ class FirebaseAccountLifecycle
     if (provider != AccountProvider.google) {
       throw const UnsupportedAccountProviderLink();
     }
-    final user = _requireOwner(ownerId);
-    final credential = await googleCredential();
-    if (credential == null) throw const GoogleSignInCancelled();
-    await user.link(credential);
-    return _refreshOwner(ownerId);
+    try {
+      final user = _requireOwner(ownerId);
+      final credential = await googleCredential();
+      if (credential == null) throw const GoogleSignInCancelled();
+      await user.link(credential);
+      return await _refreshOwner(ownerId);
+    } on Object catch (error, stackTrace) {
+      throwMappedFirebaseAccountError(error, stackTrace);
+    }
   }
 
   Future<AccountIdentity> _refreshOwner(String ownerId) async {
