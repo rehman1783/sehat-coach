@@ -2,6 +2,11 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "version": 2,
   "buildCommand": "npm run build",
+  "functions": {
+    "api/index.ts": {
+      "includeFiles": "{src/**,node_modules/@google-cloud/firestore/build/protos/**,node_modules/farmhash-modern/bin/**}"
+    }
+  },
   "rewrites": [
     {
       "source": "/",
