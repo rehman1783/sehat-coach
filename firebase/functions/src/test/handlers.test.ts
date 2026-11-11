@@ -9,6 +9,13 @@ import {
   handleSyncPull,
   handleSyncUpload,
 } from '../handlers/sync';
+import {
+  NodeOrFrameworkResponse,
+  createJsonResponseAdapter,
+  stripWrappingQuotes,
+  toHttpRequest,
+} from '../httpAdapter';
+import { routeRequest } from '../router';
 import { createNodeHttpServer } from '../server';
 
 function captureResponse(): {
@@ -291,6 +298,7 @@ test('syncUpload and syncPull validate revisions, cursors, and pagination', asyn
 
 test('createNodeHttpServer routes healthz, eligibility, syncPull, and 404 over HTTP', async () => {
   const server = createNodeHttpServer({
+    ensureAdmin: () => ({ ready: true, configStatus: 'ready' }),
     adultEligibility: () => ({
       auth: validAuth('uid-http'),
       getUser: async () => ({}),
@@ -346,7 +354,12 @@ test('createNodeHttpServer routes healthz, eligibility, syncPull, and 404 over H
 
     const health = await requestJson('/healthz', 'GET');
     assert.equal(health.status, 200);
-    assert.deepEqual(health.json, { ok: true, service: 'sehat-coach-backend' });
+    assert.deepEqual(health.json, {
+      ok: true,
+      service: 'sehat-coach-backend',
+      firebaseAdminConfigured: true,
+      configStatus: 'ready',
+    });
 
     const eligibility = await requestJson(
       '/adultEligibility',
@@ -376,5 +389,74 @@ test('createNodeHttpServer routes healthz, eligibility, syncPull, and 404 over H
       server.close((err) => (err ? reject(err) : resolve())),
     );
   }
+});
+
+test('router returns 503 safely when Firebase Admin env vars are missing', async () => {
+  const out = captureResponse();
+  await routeRequest(
+    '/adultEligibility',
+    {
+      method: 'POST',
+      headers: baseHeaders(),
+      query: {},
+      body: {},
+    },
+    out.res,
+    {
+      ensureAdmin: () => ({
+        ready: false,
+        configStatus: 'missing_service_account_env',
+      }),
+    },
+  );
+  assert.equal(out.status(), 503);
+  assert.deepEqual(out.body(), {
+    error: 'backend_not_configured',
+    configStatus: 'missing_service_account_env',
+  });
+});
+
+test('httpAdapter supports Vercel pre-parsed requests and raw Node ServerResponse', async () => {
+  assert.equal(stripWrappingQuotes('"hello"'), 'hello');
+
+  let statusCode = 0;
+  let headers: Record<string, unknown> = {};
+  let rawBody = '';
+  const rawRes = {
+    headersSent: false,
+    writeHead(code: number, resHeaders: Record<string, unknown>) {
+      statusCode = code;
+      headers = resHeaders;
+    },
+    end(chunk: string) {
+      rawBody = chunk;
+    },
+  } as unknown as NodeOrFrameworkResponse;
+
+  const { request } = await toHttpRequest({
+    method: 'GET',
+    url: '/api/index?__sehatRoute=healthz',
+    headers: {},
+    query: { __sehatRoute: 'healthz' },
+  } as unknown as Parameters<typeof toHttpRequest>[0]);
+  const rewritten =
+    typeof request.query.__sehatRoute === 'string'
+      ? `/${request.query.__sehatRoute}`
+      : '/';
+  const query = { ...request.query };
+  delete query.__sehatRoute;
+
+  await routeRequest(rewritten, { ...request, query }, createJsonResponseAdapter(rawRes), {
+    ensureAdmin: () => ({ ready: true, configStatus: 'ready' }),
+  });
+
+  assert.equal(statusCode, 200);
+  assert.equal(headers['content-type'], 'application/json; charset=utf-8');
+  assert.deepEqual(JSON.parse(rawBody), {
+    ok: true,
+    service: 'sehat-coach-backend',
+    firebaseAdminConfigured: true,
+    configStatus: 'ready',
+  });
 });
 
