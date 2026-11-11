@@ -14,6 +14,7 @@ import {
   sendHttpError,
   sha256Hex,
 } from '../auth';
+import { ensureFirebaseAdminInitialized } from '../firebaseAdmin';
 
 const MAX_DELETION_BODY_BYTES = 8 * 1024;
 
@@ -44,6 +45,7 @@ function isAuthUserNotFound(error: unknown): boolean {
 }
 
 export function defaultAccountDeletionDeps(): AccountDeletionDeps {
+  ensureFirebaseAdminInitialized();
   const auth = getAuth();
   const db = getFirestore();
   return {

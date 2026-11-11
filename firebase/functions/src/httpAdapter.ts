@@ -16,12 +16,11 @@ export function stripWrappingQuotes(value: string): string {
   return trimmed;
 }
 
-export function extractQueryParams(
-  rawUrl: string | undefined,
+export function searchParamsToQuery(
+  searchParams: URLSearchParams,
 ): Record<string, string | string[]> {
-  const url = new URL(rawUrl ?? '/', 'http://localhost');
   const query: Record<string, string | string[]> = {};
-  for (const [key, value] of url.searchParams.entries()) {
+  for (const [key, value] of searchParams.entries()) {
     const existing = query[key];
     if (existing === undefined) {
       query[key] = value;
@@ -32,6 +31,13 @@ export function extractQueryParams(
     }
   }
   return query;
+}
+
+export function extractQueryParams(
+  rawUrl: string | undefined,
+): Record<string, string | string[]> {
+  const url = new URL(rawUrl ?? '/', 'http://localhost');
+  return searchParamsToQuery(url.searchParams);
 }
 
 export function readRequestBody(

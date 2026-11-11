@@ -15,6 +15,7 @@ import {
   sendHttpError,
   sha256Hex,
 } from '../auth';
+import { ensureFirebaseAdminInitialized } from '../firebaseAdmin';
 
 const MAX_UPLOAD_BODY_BYTES = 256 * 1024;
 const MAX_PULL_CHANGES = 100;
@@ -73,6 +74,7 @@ interface StoredOperationDoc {
 }
 
 export function defaultSyncDeps(): SyncDeps {
+  ensureFirebaseAdminInitialized();
   const db = getFirestore();
   return {
     auth: defaultAuthDependencies(),

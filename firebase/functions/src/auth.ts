@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 import { getAppCheck } from 'firebase-admin/app-check';
 import { getAuth } from 'firebase-admin/auth';
+import { ensureFirebaseAdminInitialized } from './firebaseAdmin';
 
 export interface HttpRequest {
   method: string;
@@ -34,6 +35,7 @@ export class HttpError extends Error {
 }
 
 export function defaultAuthDependencies(): AuthDependencies {
+  ensureFirebaseAdminInitialized();
   return {
     verifyIdToken: (idToken) => getAuth().verifyIdToken(idToken, true),
     verifyAppCheckToken: (appCheckToken) =>

@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import http from 'node:http';
 import test from 'node:test';
 import { AuthDependencies, HttpRequest, HttpResponse } from '../auth';
+import { handleFetchRequest } from '../fetchHandler';
 import { handleAccountDeletion } from '../handlers/accountDeletion';
 import { handleAdultEligibility } from '../handlers/adultEligibility';
 import {
@@ -9,12 +10,7 @@ import {
   handleSyncPull,
   handleSyncUpload,
 } from '../handlers/sync';
-import {
-  NodeOrFrameworkResponse,
-  createJsonResponseAdapter,
-  stripWrappingQuotes,
-  toHttpRequest,
-} from '../httpAdapter';
+import { stripWrappingQuotes } from '../httpAdapter';
 import { routeRequest } from '../router';
 import { createNodeHttpServer } from '../server';
 
@@ -416,47 +412,45 @@ test('router returns 503 safely when Firebase Admin env vars are missing', async
   });
 });
 
-test('httpAdapter supports Vercel pre-parsed requests and raw Node ServerResponse', async () => {
+test('handleFetchRequest handles Web Request/Response for Vercel root entrypoint', async () => {
   assert.equal(stripWrappingQuotes('"hello"'), 'hello');
-
-  let statusCode = 0;
-  let headers: Record<string, unknown> = {};
-  let rawBody = '';
-  const rawRes = {
-    headersSent: false,
-    writeHead(code: number, resHeaders: Record<string, unknown>) {
-      statusCode = code;
-      headers = resHeaders;
-    },
-    end(chunk: string) {
-      rawBody = chunk;
-    },
-  } as unknown as NodeOrFrameworkResponse;
-
-  const { request } = await toHttpRequest({
-    method: 'GET',
-    url: '/api/index?__sehatRoute=healthz',
-    headers: {},
-    query: { __sehatRoute: 'healthz' },
-  } as unknown as Parameters<typeof toHttpRequest>[0]);
-  const rewritten =
-    typeof request.query.__sehatRoute === 'string'
-      ? `/${request.query.__sehatRoute}`
-      : '/';
-  const query = { ...request.query };
-  delete query.__sehatRoute;
-
-  await routeRequest(rewritten, { ...request, query }, createJsonResponseAdapter(rawRes), {
+  const deps = {
     ensureAdmin: () => ({ ready: true, configStatus: 'ready' }),
-  });
+    adultEligibility: () => ({
+      auth: validAuth('uid-web'),
+      getUser: async () => ({}),
+      setCustomUserClaims: async () => {},
+      saveEligibilityRecord: async () => {},
+      nowUtc: () => new Date('2026-11-11T19:00:00Z'),
+    }),
+  };
 
-  assert.equal(statusCode, 200);
-  assert.equal(headers['content-type'], 'application/json; charset=utf-8');
-  assert.deepEqual(JSON.parse(rawBody), {
+  const healthRes = await handleFetchRequest(
+    new Request('https://sehat-coach.vercel.app/healthz', { method: 'GET' }),
+    deps,
+  );
+  assert.equal(healthRes.status, 200);
+  assert.deepEqual(await healthRes.json(), {
     ok: true,
     service: 'sehat-coach-backend',
     firebaseAdminConfigured: true,
     configStatus: 'ready',
   });
+
+  const postRes = await handleFetchRequest(
+    new Request('https://sehat-coach.vercel.app/adultEligibility', {
+      method: 'POST',
+      headers: { ...baseHeaders(), 'content-type': 'application/json' },
+      body: JSON.stringify({
+        ownerId: 'uid-web',
+        declaredAge: 22,
+        minimumAge: 18,
+        confirmed: true,
+        policyVersion: 'v1',
+      }),
+    }),
+    deps,
+  );
+  assert.equal(postRes.status, 200);
 });
 

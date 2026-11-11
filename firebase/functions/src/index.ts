@@ -1,10 +1,8 @@
 import { onRequest } from 'firebase-functions/v2/https';
-import { ensureFirebaseAdminInitialized } from './firebaseAdmin';
+import { handleFetchRequest } from './fetchHandler';
 import { handleAccountDeletion } from './handlers/accountDeletion';
 import { handleAdultEligibility } from './handlers/adultEligibility';
 import { handleSyncPull, handleSyncUpload } from './handlers/sync';
-
-ensureFirebaseAdminInitialized();
 
 const REGION = 'asia-south1';
 
@@ -28,3 +26,9 @@ export const syncPull = onRequest(
   (req, res) => handleSyncPull(req, res),
 );
 
+// Web-standard entrypoint used by Vercel zero-config backend deployments.
+export default {
+  async fetch(request: Request): Promise<Response> {
+    return handleFetchRequest(request);
+  },
+};

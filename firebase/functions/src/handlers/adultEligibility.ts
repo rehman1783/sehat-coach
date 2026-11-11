@@ -12,6 +12,7 @@ import {
   requireBoundedId,
   sendHttpError,
 } from '../auth';
+import { ensureFirebaseAdminInitialized } from '../firebaseAdmin';
 
 const MAX_ELIGIBILITY_BODY_BYTES = 8 * 1024;
 
@@ -35,6 +36,7 @@ export interface AdultEligibilityDeps {
 }
 
 export function defaultAdultEligibilityDeps(): AdultEligibilityDeps {
+  ensureFirebaseAdminInitialized();
   const auth = getAuth();
   const db = getFirestore();
   return {

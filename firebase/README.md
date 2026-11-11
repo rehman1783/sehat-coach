@@ -30,7 +30,7 @@ Once live (for example `https://sehat-coach-backend.onrender.com`), your 4 endpo
 ## 3. Deploy on Vercel
 
 1. Import the GitHub repository into Vercel and set **Root Directory** to `firebase/functions`.
-2. Vercel reads [`vercel.json`](functions/vercel.json), runs `npm run build`, and serves [`api/index.ts`](functions/api/index.ts).
+2. Vercel reads [`vercel.json`](functions/vercel.json), runs `npm run build`, and serves [`src/index.ts`](functions/src/index.ts) via its default Web `fetch` entrypoint.
 3. Add `FIREBASE_PROJECT_ID`, `FIREBASE_CLIENT_EMAIL`, and `FIREBASE_PRIVATE_KEY` in **Project Settings -> Environment Variables**, then deploy.
 4. Use the exact same 4 HTTPS paths on your Vercel domain (`/adultEligibility`, `/accountDeletion`, `/syncUpload`, `/syncPull`).
 
