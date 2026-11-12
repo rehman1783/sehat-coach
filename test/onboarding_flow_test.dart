@@ -140,5 +140,15 @@ Future<void> _completeOnboarding(
   await tester.tap(find.text('CLAIM MY PLAN'));
   await tester.pumpAndSettle();
   expect(find.text('REVIEW YOUR PLAN'), findsOneWidget);
+  final sheetMaterial = tester.widget<Material>(
+    find
+        .ancestor(
+          of: find.text('REVIEW YOUR PLAN'),
+          matching: find.byType(Material),
+        )
+        .first,
+  );
+  expect(sheetMaterial.color, isNotNull);
+  expect(sheetMaterial.color!.a, 1.0);
   expect(tester.takeException(), isNull);
 }

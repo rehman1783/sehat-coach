@@ -177,7 +177,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
+      useSafeArea: true,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
       builder: (ctx) => AuthBottomSheet(
         profile: _controller.state,
         persistsToAccount: widget.authenticatedCompletion != null,

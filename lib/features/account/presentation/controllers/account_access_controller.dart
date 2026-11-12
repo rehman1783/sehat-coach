@@ -218,6 +218,12 @@ class AccountAccessController extends GetxController {
     } on AuthenticationFailure catch (error) {
       errorMessage.value = _safeFailureMessage(error.code);
     } on AdultEligibilityRequired {
+      final hasAdultAge = declaredAge.value >= 18 && declaredAge.value <= 100;
+      if (hasAdultAge && !adultConfirmed.value) {
+        errorMessage.value =
+            'Please confirm that you are 18 or older to continue.';
+        return;
+      }
       canConfirmAdultEligibility.value = false;
       mode.value = AccountAccessMode.ineligible;
       errorMessage.value = 'You must be 18 or older to create an account.';
@@ -227,8 +233,11 @@ class AccountAccessController extends GetxController {
           'Please retry or contact support before clearing local data.';
     } on FormatException {
       errorMessage.value = 'Enter a valid email address.';
-    } on ArgumentError {
-      errorMessage.value = 'Check the email, password and age information.';
+    } on ArgumentError catch (error) {
+      final detail = error.message?.toString() ?? '';
+      errorMessage.value = detail.contains('6 characters')
+          ? 'Password must be at least 6 characters.'
+          : 'Check the email, password and age information.';
     } on Object {
       errorMessage.value = 'Account access is unavailable. Please try again.';
     } finally {

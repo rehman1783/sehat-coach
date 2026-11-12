@@ -51,84 +51,93 @@ class _AuthBottomSheetState extends State<AuthBottomSheet> {
         widget.onEdit(step);
       },
     );
-    return SafeArea(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              english ? 'REVIEW YOUR PLAN' : 'APNA PLAN CHECK KAREIN',
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-            const SizedBox(height: 12),
-            Text(
-              widget.persistsToAccount
-                  ? (english
-                        ? 'Your answers will be saved securely to your account before Home opens.'
-                        : 'Home khulne se pehle aapke jawabat account mein mehfooz save honge.')
-                  : (english
-                        ? 'Preview only. No account is created and your answers are not saved when the app closes.'
-                        : 'Yeh preview hai. Account nahi banega aur app band hone par jawabat save nahi honge.'),
-            ),
-            review(english ? 'Goal' : 'Goal', profile.goal?.name ?? '—', 1),
-            review(
-              english ? 'Measurements & activity' : 'Measurements aur activity',
-              '${profile.age} • ${profile.heightCm} cm • ${profile.weightKg} kg\n'
-              '${profile.activityLevel.name} • ${profile.goalPace.name} • '
-              '${profile.targetWeightKg} kg',
-              3,
-            ),
-            review(
-              english ? 'City' : 'Shehar',
-              '${profile.city}, ${profile.country}',
-              4,
-            ),
-            review(
-              english ? 'Food routine' : 'Khane ka routine',
-              profile.kitchen?.name ?? '—',
-              5,
-            ),
-            review(
-              english ? 'Health preferences' : 'Health preferences',
-              profile.conditions.map((c) => c.name).join(', '),
-              7,
-            ),
-            review(english ? 'Coach' : 'Coach', profile.coachName, 8),
-            const SizedBox(height: 16),
-            if (_error != null) ...[
-              Semantics(
-                liveRegion: true,
-                label: 'Error: $_error',
-                excludeSemantics: true,
-                child: Text(
-                  _error!,
-                  style: TextStyle(color: Theme.of(context).colorScheme.error),
-                  textAlign: TextAlign.center,
-                ),
+    return Material(
+      color: Theme.of(context).colorScheme.surface,
+      borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+      clipBehavior: Clip.antiAlias,
+      child: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                english ? 'REVIEW YOUR PLAN' : 'APNA PLAN CHECK KAREIN',
+                style: Theme.of(context).textTheme.headlineSmall,
               ),
               const SizedBox(height: 12),
-            ],
-            ConstrainedBox(
-              constraints: const BoxConstraints(minHeight: 52),
-              child: FilledButton(
-                onPressed: _saving ? null : _complete,
-                child: Text(
-                  _saving
-                      ? (english
-                            ? 'Saving securely…'
-                            : 'Mehfooz save ho raha hai…')
-                      : widget.persistsToAccount
-                      ? (english
-                            ? 'Save and continue'
-                            : 'Save karke jari rakhein')
-                      : (english ? 'Preview my home' : 'Apna home dekhein'),
-                  textAlign: TextAlign.center,
+              Text(
+                widget.persistsToAccount
+                    ? (english
+                          ? 'Your answers will be saved securely to your account before Home opens.'
+                          : 'Home khulne se pehle aapke jawabat account mein mehfooz save honge.')
+                    : (english
+                          ? 'Preview only. No account is created and your answers are not saved when the app closes.'
+                          : 'Yeh preview hai. Account nahi banega aur app band hone par jawabat save nahi honge.'),
+              ),
+              review(english ? 'Goal' : 'Goal', profile.goal?.name ?? '—', 1),
+              review(
+                english
+                    ? 'Measurements & activity'
+                    : 'Measurements aur activity',
+                '${profile.age} • ${profile.heightCm} cm • ${profile.weightKg} kg\n'
+                '${profile.activityLevel.name} • ${profile.goalPace.name} • '
+                '${profile.targetWeightKg} kg',
+                3,
+              ),
+              review(
+                english ? 'City' : 'Shehar',
+                '${profile.city}, ${profile.country}',
+                4,
+              ),
+              review(
+                english ? 'Food routine' : 'Khane ka routine',
+                profile.kitchen?.name ?? '—',
+                5,
+              ),
+              review(
+                english ? 'Health preferences' : 'Health preferences',
+                profile.conditions.map((c) => c.name).join(', '),
+                7,
+              ),
+              review(english ? 'Coach' : 'Coach', profile.coachName, 8),
+              const SizedBox(height: 16),
+              if (_error != null) ...[
+                Semantics(
+                  liveRegion: true,
+                  label: 'Error: $_error',
+                  excludeSemantics: true,
+                  child: Text(
+                    _error!,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.error,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                const SizedBox(height: 12),
+              ],
+              ConstrainedBox(
+                constraints: const BoxConstraints(minHeight: 52),
+                child: FilledButton(
+                  onPressed: _saving ? null : _complete,
+                  child: Text(
+                    _saving
+                        ? (english
+                              ? 'Saving securely…'
+                              : 'Mehfooz save ho raha hai…')
+                        : widget.persistsToAccount
+                        ? (english
+                              ? 'Save and continue'
+                              : 'Save karke jari rakhein')
+                        : (english ? 'Preview my home' : 'Apna home dekhein'),
+                    textAlign: TextAlign.center,
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

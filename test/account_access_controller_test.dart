@@ -261,6 +261,7 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(ageCheckbox);
       await tester.pump();
+      expect(tester.widget<CheckboxListTile>(ageCheckbox).value, isTrue);
       await tester.scrollUntilVisible(
         confirmButton,
         150,
@@ -276,6 +277,132 @@ void main() {
       expect(ready, isTrue);
     },
   );
+
+  testWidgets(
+    'password eye icon toggles visibility on screen without losing typed text',
+    (tester) async {
+      final controller = _controller(_Runtime());
+      await _pumpAccountScreen(tester, controller);
+      final passwordField = find.widgetWithText(TextFormField, 'Password');
+      final editableFinder = find.descendant(
+        of: passwordField,
+        matching: find.byType(EditableText),
+      );
+
+      final iconButton = find.descendant(
+        of: passwordField,
+        matching: find.byType(IconButton),
+      );
+      await tester.scrollUntilVisible(
+        passwordField,
+        80,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.ensureVisible(passwordField);
+      await tester.pumpAndSettle();
+      await tester.enterText(passwordField, 'MySecret123');
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(iconButton);
+      await tester.pumpAndSettle();
+      expect(tester.widget<EditableText>(editableFinder).obscureText, isTrue);
+      expect(find.byTooltip('Show password'), findsOneWidget);
+
+      await tester.tap(iconButton);
+      await tester.pump();
+      expect(tester.widget<EditableText>(editableFinder).obscureText, isFalse);
+      expect(
+        tester.widget<EditableText>(editableFinder).controller.text,
+        'MySecret123',
+      );
+      expect(find.byTooltip('Hide password'), findsOneWidget);
+
+      await tester.tap(iconButton);
+      await tester.pump();
+      expect(tester.widget<EditableText>(editableFinder).obscureText, isTrue);
+      expect(find.byTooltip('Show password'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'create account toggles 18+ checkbox visually and accepts age 18 and above',
+    (tester) async {
+      for (final ageText in ['18', '25']) {
+        final runtime = _Runtime();
+        final auth = _AuthPort();
+        final controller = _controller(runtime, port: auth)
+          ..showCreateAccount();
+        await _pumpAccountScreen(tester, controller);
+
+        Future<void> enterVisible(String label, String value) async {
+          final field = find.widgetWithText(TextFormField, label);
+          await tester.scrollUntilVisible(
+            field,
+            150,
+            scrollable: find.byType(Scrollable).first,
+          );
+          await tester.ensureVisible(field);
+          await tester.enterText(field, value);
+          await tester.pump();
+        }
+
+        await enterVisible('Email address', 'adult$ageText@example.com');
+        await enterVisible('Password', 'StrongPass1!');
+        await enterVisible('Age', ageText);
+
+        final checkboxFinder = find.widgetWithText(
+          CheckboxListTile,
+          'I confirm that I am 18 or older',
+        );
+        await tester.scrollUntilVisible(
+          checkboxFinder,
+          150,
+          scrollable: find.byType(Scrollable).first,
+        );
+        await tester.ensureVisible(checkboxFinder);
+        await tester.pumpAndSettle();
+        expect(tester.widget<CheckboxListTile>(checkboxFinder).value, isFalse);
+
+        await tester.tap(checkboxFinder);
+        await tester.pump();
+        expect(tester.widget<CheckboxListTile>(checkboxFinder).value, isTrue);
+        expect(controller.adultConfirmed.value, isTrue);
+
+        final submit = find.widgetWithText(FilledButton, 'CREATE ACCOUNT');
+        await tester.scrollUntilVisible(
+          submit,
+          150,
+          scrollable: find.byType(Scrollable).first,
+        );
+        await tester.ensureVisible(submit);
+        await tester.pumpAndSettle();
+        await tester.tap(submit);
+        await tester.pumpAndSettle();
+
+        expect(auth.registrationCalls, 1);
+        expect(auth.lastAttestation?.declaredAge, int.parse(ageText));
+        expect(auth.lastAttestation?.confirmed, isTrue);
+        expect(controller.mode.value, AccountAccessMode.verifyEmail);
+      }
+    },
+  );
+
+  test('create account with 18+ age but unchecked confirmation prompts user without minor lockout', () async {
+    final auth = _AuthPort();
+    final controller = _controller(_Runtime(), port: auth)..showCreateAccount();
+    controller.emailAddress.value = 'adult@example.com';
+    controller.password.value = 'StrongPass1!';
+    controller.declaredAge.value = 21;
+    controller.adultConfirmed.value = false;
+
+    await controller.submitPassword();
+
+    expect(auth.registrationCalls, 0);
+    expect(controller.mode.value, AccountAccessMode.createAccount);
+    expect(
+      controller.errorMessage.value,
+      'Please confirm that you are 18 or older to continue.',
+    );
+  });
 }
 
 Future<void> _pumpAccountScreen(
@@ -330,6 +457,7 @@ class _AuthPort
   int registrationCalls = 0;
   int eligibilityConfirmCalls = 0;
   int signedOutCount = 0;
+  AdultEligibilityAttestation? lastAttestation;
 
   AccountIdentity _identity(
     AccountProvider provider, {
@@ -363,6 +491,7 @@ class _AuthPort
     required AdultEligibilityAttestation eligibility,
   }) async {
     registrationCalls++;
+    lastAttestation = eligibility;
     return _identity(AccountProvider.password, emailVerified: false);
   }
 

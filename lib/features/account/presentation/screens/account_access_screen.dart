@@ -117,9 +117,10 @@ class _CredentialsFormState extends State<_CredentialsForm> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => Obx(() {
     final creating = controller.mode.value == AccountAccessMode.createAccount;
     final busy = controller.isBusy.value;
+    final obscure = controller.obscurePassword.value;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -136,7 +137,7 @@ class _CredentialsFormState extends State<_CredentialsForm> {
         const SizedBox(height: 12),
         TextFormField(
           controller: _passwordController,
-          obscureText: controller.obscurePassword.value,
+          obscureText: obscure,
           autocorrect: false,
           enableSuggestions: false,
           enableIMEPersonalizedLearning: false,
@@ -152,12 +153,10 @@ class _CredentialsFormState extends State<_CredentialsForm> {
           decoration: InputDecoration(
             labelText: 'Password',
             suffixIcon: IconButton(
-              tooltip: controller.obscurePassword.value
-                  ? 'Show password'
-                  : 'Hide password',
+              tooltip: obscure ? 'Show password' : 'Hide password',
               onPressed: () => controller.obscurePassword.toggle(),
               icon: Icon(
-                controller.obscurePassword.value
+                obscure
                     ? Icons.visibility_outlined
                     : Icons.visibility_off_outlined,
               ),
@@ -211,7 +210,7 @@ class _CredentialsFormState extends State<_CredentialsForm> {
         ),
       ],
     );
-  }
+  });
 }
 
 class _AdultAttestationFields extends StatefulWidget {
@@ -261,13 +260,17 @@ class _AdultAttestationFieldsState extends State<_AdultAttestationFields> {
               : (int.tryParse(trimmed) ?? 0);
         },
       ),
-      CheckboxListTile(
-        contentPadding: EdgeInsets.zero,
-        value: widget.controller.adultConfirmed.value,
-        onChanged: (value) =>
-            widget.controller.adultConfirmed.value = value ?? false,
-        title: const Text('I confirm that I am 18 or older'),
-        subtitle: const Text('No identity document is requested.'),
+      Obx(
+        () => CheckboxListTile(
+          contentPadding: EdgeInsets.zero,
+          value: widget.controller.adultConfirmed.value,
+          onChanged: widget.controller.isBusy.value
+              ? null
+              : (value) =>
+                    widget.controller.adultConfirmed.value = value ?? false,
+          title: const Text('I confirm that I am 18 or older'),
+          subtitle: const Text('No identity document is requested.'),
+        ),
       ),
     ],
   );
@@ -278,7 +281,7 @@ class _VerificationActions extends StatelessWidget {
   final AccountAccessController controller;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => Obx(() {
     final busy = controller.isBusy.value;
     return Container(
       padding: const EdgeInsets.all(18),
@@ -311,7 +314,7 @@ class _VerificationActions extends StatelessWidget {
         ],
       ),
     );
-  }
+  });
 }
 
 class _IneligibleCard extends StatelessWidget {
@@ -319,7 +322,7 @@ class _IneligibleCard extends StatelessWidget {
   final AccountAccessController controller;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => Obx(() {
     final busy = controller.isBusy.value;
     if (controller.canConfirmAdultEligibility.value) {
       return Material(
@@ -378,7 +381,7 @@ class _IneligibleCard extends StatelessWidget {
         ],
       ),
     );
-  }
+  });
 }
 
 class _FeedbackCard extends StatelessWidget {
