@@ -13,10 +13,12 @@ class AccountAccessDestinationScreen extends StatefulWidget {
     super.key,
     required this.controller,
     required this.destination,
+    this.onStartCreateAccount,
   });
 
   final AccountAccessController controller;
   final AccountAccessDestination destination;
+  final Future<void> Function(BuildContext context)? onStartCreateAccount;
 
   @override
   State<AccountAccessDestinationScreen> createState() =>
@@ -52,19 +54,23 @@ class _AccountAccessDestinationScreenState
   }
 
   @override
-  Widget build(BuildContext context) =>
-      AccountAccessScreen(controller: widget.controller);
+  Widget build(BuildContext context) => AccountAccessScreen(
+    controller: widget.controller,
+    onStartCreateAccount: widget.onStartCreateAccount,
+  );
 }
 
 /// The three account-access destinations consumed by trusted app bootstrap.
 class AccountAccessDestinations {
-  const AccountAccessDestinations(this.controller);
+  const AccountAccessDestinations(this.controller, {this.onStartCreateAccount});
 
   final AccountAccessController controller;
+  final Future<void> Function(BuildContext context)? onStartCreateAccount;
 
   Widget get signedOut => AccountAccessDestinationScreen(
     controller: controller,
     destination: AccountAccessDestination.signedOut,
+    onStartCreateAccount: onStartCreateAccount,
   );
 
   Widget get verification => AccountAccessDestinationScreen(

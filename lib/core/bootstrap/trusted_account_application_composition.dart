@@ -1,8 +1,11 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 
 import '../../features/bachat/domain/bachat_repository.dart';
 import '../../features/location/domain/city_configuration.dart';
 import '../../features/onboarding/domain/models/onboarding_state.dart';
+import '../../features/onboarding/domain/pending_onboarding_draft.dart';
+import '../../features/onboarding/presentation/screens/onboarding_screen.dart';
+import '../../features/account/presentation/controllers/account_access_controller.dart';
 import '../../features/account/presentation/screens/account_access_destination_screen.dart';
 import '../../features/account/data/secure_account_lifecycle_port.dart';
 import '../../features/account/presentation/controllers/account_switch_controller.dart';
@@ -101,10 +104,51 @@ class TrustedAccountApplicationComposition {
       initialLanguage: initialLanguage,
       detectLocation: detectLocation,
     );
+    final accessController = core.createAccountAccessController();
+    final pendingDraft = PendingOnboardingDraft();
     return TrustedAccountApplicationComposition.withAccountAccessAndSwitch(
       core: core,
       createShell: createShell,
       missingProfile: onboarding.build(),
+      accountAccessController: accessController,
+      onStartCreateAccount: (context) async {
+        if (pendingDraft.hasDraft) {
+          accessController.showCreateAccount();
+          return;
+        }
+        await Navigator.of(context).push<bool>(
+          MaterialPageRoute(
+            builder: (_) => OnboardingScreen(
+              initialLanguage: initialLanguage,
+              detectLocation: detectLocation,
+              preAuthHandoff: true,
+              popOnComplete: true,
+              authenticatedCompletion: (profile, adultConfirmed) async {
+                pendingDraft.save(profile, adultAgeConfirmed: adultConfirmed);
+                accessController.declaredAge.value = profile.age;
+                accessController.adultConfirmed.value = adultConfirmed;
+                accessController.showCreateAccount();
+              },
+            ),
+          ),
+        );
+      },
+      completePendingProfile: (loadStoredProfile) async {
+        final existing = await loadStoredProfile();
+        if (existing != null) {
+          pendingDraft.clear();
+          return existing;
+        }
+        final pending = pendingDraft.peek();
+        if (pending == null) return null;
+        try {
+          await onboarding.complete(pending.profile, pending.adultAgeConfirmed);
+          pendingDraft.clear();
+          return await loadStoredProfile() ?? pending.profile;
+        } on Object {
+          return null;
+        }
+      },
       synchronizeOwner: synchronizeOwner,
       connectivityCheck: connectivityCheck,
       onReadyForAuthentication: onReadyForAuthentication,
@@ -121,6 +165,12 @@ class TrustedAccountApplicationComposition {
     required TrustedAccountCoreComposition core,
     required ActivatedShellFactory createShell,
     required Widget missingProfile,
+    AccountAccessController? accountAccessController,
+    Future<void> Function(BuildContext context)? onStartCreateAccount,
+    Future<OnboardingState?> Function(
+      Future<OnboardingState?> Function() loadStoredProfile,
+    )?
+    completePendingProfile,
     required OwnerAction synchronizeOwner,
     required AccountSwitchConnectivityCheck connectivityCheck,
     required AccountSwitchReadyAction onReadyForAuthentication,
@@ -141,6 +191,9 @@ class TrustedAccountApplicationComposition {
       createShell: createShell,
       accountSwitchBlocked: AccountSwitchScreen(controller: switching),
       missingProfile: missingProfile,
+      accountAccessController: accountAccessController,
+      onStartCreateAccount: onStartCreateAccount,
+      completePendingProfile: completePendingProfile,
       bachatCities: bachatCities,
       bachatRepository: bachatRepository,
       loading: loading,
@@ -155,6 +208,12 @@ class TrustedAccountApplicationComposition {
     required ActivatedShellFactory createShell,
     required Widget accountSwitchBlocked,
     required Widget missingProfile,
+    AccountAccessController? accountAccessController,
+    Future<void> Function(BuildContext context)? onStartCreateAccount,
+    Future<OnboardingState?> Function(
+      Future<OnboardingState?> Function() loadStoredProfile,
+    )?
+    completePendingProfile,
     PublishedCityConfiguration? bachatCities,
     BachatRepository? bachatRepository,
     Widget? loading,
@@ -163,7 +222,8 @@ class TrustedAccountApplicationComposition {
     Listenable? profileRefresh,
   }) {
     final destinations = AccountAccessDestinations(
-      core.createAccountAccessController(),
+      accountAccessController ?? core.createAccountAccessController(),
+      onStartCreateAccount: onStartCreateAccount,
     );
     return TrustedAccountApplicationComposition(
       core: core,
@@ -173,6 +233,7 @@ class TrustedAccountApplicationComposition {
       adultEligibilityRequired: destinations.adultEligibility,
       accountSwitchBlocked: accountSwitchBlocked,
       missingProfile: missingProfile,
+      completePendingProfile: completePendingProfile,
       bachatCities: bachatCities,
       bachatRepository: bachatRepository,
       loading: loading,
@@ -190,6 +251,7 @@ class TrustedAccountApplicationComposition {
     required this.adultEligibilityRequired,
     required this.accountSwitchBlocked,
     required this.missingProfile,
+    this.completePendingProfile,
     this.bachatCities,
     this.bachatRepository,
     this.loading,
@@ -211,6 +273,10 @@ class TrustedAccountApplicationComposition {
   final Widget adultEligibilityRequired;
   final Widget accountSwitchBlocked;
   final Widget missingProfile;
+  final Future<OnboardingState?> Function(
+    Future<OnboardingState?> Function() loadStoredProfile,
+  )?
+  completePendingProfile;
   final PublishedCityConfiguration? bachatCities;
   final BachatRepository? bachatRepository;
   final Widget? loading;
@@ -224,6 +290,7 @@ class TrustedAccountApplicationComposition {
       features: core.features,
       createShell: createShell,
       missingProfile: missingProfile,
+      completePendingProfile: completePendingProfile,
       bachatCities: bachatCities,
       bachatRepository: bachatRepository,
       loading: loading,

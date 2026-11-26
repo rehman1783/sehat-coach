@@ -24,12 +24,16 @@ class OnboardingScreen extends StatefulWidget {
   final bool detectLocation;
   final Future<void> Function(OnboardingState profile, bool adultAgeConfirmed)?
   authenticatedCompletion;
+  final bool preAuthHandoff;
+  final bool popOnComplete;
 
   const OnboardingScreen({
     super.key,
     this.initialLanguage = AppLanguage.english,
     this.detectLocation = true,
     this.authenticatedCompletion,
+    this.preAuthHandoff = false,
+    this.popOnComplete = false,
   });
 
   @override
@@ -168,13 +172,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  void _openAuthBottomSheet() {
+  Future<void> _openAuthBottomSheet() async {
     if (!_controller.adultAgeConfirmed) {
       _goToStep(3);
       return;
     }
     HapticFeedback.mediumImpact();
-    showModalBottomSheet(
+    final completed = await showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
@@ -185,6 +189,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       builder: (ctx) => AuthBottomSheet(
         profile: _controller.state,
         persistsToAccount: widget.authenticatedCompletion != null,
+        preAuthHandoff: widget.preAuthHandoff,
         onEdit: _goToStep,
         onComplete: () async {
           final snapshot = _controller.state.copyWith(
@@ -209,6 +214,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         },
       ),
     );
+    if (completed == true && widget.popOnComplete && mounted) {
+      Navigator.pop(context, true);
+    }
   }
 
   @override

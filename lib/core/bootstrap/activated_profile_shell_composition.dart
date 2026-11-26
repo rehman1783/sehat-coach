@@ -23,6 +23,7 @@ class ActivatedProfileShellComposition {
     required this.features,
     required this.createShell,
     required this.missingProfile,
+    this.completePendingProfile,
     this.bachatCities,
     this.bachatRepository,
     this.loading,
@@ -39,6 +40,10 @@ class ActivatedProfileShellComposition {
   final ActivatedAccountFeatures features;
   final ActivatedShellFactory createShell;
   final Widget missingProfile;
+  final Future<OnboardingState?> Function(
+    Future<OnboardingState?> Function() loadStoredProfile,
+  )?
+  completePendingProfile;
   final PublishedCityConfiguration? bachatCities;
   final BachatRepository? bachatRepository;
   final Widget? loading;
@@ -55,7 +60,15 @@ class ActivatedProfileShellComposition {
 
   Future<OnboardingState?> loadProfile() async {
     final loader = await features.createProfileLoader();
-    return loader.load();
+    final stored = await loader.load();
+    if (completePendingProfile case final resolvePending?) {
+      if (stored != null) {
+        await resolvePending(() async => stored);
+        return stored;
+      }
+      return resolvePending(loader.load);
+    }
+    return stored;
   }
 
   Widget buildShellForProfile(OnboardingState profile) {

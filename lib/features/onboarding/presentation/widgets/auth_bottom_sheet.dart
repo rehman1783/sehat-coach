@@ -9,6 +9,7 @@ class AuthBottomSheet extends StatefulWidget {
   final OnboardingState profile;
   final ValueChanged<int> onEdit;
   final bool persistsToAccount;
+  final bool preAuthHandoff;
 
   const AuthBottomSheet({
     super.key,
@@ -16,6 +17,7 @@ class AuthBottomSheet extends StatefulWidget {
     required this.profile,
     required this.onEdit,
     this.persistsToAccount = false,
+    this.preAuthHandoff = false,
   });
 
   @override
@@ -68,7 +70,11 @@ class _AuthBottomSheetState extends State<AuthBottomSheet> {
               ),
               const SizedBox(height: 12),
               Text(
-                widget.persistsToAccount
+                widget.preAuthHandoff
+                    ? (english
+                          ? 'Next, create your account or sign in to save your plan securely.'
+                          : 'Ab apna account banayein ya sign in karein taake aapka plan mehfooz save ho.')
+                    : widget.persistsToAccount
                     ? (english
                           ? 'Your answers will be saved securely to your account before Home opens.'
                           : 'Home khulne se pehle aapke jawabat account mein mehfooz save honge.')
@@ -127,6 +133,10 @@ class _AuthBottomSheetState extends State<AuthBottomSheet> {
                         ? (english
                               ? 'Saving securely…'
                               : 'Mehfooz save ho raha hai…')
+                        : widget.preAuthHandoff
+                        ? (english
+                              ? 'Continue to create account'
+                              : 'Account banane ke liye aage barhein')
                         : widget.persistsToAccount
                         ? (english
                               ? 'Save and continue'
@@ -150,7 +160,7 @@ class _AuthBottomSheetState extends State<AuthBottomSheet> {
     });
     try {
       await widget.onComplete();
-      if (mounted) Navigator.pop(context);
+      if (mounted) Navigator.pop(context, true);
     } on Object {
       if (!mounted) return;
       setState(() {

@@ -7,9 +7,14 @@ import '../../../../core/widgets/responsive_content.dart';
 import '../controllers/account_access_controller.dart';
 
 class AccountAccessScreen extends StatelessWidget {
-  const AccountAccessScreen({super.key, required this.controller});
+  const AccountAccessScreen({
+    super.key,
+    required this.controller,
+    this.onStartCreateAccount,
+  });
 
   final AccountAccessController controller;
+  final Future<void> Function(BuildContext context)? onStartCreateAccount;
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -43,7 +48,10 @@ class AccountAccessScreen extends StatelessWidget {
               const SizedBox(height: 24),
               if (mode == AccountAccessMode.signIn ||
                   mode == AccountAccessMode.createAccount)
-                _CredentialsForm(controller: controller),
+                _CredentialsForm(
+                  controller: controller,
+                  onStartCreateAccount: onStartCreateAccount,
+                ),
               if (mode == AccountAccessMode.verifyEmail)
                 _VerificationActions(controller: controller),
               if (mode == AccountAccessMode.ineligible)
@@ -73,8 +81,9 @@ class AccountAccessScreen extends StatelessWidget {
 }
 
 class _CredentialsForm extends StatefulWidget {
-  const _CredentialsForm({required this.controller});
+  const _CredentialsForm({required this.controller, this.onStartCreateAccount});
   final AccountAccessController controller;
+  final Future<void> Function(BuildContext context)? onStartCreateAccount;
 
   @override
   State<_CredentialsForm> createState() => _CredentialsFormState();
@@ -107,10 +116,12 @@ class _CredentialsFormState extends State<_CredentialsForm> {
     _passwordController.clear();
   }
 
-  void _switchMode(bool creating) {
+  Future<void> _switchMode(bool creating) async {
     _passwordController.clear();
     if (creating) {
       controller.showSignIn();
+    } else if (widget.onStartCreateAccount case final startCreate?) {
+      await startCreate(context);
     } else {
       controller.showCreateAccount();
     }
