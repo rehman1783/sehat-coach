@@ -85,6 +85,7 @@ void main() {
     () async {
       final harness = await _Harness.create('owner-a');
       addTearDown(harness.dispose);
+      await harness.service.open('owner-a');
       final features = ActivatedAccountFeatures(
         databases: harness.service,
         ownerSession: harness.session,
@@ -166,6 +167,7 @@ void main() {
     () async {
       final harness = await _Harness.create('owner-a');
       addTearDown(harness.dispose);
+      await harness.service.open('owner-a');
       final repository = _BachatRepository();
 
       final controller =
@@ -190,6 +192,7 @@ void main() {
     () async {
       final harness = await _Harness.create('owner-a');
       addTearDown(harness.dispose);
+      await harness.service.open('owner-a');
       final features = ActivatedAccountFeatures(
         databases: harness.service,
         ownerSession: harness.session,
@@ -217,6 +220,7 @@ void main() {
     () async {
       final harness = await _Harness.create('owner-a');
       addTearDown(harness.dispose);
+      await harness.service.open('owner-a');
       final serialized = SerializedIdentitySession(
         AccountIdentity(
           uid: 'owner-a',
@@ -247,6 +251,43 @@ void main() {
       expect(disabled.supportsAiMealAssistant, isFalse);
       expect(disabled.createAiMealAssistant, throwsStateError);
       expect(disabled.createAiMealDraftHandoff, throwsStateError);
+    },
+  );
+
+  test(
+    'bound-owner sync executes inside serialized transition without deadlock',
+    () async {
+      final harness = await _Harness.create('owner-a');
+      addTearDown(harness.dispose);
+      await harness.service.open('owner-a');
+      final serialized = SerializedIdentitySession(
+        AccountIdentity(
+          uid: 'owner-a',
+          emailVerified: true,
+          adultEligible: true,
+          linkedProviders: const {AccountProvider.password},
+        ),
+      );
+      final sync = _SyncTransport();
+      final features = ActivatedAccountFeatures(
+        databases: harness.service,
+        ownerSession: VerifiedAdultOwnerSession(serialized),
+        syncUpload: sync,
+        syncPull: sync,
+      );
+
+      final result = await serialized
+          .transition<bool>((identity) async {
+            final execution = await features.createSyncExecutionForBoundOwner(
+              identity!.uid,
+            );
+            await execution.run();
+            return const IdentityTransition(identity: null, value: true);
+          })
+          .timeout(const Duration(seconds: 5));
+
+      expect(result, isTrue);
+      expect(sync.pulledOwners, ['owner-a']);
     },
   );
 }

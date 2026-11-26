@@ -174,7 +174,9 @@ TrustedSehatCoachBootstrap composeTrustedConsumerRuntime({
         bootstrap.core.runtime.activeOwnerId != ownerId) {
       throw StateError('Synchronization owner is not the active account');
     }
-    await (await bootstrap.core.features.createSyncExecution()).run();
+    await (await bootstrap.core.features.createSyncExecutionForBoundOwner(
+      ownerId,
+    )).run();
   }
 
   Future<void> profileCommitted(OnboardingState profile) async {

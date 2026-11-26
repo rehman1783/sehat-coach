@@ -452,6 +452,34 @@ class ActivatedAccountFeatures {
     });
   }
 
+  /// Creates sync for an owner already serialized by an exclusive lifecycle
+  /// transition (such as sign-out or account switch), avoiding re-entering
+  /// [SerializedIdentitySession] while still enforcing active-owner continuity.
+  Future<SyncExecutionCoordinator> createSyncExecutionForBoundOwner(
+    String ownerId,
+  ) async {
+    if (ownerId.trim().isEmpty || _databases.activeOwnerId != ownerId) {
+      throw StateError('Active database owner does not match sync owner');
+    }
+    final database = await _databases.open(ownerId);
+    if (_databases.activeOwnerId != ownerId) {
+      throw StateError('Active database owner changed during composition');
+    }
+    final boundSession = _BoundActiveOwnerSession(
+      ownerId: ownerId,
+      activeOwnerId: () => _databases.activeOwnerId,
+    );
+    final execution = _createSyncExecution(
+      database,
+      ownerId,
+      ownerSession: boundSession,
+    );
+    if (execution == null) {
+      throw StateError('Trusted synchronization transport is unavailable');
+    }
+    return execution;
+  }
+
   Future<SyncTriggerCoordinator> createSyncTriggers(
     Stream<bool> networkLink, {
     SyncResultListener? onResult,
@@ -465,23 +493,25 @@ class ActivatedAccountFeatures {
 
   SyncExecutionCoordinator? _createSyncExecution(
     db.AppDatabase database,
-    String ownerId,
-  ) {
+    String ownerId, {
+    AuthenticatedOwnerSession? ownerSession,
+  }) {
     final upload = _syncUpload;
     final pull = _syncPull;
     if (upload == null && pull == null) return null;
     if (upload == null || pull == null) {
       throw StateError('Upload and pull transports must be supplied together');
     }
+    final session = ownerSession ?? _ownerSession;
     return SyncExecutionCoordinator(
       SyncCycleCoordinator(
         SyncUploadCoordinator(
-          _ownerSession,
+          session,
           DriftLocalChangeStore(database, ownerId),
           upload,
         ),
         SyncPullCoordinator(
-          _ownerSession,
+          session,
           DriftPullApplyStore(database, ownerId),
           pull,
         ),
@@ -735,5 +765,23 @@ class ActivatedAccountFeatures {
         unit: profile.unit,
       );
     });
+  }
+}
+
+class _BoundActiveOwnerSession implements AuthenticatedOwnerSession {
+  const _BoundActiveOwnerSession({
+    required this.ownerId,
+    required this.activeOwnerId,
+  });
+
+  final String ownerId;
+  final String? Function() activeOwnerId;
+
+  @override
+  Future<T> withOwner<T>(Future<T> Function(String ownerId) operation) async {
+    if (ownerId.trim().isEmpty || activeOwnerId() != ownerId) {
+      throw StateError('Active database owner does not match sync owner');
+    }
+    return operation(ownerId);
   }
 }
