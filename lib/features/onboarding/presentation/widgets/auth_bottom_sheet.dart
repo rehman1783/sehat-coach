@@ -160,7 +160,9 @@ class _AuthBottomSheetState extends State<AuthBottomSheet> {
     });
     try {
       await widget.onComplete();
-      if (mounted) Navigator.pop(context, true);
+      if (mounted && (ModalRoute.of(context)?.isCurrent ?? false)) {
+        Navigator.pop(context, true);
+      }
     } on Object {
       if (!mounted) return;
       setState(() {

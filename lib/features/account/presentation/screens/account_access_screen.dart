@@ -112,11 +112,13 @@ class _CredentialsFormState extends State<_CredentialsForm> {
   }
 
   Future<void> _submitPassword() async {
+    FocusManager.instance.primaryFocus?.unfocus();
     await controller.submitPassword();
     _passwordController.clear();
   }
 
   Future<void> _switchMode(bool creating) async {
+    FocusManager.instance.primaryFocus?.unfocus();
     _passwordController.clear();
     if (creating) {
       controller.showSignIn();

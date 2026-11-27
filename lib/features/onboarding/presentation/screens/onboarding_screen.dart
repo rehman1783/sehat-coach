@@ -173,6 +173,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   Future<void> _openAuthBottomSheet() async {
+    FocusManager.instance.primaryFocus?.unfocus();
     if (!_controller.adultAgeConfirmed) {
       _goToStep(3);
       return;

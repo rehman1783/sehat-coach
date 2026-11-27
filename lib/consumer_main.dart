@@ -2,7 +2,6 @@ import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
 import 'core/bootstrap/activated_shell_composition.dart';
@@ -103,11 +102,16 @@ class _SehatCoachConsumerAppState extends State<SehatCoachConsumerApp> {
   }
 
   Future<void> _returnToRoot() async {
-    navigatorKey.currentState?.popUntil((route) => route.isFirst);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final nav = navigatorKey.currentState;
+      if (nav != null && nav.canPop()) {
+        nav.popUntil((route) => route.isFirst);
+      }
+    });
   }
 
   @override
-  Widget build(BuildContext context) => GetMaterialApp(
+  Widget build(BuildContext context) => MaterialApp(
     navigatorKey: navigatorKey,
     title: AppConstants.appName,
     debugShowCheckedModeBanner: false,
