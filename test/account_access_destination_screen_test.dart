@@ -65,6 +65,26 @@ void main() {
     expect(controller.errorMessage.value, isNull);
     expect(find.text('Old provider detail'), findsNothing);
   });
+
+  testWidgets(
+    'adultEligibility destination renders custom onboarding builder when provided',
+    (tester) async {
+      final controller = _controller();
+      await tester.pumpWidget(
+        MaterialApp(
+          home: AccountAccessDestinationScreen(
+            controller: controller,
+            destination: AccountAccessDestination.adultEligibility,
+            adultEligibilityBuilder: (_) =>
+                const Scaffold(body: Text('GOOGLE ONBOARDING')),
+          ),
+        ),
+      );
+      await tester.pump();
+      expect(find.text('GOOGLE ONBOARDING'), findsOneWidget);
+      expect(find.text('AGE REQUIREMENT'), findsNothing);
+    },
+  );
 }
 
 AccountAccessController _controller() => AccountAccessController(

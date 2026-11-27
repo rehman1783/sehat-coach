@@ -133,6 +133,25 @@ class TrustedAccountApplicationComposition {
           ),
         );
       },
+      adultEligibilityBuilder: (_) {
+        if (pendingDraft.peek() case final pending?) {
+          accessController.declaredAge.value = pending.profile.age;
+          accessController.adultConfirmed.value = pending.adultAgeConfirmed;
+        }
+        return OnboardingScreen(
+          initialLanguage: initialLanguage,
+          detectLocation: detectLocation,
+          authenticatedCompletion: (profile, adultConfirmed) async {
+            pendingDraft.save(profile, adultAgeConfirmed: adultConfirmed);
+            accessController.declaredAge.value = profile.age;
+            accessController.adultConfirmed.value = adultConfirmed;
+            await accessController.submitAdultEligibility();
+            if (accessController.errorMessage.value case final error?) {
+              throw StateError(error);
+            }
+          },
+        );
+      },
       completePendingProfile: (loadStoredProfile) async {
         final existing = await loadStoredProfile();
         if (existing != null) {
@@ -167,6 +186,7 @@ class TrustedAccountApplicationComposition {
     required Widget missingProfile,
     AccountAccessController? accountAccessController,
     Future<void> Function(BuildContext context)? onStartCreateAccount,
+    WidgetBuilder? adultEligibilityBuilder,
     Future<OnboardingState?> Function(
       Future<OnboardingState?> Function() loadStoredProfile,
     )?
@@ -193,6 +213,7 @@ class TrustedAccountApplicationComposition {
       missingProfile: missingProfile,
       accountAccessController: accountAccessController,
       onStartCreateAccount: onStartCreateAccount,
+      adultEligibilityBuilder: adultEligibilityBuilder,
       completePendingProfile: completePendingProfile,
       bachatCities: bachatCities,
       bachatRepository: bachatRepository,
@@ -210,6 +231,7 @@ class TrustedAccountApplicationComposition {
     required Widget missingProfile,
     AccountAccessController? accountAccessController,
     Future<void> Function(BuildContext context)? onStartCreateAccount,
+    WidgetBuilder? adultEligibilityBuilder,
     Future<OnboardingState?> Function(
       Future<OnboardingState?> Function() loadStoredProfile,
     )?
@@ -224,6 +246,7 @@ class TrustedAccountApplicationComposition {
     final destinations = AccountAccessDestinations(
       accountAccessController ?? core.createAccountAccessController(),
       onStartCreateAccount: onStartCreateAccount,
+      adultEligibilityBuilder: adultEligibilityBuilder,
     );
     return TrustedAccountApplicationComposition(
       core: core,

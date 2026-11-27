@@ -94,4 +94,7 @@ class _Client implements GoogleAuthenticationClient {
     if (error case final error?) throw error;
     return token;
   }
+
+  @override
+  Future<void> signOut() async {}
 }

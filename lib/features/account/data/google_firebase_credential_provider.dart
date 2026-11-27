@@ -7,6 +7,8 @@ abstract interface class GoogleAuthenticationClient {
   bool supportsAuthenticate();
 
   Future<String?> authenticateIdToken();
+
+  Future<void> signOut();
 }
 
 class FlutterGoogleAuthenticationClient implements GoogleAuthenticationClient {
@@ -24,6 +26,9 @@ class FlutterGoogleAuthenticationClient implements GoogleAuthenticationClient {
   @override
   Future<String?> authenticateIdToken() async =>
       (await _signIn.authenticate()).authentication.idToken;
+
+  @override
+  Future<void> signOut() => _signIn.signOut();
 }
 
 /// Creates a short-lived Firebase credential from an explicit Google sign-in.
@@ -71,6 +76,14 @@ class GoogleFirebaseCredentialProvider {
     } on GoogleSignInException catch (error) {
       if (error.code == GoogleSignInExceptionCode.canceled) return null;
       throw GoogleSignInUnavailable(error.code.name);
+    }
+  }
+
+  Future<void> signOut() async {
+    try {
+      await _client.signOut();
+    } on Object {
+      // Best-effort Google Sign-In cache clearing during Firebase sign-out.
     }
   }
 }

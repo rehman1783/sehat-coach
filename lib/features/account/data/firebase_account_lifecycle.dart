@@ -79,6 +79,7 @@ class FirebaseAccountLifecycle
     required this.auth,
     required this.googleCredential,
     required this.nowUtc,
+    this.googleSignOut,
     this.recentAuthenticationWindow = const Duration(minutes: 5),
     this.allowedFutureClockSkew = const Duration(minutes: 1),
     this.adultEligibilityClaim = 'adult_eligible',
@@ -87,6 +88,7 @@ class FirebaseAccountLifecycle
   final FirebaseLifecycleAuthPort auth;
   final GoogleCredentialProvider googleCredential;
   final DateTime Function() nowUtc;
+  final Future<void> Function()? googleSignOut;
   final Duration recentAuthenticationWindow;
   final Duration allowedFutureClockSkew;
   final String adultEligibilityClaim;
@@ -103,6 +105,7 @@ class FirebaseAccountLifecycle
   Future<void> clearSession(String ownerId) async {
     _requireOwner(ownerId);
     await auth.signOut();
+    await googleSignOut?.call();
   }
 
   @override

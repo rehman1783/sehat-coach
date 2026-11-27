@@ -14,11 +14,13 @@ class AccountAccessDestinationScreen extends StatefulWidget {
     required this.controller,
     required this.destination,
     this.onStartCreateAccount,
+    this.adultEligibilityBuilder,
   });
 
   final AccountAccessController controller;
   final AccountAccessDestination destination;
   final Future<void> Function(BuildContext context)? onStartCreateAccount;
+  final WidgetBuilder? adultEligibilityBuilder;
 
   @override
   State<AccountAccessDestinationScreen> createState() =>
@@ -54,18 +56,29 @@ class _AccountAccessDestinationScreenState
   }
 
   @override
-  Widget build(BuildContext context) => AccountAccessScreen(
-    controller: widget.controller,
-    onStartCreateAccount: widget.onStartCreateAccount,
-  );
+  Widget build(BuildContext context) {
+    if (widget.destination == AccountAccessDestination.adultEligibility &&
+        widget.adultEligibilityBuilder != null) {
+      return widget.adultEligibilityBuilder!(context);
+    }
+    return AccountAccessScreen(
+      controller: widget.controller,
+      onStartCreateAccount: widget.onStartCreateAccount,
+    );
+  }
 }
 
 /// The three account-access destinations consumed by trusted app bootstrap.
 class AccountAccessDestinations {
-  const AccountAccessDestinations(this.controller, {this.onStartCreateAccount});
+  const AccountAccessDestinations(
+    this.controller, {
+    this.onStartCreateAccount,
+    this.adultEligibilityBuilder,
+  });
 
   final AccountAccessController controller;
   final Future<void> Function(BuildContext context)? onStartCreateAccount;
+  final WidgetBuilder? adultEligibilityBuilder;
 
   Widget get signedOut => AccountAccessDestinationScreen(
     controller: controller,
@@ -81,5 +94,6 @@ class AccountAccessDestinations {
   Widget get adultEligibility => AccountAccessDestinationScreen(
     controller: controller,
     destination: AccountAccessDestination.adultEligibility,
+    adultEligibilityBuilder: adultEligibilityBuilder,
   );
 }

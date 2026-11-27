@@ -123,6 +123,7 @@ createFlutterFireAccountServicesStartup({
           final lifecycle = FirebaseAccountLifecycle(
             auth: FlutterFireLifecycleAuthPort(auth),
             googleCredential: google.call,
+            googleSignOut: google.signOut,
             nowUtc: nowUtc,
           );
           final deletion = TrustedAccountDeletionGateway(
