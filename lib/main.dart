@@ -1,6 +1,5 @@
 import 'package:device_preview/device_preview.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 import 'core/config/app_config.dart';
 import 'core/bootstrap/application_startup.dart';
@@ -26,7 +25,7 @@ class SehatCoachApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
+    return MaterialApp(
       title: AppConstants.appName,
       debugShowCheckedModeBanner: false,
       locale: DevicePreview.locale(context),

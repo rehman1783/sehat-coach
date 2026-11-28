@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -226,8 +228,12 @@ class WaterDashboardCard extends StatelessWidget {
         ),
       ),
     );
-    target.dispose();
-    note.dispose();
+    unawaited(
+      Future<void>.delayed(const Duration(milliseconds: 400), () {
+        target.dispose();
+        note.dispose();
+      }),
+    );
     if (result == null) return;
     await controller.saveTarget(
       targetMilliliters: result.milliliters,

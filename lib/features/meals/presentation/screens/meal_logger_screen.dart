@@ -116,6 +116,7 @@ class _MealLoggerScreenState extends State<MealLoggerScreen> {
   }
 
   Future<void> _saveMeal() async {
+    FocusManager.instance.primaryFocus?.unfocus();
     final event = await widget.controller.save(
       occurredAt: DateTime.now(),
       rawUserInput: _search.text,

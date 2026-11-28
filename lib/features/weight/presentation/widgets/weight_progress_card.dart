@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -96,8 +98,12 @@ class _WeightProgressCardState extends State<WeightProgressCard> {
         );
       }
     }
-    weight.dispose();
-    note.dispose();
+    unawaited(
+      Future<void>.delayed(const Duration(milliseconds: 400), () {
+        weight.dispose();
+        note.dispose();
+      }),
+    );
   }
 
   @override
